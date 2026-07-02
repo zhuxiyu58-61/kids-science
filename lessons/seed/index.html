@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>种子的旅行 · 知识乐园</title>
+<style>
+  :root{ --grass:#f3fbe9; --ink:#3a5230; --ink2:#6f8a5c; --card:#fff; --green:#4db06a; --shadow:0 10px 30px rgba(70,120,50,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, #f7fdee 0%, #dff3c8 65%, #c6e8a6 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;}
+  .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;}
+  .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;}
+  .dot.on{background:var(--green); transform:scale(1.2);}
+
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;}
+  .scene.active{display:flex;}
+
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .mascot{font-size:110px; animation:bob 2s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+  .introCard{background:var(--card); border-radius:26px; padding:24px 30px; box-shadow:var(--shadow); max-width:560px; font-size:clamp(17px,2.5vw,22px); font-weight:800; line-height:1.7;}
+  .introCard b{color:var(--green);}
+  .bigbtn{border:none; border-radius:22px; padding:16px 40px; font-size:21px; font-weight:900; color:#fff; background:linear-gradient(160deg,#7bd37e,#43a860); box-shadow:var(--shadow); cursor:pointer; letter-spacing:2px; margin-top:20px; transition:transform .1s;}
+  .bigbtn:active{transform:scale(.95);}
+
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:16px; padding:9px 20px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);}
+  .exTab.on{background:var(--green); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;}
+  .exFoot{margin-top:8px;}
+  .subview{flex:1; min-height:0; display:none;}
+  .subview.on{display:flex;}
+
+  #ex-grow{gap:16px;}
+  @media (max-width:760px){ #ex-grow{flex-direction:column; overflow:auto;} }
+  .potWrap{flex:1; display:flex; align-items:center; justify-content:center; min-height:0;}
+  #cv{width:100%; max-width:340px; height:auto; display:block; filter:drop-shadow(0 12px 22px rgba(70,120,50,.22));}
+  .panel{flex:1.05; display:flex; flex-direction:column; gap:10px; min-height:0;}
+  .stateBadge{display:flex; align-items:center; gap:12px; background:var(--card); border-radius:20px; padding:12px 16px; box-shadow:var(--shadow);}
+  .stateBadge .face{font-size:40px; transition:transform .3s;}
+  .stateBadge .stateName{font-size:22px; font-weight:900;}
+  .stateBadge .stateTag{font-size:12px; color:#fff; padding:3px 11px; border-radius:20px; font-weight:800; margin-top:3px; display:inline-block; background:var(--green);}
+  .bubble{background:var(--card); border-radius:18px; padding:13px 16px; box-shadow:var(--shadow); font-size:clamp(14px,2vw,17px); line-height:1.6; font-weight:700;}
+  .bubble b{color:var(--green);}
+  .needBar{display:flex; gap:8px; align-items:center; background:#eefbe6; border-radius:14px; padding:9px 13px; font-size:14px; font-weight:800; color:#4a7a3a;}
+  .need{display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:12px; background:#fff; border:2px solid #d3ead0; opacity:.5;}
+  .need.ok{opacity:1; border-color:var(--green); background:#e4fbe4;}
+  .life{background:#eef7ff; border-radius:14px; padding:9px 13px; font-size:14px; font-weight:800; color:#3f7abe;}
+  .fact{background:#fff7e0; border-radius:14px; padding:9px 13px; font-size:13.5px; font-weight:700; color:#b07d1e; display:flex; align-items:center; gap:8px;}
+  .fact span{flex:1; line-height:1.5;}
+  .fact button{border:none; background:#ffe0a3; color:#8a5d10; font-weight:800; border-radius:12px; padding:6px 10px; font-size:12px; cursor:pointer; white-space:nowrap;}
+  .controls{display:flex; gap:10px; margin-top:2px;}
+  .btn{flex:1; border:none; border-radius:18px; padding:14px 6px; font-size:18px; font-weight:900; color:#fff; cursor:pointer; box-shadow:var(--shadow); transition:transform .1s;}
+  .btn:active{transform:scale(.94);}
+  .btn.water{background:linear-gradient(160deg,#7ad6ff,#2f9bff);}
+  .btn.sun{background:linear-gradient(160deg,#ffd15b,#ff9f2e);}
+  .btn.reset{flex:.5; background:linear-gradient(160deg,#cfe0c4,#9bb98c); font-size:14px;}
+  .btn .em{font-size:22px; display:block;}
+
+  /* 种子会旅行 */
+  #ex-travel{flex-direction:column; align-items:center; gap:10px;}
+  .travelGrid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; width:100%; max-width:720px;}
+  @media (max-width:640px){ .travelGrid{grid-template-columns:repeat(2,1fr);} }
+  .tcard{background:var(--card); border-radius:18px; padding:14px 10px; text-align:center; box-shadow:var(--shadow); cursor:pointer; border:3px solid transparent; transition:.15s;}
+  .tcard:active{transform:scale(.96);}
+  .tcard.on{border-color:var(--green); background:#eefbe6;}
+  .tcard .tico{font-size:44px;}
+  .tcard .tname{font-weight:900; font-size:16px; margin-top:4px;}
+  .tcap{background:var(--card); border-radius:18px; padding:14px 20px; box-shadow:var(--shadow); font-size:clamp(15px,2.2vw,19px); font-weight:800; max-width:720px; width:100%; text-align:center; line-height:1.6;}
+  .tcap b{color:var(--green);}
+
+  .nextHint{background:#fff7e0; border-radius:14px; padding:10px 14px; font-weight:800; color:#c98a2b; font-size:14px; text-align:center;}
+  .nextHint b{color:#e07a1e;}
+  .nextBtn{border:none; border-radius:18px; padding:14px; font-size:19px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#ffd36b,#ff9f43); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; display:none;}
+  .nextBtn:active{transform:scale(.97);}
+
+  /* 闯关 */
+  #s-game{align-items:center;}
+  .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;}
+  .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;}
+  .gsub.on{display:flex;}
+  .orderRow{display:flex; gap:12px; flex-wrap:wrap; justify-content:center; max-width:720px;}
+  .ocard{background:#fff; border-radius:18px; box-shadow:var(--shadow); padding:14px; text-align:center; cursor:pointer; width:120px; border:3px solid #e3efda; transition:.15s; position:relative;}
+  .ocard:active{transform:scale(.96);}
+  .ocard.done{border-color:var(--green); background:#eefbe6; cursor:default;}
+  .ocard .oico{font-size:44px;}
+  .ocard .oname{font-weight:800; font-size:15px; margin-top:4px;}
+  .ocard .onum{position:absolute; top:-10px; left:-10px; width:30px; height:30px; border-radius:50%; background:var(--green); color:#fff; font-weight:900; display:none; align-items:center; justify-content:center; font-size:16px;}
+  .ocard.done .onum{display:flex;}
+  .orderHint{margin-top:14px; font-weight:800; color:var(--ink2);}
+  .roundNext{display:none; margin-top:18px; text-align:center;}
+
+  .qcard{background:var(--card); border-radius:24px; box-shadow:var(--shadow); padding:22px 26px; max-width:560px; width:100%; text-align:center;}
+  .qcard .qico{font-size:52px;}
+  .qcard .qtext{font-size:20px; font-weight:900; margin:8px 0 16px;}
+  .qopts{display:flex; flex-direction:column; gap:10px;}
+  .qopt{border:3px solid #e3efda; background:#f6fdf1; border-radius:16px; padding:14px; font-size:17px; font-weight:800; color:var(--ink); cursor:pointer; transition:.15s;}
+  .qopt:active{transform:scale(.97);}
+  .qopt.right{border-color:#41c98a; background:#e4fbef;}
+  .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:16px; font-weight:800; min-height:22px;}
+  .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+
+  #s-finish{align-items:center; justify-content:center; text-align:center;}
+  .finishCard{background:var(--card); border-radius:28px; padding:26px 34px; box-shadow:var(--shadow); max-width:520px;}
+  .medal{font-size:110px; animation:pop .5s ease;}
+  @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:28px;}
+  .medalName{display:inline-block; background:linear-gradient(160deg,#9be07f,#4db06a); color:#fff; font-weight:900; font-size:19px; padding:8px 22px; border-radius:20px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:700; line-height:1.8; margin:0 0 18px; font-size:15px;}
+  .finishCard p b{color:var(--green);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;}
+  .finishBtns button{border:none; border-radius:18px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;}
+  .fb1{background:var(--green); color:#fff;} .fb2{background:#eef3ec; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">种子的旅行<small>科学 · 植物怎么长大、种子怎么旅行</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <!-- 1 开场 -->
+  <section class="scene active" id="s-intro">
+    <div class="mascot">🌱</div>
+    <div class="introCard"><b>一粒小种子，怎么长成一棵大植物？</b><br>它需要哪些东西才能长大？靠什么活下去？<br>当一回小园丁，亲手种一棵向日葵，边种边观察。</div>
+    <button class="bigbtn" onclick="go('explore')">开始种植 ▶</button>
+  </section>
+
+  <!-- 2 探索 -->
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tab-grow" onclick="switchEx('grow')">🌻 养大它</button>
+      <button class="exTab" id="tab-travel" onclick="switchEx('travel')">🌬️ 种子会旅行</button>
+    </div>
+    <div class="exBody">
+      <!-- 养大它 -->
+      <div class="subview on" id="ex-grow">
+        <div class="potWrap"><canvas id="cv" width="340" height="470"></canvas></div>
+        <div class="panel">
+          <div class="stateBadge">
+            <div class="face" id="face">🌰</div>
+            <div><div class="stateName" id="stateName">种子</div><span class="stateTag" id="stateTag">第 1 步</span></div>
+          </div>
+          <div class="bubble" id="bubble">我是一颗小<b>种子</b>，睡在泥土里。给我浇点水、晒晒太阳吧！</div>
+          <div class="needBar" id="needBar">这一步需要：
+            <span class="need" id="needW">💧 浇水</span>
+            <span class="need" id="needS">☀️ 阳光</span>
+          </div>
+          <div class="life" id="life">🌰 生活里的它：西瓜子、苹果核、花生、松果里的籽</div>
+          <div class="fact"><span id="factText">💡 你知道吗？一颗小小的种子，能长成比你高好多好多的大树！</span><button onclick="nextFact()">换一个</button></div>
+          <div class="controls">
+            <button class="btn water" onclick="giveWater()"><span class="em">💧</span>浇水</button>
+            <button class="btn sun" onclick="giveSun()"><span class="em">☀️</span>晒太阳</button>
+            <button class="btn reset" onclick="resetGrow()"><span class="em">🔄</span>重来</button>
+          </div>
+        </div>
+      </div>
+      <!-- 种子会旅行 -->
+      <div class="subview" id="ex-travel">
+        <div class="travelGrid" id="travelGrid">
+          <div class="tcard on" data-i="0"><div class="tico">🌬️</div><div class="tname">随风飞</div></div>
+          <div class="tcard" data-i="1"><div class="tico">🦊</div><div class="tname">挂身上</div></div>
+          <div class="tcard" data-i="2"><div class="tico">🐦</div><div class="tname">被鸟带走</div></div>
+          <div class="tcard" data-i="3"><div class="tico">🥥</div><div class="tname">水上漂</div></div>
+        </div>
+        <div class="tcap" id="tcap">🌬️ <b>蒲公英</b>的种子长着白白的小绒毛，风一吹，就像很多小降落伞一样飞到远方安家～</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🌱 把我从种子养到<b>结出新种子</b>，就能去闯关！（现在：<span id="stageNow">种子</span>）</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <!-- 3 闯关 -->
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 排排队<small>按顺序点：小种子是怎么长大的？</small></div>
+    <div class="gsub on" id="g-order">
+      <div class="orderRow" id="orderRow"></div>
+      <div class="orderHint" id="orderHint">从最开始的样子点起～</div>
+      <div class="roundNext" id="orderNext">
+        <div style="font-size:19px;font-weight:900;color:#2ba36a;margin-bottom:8px">排对啦！🎉</div>
+        <button class="bigbtn" onclick="startQuiz()">下一关 ▶</button>
+      </div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog">第 1 / 3 题</div>
+      <div class="qcard">
+        <div class="qico" id="qico">🌱</div>
+        <div class="qtext" id="qtext"></div>
+        <div class="qopts" id="qopts"></div>
+        <div class="qfb" id="qfb"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 徽章 -->
+  <section class="scene" id="s-finish">
+    <div class="finishCard">
+      <div class="medal">🏅</div>
+      <h2>太棒啦！</h2>
+      <div class="medalName">🎖 小小园丁</div>
+      <p>你搞清楚了：<br>• 植物一生：种子→发芽（先长根）→长叶→开花→结种子；<br>• 叶子靠<b>光合作用</b>，用阳光+水+空气自己制造养分；<br>• 种子会<b>传播</b>：随风飞、挂在动物身上、被鸟带走、顺水漂到远方安家。</p>
+      <div class="finishBtns">
+        <button class="fb2" onclick="location.reload()">再玩一次</button>
+        <button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button>
+      </div>
+    </div>
+  </section>
+
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+/* ===== 场景 ===== */
+const SCENES=['intro','explore','game','finish'];
+function go(name){
+  document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s-'+name).classList.add('active');
+  const idx=SCENES.indexOf(name);
+  SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx));
+  if(name==='finish') celebrate();
+}
+function switchEx(v){
+  document.getElementById('ex-grow').classList.toggle('on', v==='grow');
+  document.getElementById('ex-travel').classList.toggle('on', v==='travel');
+  document.getElementById('tab-grow').classList.toggle('on', v==='grow');
+  document.getElementById('tab-travel').classList.toggle('on', v==='travel');
+}
+
+/* ===== 养大它 ===== */
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+const W=cv.width, H=cv.height;
+const cx=W/2, soilY=H-96;
+const STAGES=[
+  {face:'🌰',name:'种子',text:'<b>种子</b>里藏着一点养分和一个小胚芽。浇水后种子吸饱水，就准备<b>发芽</b>了。',life:'🌰 种子举例：西瓜子、苹果核、花生、松果里的籽'},
+  {face:'🌱',name:'发芽',text:'种子<b>发芽</b>了：先长出<b>根</b>往下扎（吸水和养分），再顶出<b>芽</b>钻出泥土。',life:'🌱 发芽举例：豆芽、刚破土的小苗'},
+  {face:'🌿',name:'长叶子',text:'长出了<b>叶子</b>。叶子能用阳光、水和空气自己制造养分，这叫<b>光合作用</b>。',life:'🌿 叶子举例：青菜、小树苗的叶子'},
+  {face:'🌻',name:'开花',text:'植物<b>开花</b>了。花是用来繁殖的——蜜蜂帮它<b>传粉</b>，之后才能结出种子。',life:'🌻 花举例：向日葵、桃花、油菜花'},
+  {face:'🌰',name:'结种子',text:'花谢后<b>结出新种子</b>。种子成熟后会<b>传播</b>出去，在新地方长成新的植物。',life:'🍎 果实/种子举例：苹果、西瓜、向日葵瓜子'},
+];
+let stage=0, grow=0, hasW=false, hasS=false;
+const face=document.getElementById('face'),stateName=document.getElementById('stateName'),stateTag=document.getElementById('stateTag'),
+  bubble=document.getElementById('bubble'),life=document.getElementById('life'),needW=document.getElementById('needW'),needS=document.getElementById('needS'),
+  stageNow=document.getElementById('stageNow'),nextHint=document.getElementById('nextHint'),nextBtn=document.getElementById('nextBtn');
+function refreshNeed(){ needW.classList.toggle('ok',hasW); needS.classList.toggle('ok',hasS); }
+function tryGrow(){
+  refreshNeed();
+  if(hasW&&hasS&&stage<4){ stage++; hasW=false; hasS=false; setTimeout(refreshNeed,300); updateStage(); }
+}
+function giveWater(){ if(stage<4){ hasW=true; tryGrow(); } }
+function giveSun(){ if(stage<4){ hasS=true; tryGrow(); } }
+function resetGrow(){ stage=0; grow=0; hasW=false; hasS=false; refreshNeed(); updateStage(); }
+function updateStage(){
+  const st=STAGES[stage];
+  face.textContent=st.face; face.style.transform='scale(1.25)'; setTimeout(()=>face.style.transform='scale(1)',200);
+  stateName.textContent=st.name; stateTag.textContent= stage<4? '第 '+(stage+1)+' 步':'长成啦！';
+  bubble.innerHTML=st.text; life.textContent=st.life; stageNow.textContent=st.name;
+  document.getElementById('needBar').style.display = stage>=4 ? 'none' : 'flex';
+  if(stage>=4){ nextHint.style.display='none'; nextBtn.style.display='block'; }
+}
+updateStage(); refreshNeed();
+
+const FACTS=[
+ '💡 种子里存着一点养分，够小芽在钻出泥土、长出叶子之前用。',
+ '💡 叶子靠<b>光合作用</b>制造养分：用阳光 + 水 + 空气里的二氧化碳，做出植物需要的“食物”。',
+ '💡 植物的<b>根</b>往下长找水和养分，<b>茎</b>往上长把叶子举到有阳光的地方。',
+ '💡 向日葵会朝着太阳转，是为了让叶子和花接到更多阳光，做更多养分。',
+ '💡 蒲公英种子轻、带绒毛，苍耳种子带小钩——都是为了把种子<b>传播</b>到更远的地方。'
+];
+let fi=0; function nextFact(){ fi=(fi+1)%FACTS.length; document.getElementById('factText').textContent=FACTS[fi]; }
+
+function drawPot(){
+  // 泥土
+  ctx.fillStyle='#c98a52'; ctx.beginPath();
+  ctx.moveTo(cx-95,soilY); ctx.lineTo(cx+95,soilY); ctx.lineTo(cx+78,H-20); ctx.lineTo(cx-78,H-20); ctx.closePath(); ctx.fill();
+  ctx.fillStyle='#5b3d22'; ctx.fillRect(cx-95,soilY-4,190,14);
+  // 花盆口
+  ctx.fillStyle='#e5915a'; ctx.fillRect(cx-102,soilY-16,204,18);
+}
+function drawLeaf(x,y,ang,size,col){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(ang); ctx.fillStyle=col;
+  ctx.beginPath(); ctx.ellipse(size*0.5,0,size,size*0.42,0,0,7); ctx.fill(); ctx.restore();
+}
+function drawPlant(){
+  const g=grow;
+  drawPot();
+  // 种子（埋土里）
+  if(g<0.6){ ctx.fillStyle='#8a5a2b'; ctx.beginPath(); ctx.ellipse(cx,soilY+18,11,15,0,0,7); ctx.fill();
+    ctx.strokeStyle='#5b3d22'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(cx,soilY+6); ctx.lineTo(cx,soilY+30); ctx.stroke(); }
+  if(g<0.05) return;
+  // 茎
+  const stemH = Math.min(Math.max(g-0.4,0)/3.6,1) * 250;
+  const topY = soilY - stemH;
+  ctx.strokeStyle='#4aa653'; ctx.lineWidth=9; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(cx,soilY); ctx.lineTo(cx,topY); ctx.stroke();
+  // 叶子
+  if(g>1.4){ const ls=Math.min(g-1.4,1)*36;
+    drawLeaf(cx,soilY-stemH*0.45,-0.5,ls,'#5cc063');
+    drawLeaf(cx,soilY-stemH*0.62,Math.PI+0.5,ls,'#4aa653'); }
+  // 花
+  if(g>2.4){ const fs=Math.min(g-2.4,1)*40;
+    ctx.fillStyle='#ffc93c';
+    for(let a=0;a<12;a++){ const an=a/12*Math.PI*2; drawLeaf(cx+Math.cos(an)*fs*0.5, topY+Math.sin(an)*fs*0.5, an, fs*0.7,'#ffc93c'); }
+    ctx.fillStyle='#8a5a2b'; ctx.beginPath(); ctx.arc(cx,topY,fs*0.55,0,7); ctx.fill();
+    // 结种子：花心点点 + 飞走的种子
+    if(g>3.6){ ctx.fillStyle='#4a2f16';
+      for(let k=0;k<10;k++){ const an=k/10*Math.PI*2; ctx.beginPath(); ctx.arc(cx+Math.cos(an)*fs*0.28,topY+Math.sin(an)*fs*0.28,2.4,0,7); ctx.fill(); }
+      const fl=(Date.now()/1000)%2;
+      ctx.fillStyle='#a9803f'; ctx.globalAlpha=1-fl/2;
+      ctx.beginPath(); ctx.ellipse(cx+fs*0.8+fl*40, topY-fl*30, 4,6,0.5,0,7); ctx.fill();
+      ctx.strokeStyle='#d9c39a'; ctx.lineWidth=1.5;
+      for(let w=0;w<3;w++){ const wa=-0.6+w*0.4; ctx.beginPath(); ctx.moveTo(cx+fs*0.8+fl*40,topY-fl*30-6); ctx.lineTo(cx+fs*0.8+fl*40+Math.cos(wa)*8,topY-fl*30-14); ctx.stroke(); }
+      ctx.globalAlpha=1;
+    }
+  }
+}
+function tickGrow(){
+  grow += (stage-grow)*0.06;
+  ctx.clearRect(0,0,W,H);
+  drawPlant();
+  requestAnimationFrame(tickGrow);
+}
+tickGrow();
+
+/* ===== 种子会旅行 ===== */
+const TRAVEL=[
+  '🌬️ <b>蒲公英</b>的种子长着白白的小绒毛，风一吹，就像很多小降落伞一样飞到远方安家～',
+  '🦊 <b>苍耳</b>的种子身上有小钩子，会悄悄挂在小狗、小狐狸的毛上，被带到很远的地方。',
+  '🐦 甜甜的<b>果子</b>被小鸟吃掉，里面的种子随小鸟飞走，拉出来就在新地方发芽啦。',
+  '🥥 <b>椰子</b>又大又能浮在水上，顺着海水漂呀漂，漂到别的小岛上生根。'
+];
+document.querySelectorAll('#travelGrid .tcard').forEach(c=>{
+  c.addEventListener('click',()=>{ document.querySelectorAll('#travelGrid .tcard').forEach(x=>x.classList.remove('on'));
+    c.classList.add('on'); document.getElementById('tcap').innerHTML=TRAVEL[+c.dataset.i]; });
+});
+
+/* ===== 闯关1：排顺序 ===== */
+const ORDER=[{i:'🌰',n:'种子'},{i:'🌱',n:'发芽'},{i:'🌿',n:'长叶'},{i:'🌻',n:'开花'},{i:'🍂',n:'结种子'}];
+let expect=0;
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+function buildOrder(){
+  const row=document.getElementById('orderRow'); row.innerHTML='';
+  shuffle(ORDER.map((o,idx)=>({...o,idx}))).forEach(o=>{
+    const d=document.createElement('div'); d.className='ocard'; d.dataset.idx=o.idx;
+    d.innerHTML=`<div class="onum"></div><div class="oico">${o.i}</div><div class="oname">${o.n}</div>`;
+    d.onclick=()=>pickOrder(d); row.appendChild(d);
+  });
+}
+function pickOrder(d){
+  if(d.classList.contains('done')) return;
+  if(+d.dataset.idx===expect){ d.classList.add('done'); d.querySelector('.onum').textContent=expect+1; expect++;
+    if(expect===ORDER.length){ document.getElementById('orderHint').textContent='全部排好啦！'; document.getElementById('orderNext').style.display='block'; }
+    else document.getElementById('orderHint').textContent='接着点第 '+(expect+1)+' 个～';
+  } else { d.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260});
+    document.getElementById('orderHint').textContent='🤔 这个还不到时候，再想想最先是什么？'; }
+}
+buildOrder();
+
+/* ===== 闯关2：判断题 ===== */
+const QUIZ=[
+  {ico:'🌑',q:'把绿豆放在完全黑暗的柜子里、天天浇水，会怎样？',opts:[['能发芽，但小苗又细又黄，长不好',1],['完全不会发芽',0],['长得又壮又绿',0]],fb:'种子靠自带养分能发芽，但没有阳光就不能光合作用，小苗会又细又黄。'},
+  {ico:'🌻',q:'向日葵总是朝着太阳，主要是为了？',opts:[['多晒太阳、多做养分（光合作用）',1],['长得好看',0],['因为怕黑',0]],fb:'朝向太阳能接到更多阳光，制造更多养分。'},
+  {ico:'🪂',q:'蒲公英种子又轻又带绒毛，这样的“设计”是为了？',opts:[['借风把种子传播到远处',1],['吸引蜜蜂',0],['好看',0]],fb:'轻+绒毛=容易被风带走，把种子传播得更远。'},
+  {ico:'🌿',q:'下面哪一组，是植物长大都必需的？',opts:[['阳光、水和空气',1],['糖果和牛奶',0],['电和电池',0]],fb:'植物靠阳光、水、空气（还有土里的养分）生长。'},
+];
+let qi=0;
+function startQuiz(){ document.getElementById('g-order').classList.remove('on'); document.getElementById('g-quiz').classList.add('on');
+  document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>选一个正确的答案</small>'; renderQ(); }
+function renderQ(){
+  const it=QUIZ[qi];
+  document.getElementById('qprog').textContent=`第 ${qi+1} / ${QUIZ.length} 题`;
+  document.getElementById('qico').textContent=it.ico; document.getElementById('qtext').textContent=it.q;
+  const box=document.getElementById('qopts'); box.innerHTML=''; document.getElementById('qfb').textContent='';
+  it.opts.forEach(([label,ok])=>{ const b=document.createElement('div'); b.className='qopt'; b.textContent=label; b.onclick=()=>ans(b,ok,it.fb); box.appendChild(b); });
+}
+function ans(el,ok,fb){
+  const box=document.getElementById('qfb');
+  if(ok){ el.classList.add('right'); document.querySelectorAll('#qopts .qopt').forEach(o=>o.style.pointerEvents='none');
+    box.style.color='#2ba36a'; box.textContent='✅ 答对啦！'+fb;
+    setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1300);
+  } else { el.classList.add('wrong'); el.style.pointerEvents='none'; box.style.color='#e06060'; box.textContent='🤔 再想想～'; }
+}
+
+/* ===== 徽章记录 + 撒花 ===== */
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1';
+  const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}');
+  d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)};
+  const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t);
+  localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('seed','🌱','小小园丁');
+  const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight;
+  const cols=['#7bd37e','#ffd36b','#3aa7ff','#41c98a','#ff9f43','#ff8ac0'];
+  const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++;
+    bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();});
+    if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})();
+}
+
+/* 深链调试 */
+if(location.hash){const h=location.hash.slice(1);
+  if(h==='grown'){go('explore');stage=4;grow=4;updateStage();}
+  else if(h==='mid'){go('explore');stage=2;grow=2;updateStage();}
+  else if(h==='travel'){go('explore');switchEx('travel');}
+  else if(h==='quiz'){go('game');startQuiz();}
+  else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>恐龙时代 · 知识乐园</title>
+<style>
+  :root{ --accent:#5a9e46; --bg1:#f2f7e4; --bg2:#d3e2b0; --ink:#3f4a2a; --ink2:#6f7d52; --card:#fff; --shadow:0 10px 30px rgba(90,110,50,.18); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:96px;}
+  .introCard{background:var(--card); border-radius:24px; padding:24px 30px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(16px,2.3vw,20px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#7dbf5c,#4d8a3a); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:20px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  #ex-dig{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  #cvD{width:100%; max-width:600px; height:auto; display:block; border-radius:18px; box-shadow:var(--shadow); cursor:crosshair; touch-action:none;}
+  .dCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(14px,2vw,17px); font-weight:800; max-width:600px; text-align:center; min-height:44px; display:flex; align-items:center; justify-content:center;} .dCap b{color:var(--accent);}
+  #ex-kinds{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  .tipRow{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; width:100%; max-width:680px;}
+  @media (max-width:600px){ .tipRow{grid-template-columns:repeat(2,1fr);} }
+  .tc{background:var(--card); border-radius:16px; padding:14px 6px; text-align:center; box-shadow:var(--shadow); cursor:pointer; border:3px solid transparent;} .tc:active{transform:scale(.95);} .tc.on{border-color:var(--accent); background:#eef7e6;}
+  .tc .ti{font-size:36px;} .tc .tn{font-weight:900; font-size:12px; margin-top:4px;}
+  .tipCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(15px,2.2vw,18px); font-weight:800; max-width:680px; width:100%; text-align:center; min-height:48px; display:flex; align-items:center; justify-content:center;} .tipCap b{color:var(--accent);}
+  .nextHint{background:#eef7e2; border-radius:14px; padding:10px 14px; font-weight:800; color:#5b8a3f; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#7dbf5c,#4d8a3a); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:14px; width:100%; max-width:560px; justify-content:center;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #bcd39a; border-radius:20px; padding:12px 8px; text-align:center; min-height:150px; transition:.2s;} .bin.over{border-color:var(--accent); background:#eef7e6;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:34px;} .bin .binName{font-weight:900; font-size:17px; margin-top:4px;} .bin .binHint{font-size:12px; color:var(--ink2); font-weight:700;}
+  .bin .binDrop{margin-top:8px; min-height:70px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:12px; margin-top:20px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:16px; box-shadow:var(--shadow); padding:10px 14px; text-align:center; cursor:grab; touch-action:none;} .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg);} .item.placed{cursor:default; box-shadow:none; padding:5px 7px;}
+  .item .itIco{font-size:30px;} .item.placed .itIco{font-size:22px;} .item .itName{font-weight:800; font-size:12px;} .item.placed .itName{font-size:10px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #dbe7c8; background:#f6faef; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#7dbf5c,#4d8a3a); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#eef3e8; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">恐龙时代<small>生命科学 · 化石与恐龙</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🦕</div>
+    <div class="introCard"><b>恐龙早在几千万年前就没有了，没有一个人亲眼见过它。</b><br>那我们怎么知道恐龙长什么样、多大、吃什么？<br>秘密藏在地下的<b>化石</b>里。今天你来当<b>古生物学家</b>，亲手挖一挖！</div>
+    <button class="bigbtn" onclick="go('explore')">开始挖化石 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">⛏️ 挖化石</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">🦖 认识恐龙</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-dig">
+        <canvas id="cvD" width="600" height="300"></canvas>
+        <div class="dCap" id="dCap">用手指在土上<b>来回刷</b>，把埋在地下的骨头一点点扫出来～</div>
+      </div>
+      <div class="subview" id="ex-kinds">
+        <div class="tipRow" id="tipRow">
+          <div class="tc on" data-i="0"><div class="ti">🦕</div><div class="tn">梁龙</div></div>
+          <div class="tc" data-i="1"><div class="ti">🦖</div><div class="tn">霸王龙</div></div>
+          <div class="tc" data-i="2"><div class="ti">🦏</div><div class="tn">三角龙</div></div>
+          <div class="tc" data-i="3"><div class="ti">🪶</div><div class="tn">会飞的</div></div>
+        </div>
+        <div class="tipCap" id="tipCap"><b>梁龙</b>：脖子超长的<b>食草</b>恐龙，用长脖子够到高高的树叶，个头能有好几辆公交车那么长。</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 把骨架刷出来 <b>大半</b>（<span id="dig">0</span>%），就能去闯关！</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 食草还是食肉<small>看牙齿和身体，把恐龙拖到对的一边</small></div>
+    <div class="gsub on" id="g-sort">
+      <div class="bins">
+        <div class="bin" data-k="herb"><div class="binIco">🌿</div><div class="binName">食草恐龙</div><div class="binHint">吃植物·牙齿平·常有护身武器</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="carn"><div class="binIco">🥩</div><div class="binName">食肉恐龙</div><div class="binHint">吃肉·尖牙利爪·跑得快</div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray">
+        <div class="item" data-k="herb"><div class="itIco">🦕</div><div class="itName">长脖梁龙</div></div>
+        <div class="item" data-k="carn"><div class="itIco">🦖</div><div class="itName">霸王龙</div></div>
+        <div class="item" data-k="herb"><div class="itIco">🦏</div><div class="itName">三角龙</div></div>
+        <div class="item" data-k="carn"><div class="itIco">🐊</div><div class="itName">迅猛龙</div></div>
+        <div class="item" data-k="herb"><div class="itIco">🦔</div><div class="itName">剑龙</div></div>
+        <div class="item" data-k="herb"><div class="itIco">🛡️</div><div class="itName">甲龙</div></div>
+      </div>
+      <div class="roundNext" id="sortNext"><div class="ok">全部答对！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>挖掘成功！</h2><div class="medalName">🎖 恐龙探险家</div>
+      <p>你像真正的古生物学家一样弄明白了：<br>• 没人见过恐龙，我们靠地下的<b>化石</b>（变成石头的骨头、脚印）来了解它；<br>• 看<b>牙齿和身体</b>就能猜出它吃什么：平牙、长脖、护甲多是<b>食草</b>，尖牙利爪是<b>食肉</b>；<br>• 恐龙很久以前<b>灭绝</b>了，但科学家还在不断挖出新化石，了解得越来越多。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再来一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-dig').classList.toggle('on',v==='A'); document.getElementById('ex-kinds').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='block'; }
+
+/* ===== 挖化石 ===== */
+const cvD=document.getElementById('cvD'), dc=cvD.getContext('2d'); const DW=cvD.width, DH=cvD.height;
+const COLS=40, ROWS=20, cw=DW/COLS, ch=DH/ROWS;
+let dug=Array.from({length:ROWS},()=>Array(COLS).fill(false));
+// 骨架：一串骨头坐标（组成一条卧龙的轮廓）
+const BONES=[
+  [6,14],[8,13],[10,12],[12,11],[14,11],[16,11.5], // 脖子往下到身体
+  [18,12],[20,12],[22,12],[24,12],[26,12],          // 脊背
+  [28,12.5],[30,13],[32,13.5],[34,14],              // 尾巴
+  [15,9],[16.5,8],                                   // 头
+  [19,15],[20,17],[24,15],[25,17],[30,15],[31,16.5] // 腿
+];
+function drawDig(){ dc.clearRect(0,0,DW,DH);
+  // 底层：岩石 + 化石骨头
+  dc.fillStyle='#e8dcc2'; dc.fillRect(0,0,DW,DH);
+  dc.font='bold 20px system-ui'; dc.textAlign='center'; dc.textBaseline='middle';
+  BONES.forEach(([bx,by])=>{ dc.save(); dc.translate(bx*cw+cw/2,by*ch); dc.fillStyle='#6b5a3a'; dc.fillText('🦴',0,0); dc.restore(); });
+  // 覆盖层：没挖开的泥土
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ if(!dug[r][c]){
+    const shade=((r*7+c*13)%20); dc.fillStyle=`rgb(${138-shade},${104-shade},${64-shade})`;
+    dc.fillRect(c*cw,r*ch,cw+0.6,ch+0.6);
+  }}
+}
+drawDig();
+let brushing=false, digCount=0, digDone=false; const TOTAL=ROWS*COLS;
+function brush(clientX,clientY){ const r=cvD.getBoundingClientRect(); const sx=DW/r.width, sy=DH/r.height;
+  const px=(clientX-r.left)*sx, py=(clientY-r.top)*sy; const cc0=px/cw|0, rr0=py/ch|0;
+  for(let r2=rr0-1;r2<=rr0+1;r2++)for(let c2=cc0-1;c2<=cc0+1;c2++){
+    if(r2>=0&&r2<ROWS&&c2>=0&&c2<COLS&&!dug[r2][c2]){ dug[r2][c2]=true; digCount++; } }
+  drawDig(); const pct=Math.round(digCount/TOTAL*100); document.getElementById('dig').textContent=pct;
+  if(pct>=15 && pct<70) document.getElementById('dCap').innerHTML='挖到骨头啦！这些<b>化石</b>是恐龙的骨头，几千万年慢慢变成了石头。继续刷～';
+  if(pct>=70 && !digDone){ digDone=true; unlockGame(); document.getElementById('dCap').innerHTML='🦖 整副<b>骨架</b>露出来啦！科学家就是这样拼出恐龙的样子的。去闯关吧～'; nextHint.innerHTML='✅ 骨架挖出来啦！点下面去闯关～'; }
+}
+cvD.addEventListener('pointerdown',e=>{ brushing=true; brush(e.clientX,e.clientY); e.preventDefault(); });
+cvD.addEventListener('pointermove',e=>{ if(brushing) brush(e.clientX,e.clientY); });
+addEventListener('pointerup',()=>brushing=false);
+
+/* ===== 认识恐龙 ===== */
+const TIP=['<b>梁龙</b>：脖子超长的<b>食草</b>恐龙，用长脖子够高处的树叶，身体能有好几辆公交车那么长。',
+ '<b>霸王龙</b>：厉害的<b>食肉</b>恐龙，满嘴又大又尖的牙、后腿粗壮，专门捕猎别的恐龙。',
+ '<b>三角龙</b>：<b>食草</b>恐龙，头上三只角、脖子后有大骨盾，是用来<b>防身</b>、吓退敌人的。',
+ '<b>会飞的</b>：天上飞的翼龙其实不算恐龙；而有些小恐龙长着羽毛，科学家认为<b>鸟类</b>就是它们的后代。'];
+document.querySelectorAll('#tipRow .tc').forEach(c=>c.addEventListener('click',()=>{ document.querySelectorAll('#tipRow .tc').forEach(x=>x.classList.remove('on')); c.classList.add('on'); document.getElementById('tipCap').innerHTML=TIP[+c.dataset.i]; }));
+
+/* ===== 闯关1 拖拽 ===== */
+const tray=document.getElementById('tray'); let active=null,ox=0,oy=0,placed=0; const T2=6;
+const binAt=(x,y)=>[...document.querySelectorAll('#g-sort .bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+document.querySelectorAll('#g-sort .item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return; active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top; el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el); el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px'; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b&&!b.classList.contains('filled'))b.classList.add('over'); }
+addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+  const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+  if(bin&&bin.dataset.k===el.dataset.k){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); bin.classList.add('filled'); placed++; if(placed===T2) document.getElementById('sortNext').style.display='block'; }
+  else { rst(); tray.appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+
+/* ===== 闯关2 判断 ===== */
+const QUIZ=[
+ {ico:'🔎',q:'没有人见过活着的恐龙，科学家主要靠什么了解它们？',opts:[['地下挖出的化石（骨头、脚印、蛋）',1],['问年纪很大的老爷爷',0],['看恐龙留下的照片',0]],fb:'化石是了解恐龙最重要的线索。'},
+ {ico:'🦴',q:'化石其实是什么？',opts:[['埋在地下、经过很久很久变成石头的骨头等',1],['恐龙用石头做的玩具',0],['刚死不久的骨头',0]],fb:'生物遗骸经过千万年慢慢石化，就成了化石。'},
+ {ico:'🦷',q:'挖到一只满嘴又尖又大牙齿、后腿很粗的恐龙，它最可能是？',opts:[['食肉恐龙',1],['食草恐龙',0],['只吃水果的恐龙',0]],fb:'尖牙利爪、跑得快，是食肉恐龙的特征。'},
+ {ico:'🌋',q:'关于恐龙的“灭绝”，下面哪句对？',opts:[['很久以前恐龙几乎都消失了，但科学家仍不断有新发现',1],['恐龙还成群活在深山里',0],['恐龙是被人类猎光的',0]],fb:'恐龙早已灭绝，人类出现得比它们晚很多。'},
+];
+let qi=0; function startQuiz(){ document.getElementById('g-sort').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>用“化石·食草食肉·灭绝”推一推</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='想想牙齿、身体给的线索～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('dino','🦕','恐龙探险家'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#7dbf5c','#ffd36b','#3aa7ff','#41c98a','#e0a94b','#b58bff']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

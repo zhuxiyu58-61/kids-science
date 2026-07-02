@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>水的三态 · 知识乐园</title>
+<style>
+  :root{ --sky1:#bfe9ff; --sky2:#e9f8ff; --ink:#25405a; --ink2:#5a7a92; --card:#fff; --blue:#2f8fe0; --shadow:0 10px 30px rgba(40,90,140,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--sky2) 0%, var(--sky1) 70%, #a9e0ff 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffff9c; transition:.3s;} .dot.on{background:var(--blue); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:96px;}
+  .introCard{background:var(--card); border-radius:24px; padding:24px 30px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(16px,2.3vw,20px); font-weight:700; line-height:1.7;} .introCard b{color:var(--blue);}
+  .introCard h2{margin:0 0 10px; font-size:24px;}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#5bb6ff,#2f8fe0); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:20px;} .bigbtn:active{transform:scale(.95);}
+
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--blue); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex; position:relative;} .subview{flex:1; min-height:0; display:none;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  #ex-change{gap:16px;} @media (max-width:760px){ #ex-change{flex-direction:column; overflow:auto;} }
+  .beakerWrap{flex:1; display:flex; align-items:center; justify-content:center; min-height:0;}
+  #cv{width:100%; max-width:340px; height:auto; display:block; filter:drop-shadow(0 12px 22px rgba(40,90,140,.2));}
+  .panel{flex:1.1; display:flex; flex-direction:column; gap:10px; min-height:0;}
+  .stateBadge{display:flex; align-items:center; gap:12px; background:var(--card); border-radius:18px; padding:12px 16px; box-shadow:var(--shadow);}
+  .stateBadge .face{font-size:38px; transition:transform .3s;} .stateBadge .stateName{font-size:22px; font-weight:900;}
+  .stateBadge .stateTag{font-size:12px; color:#fff; padding:3px 11px; border-radius:20px; font-weight:800; margin-top:3px; display:inline-block;}
+  .bubble{background:var(--card); border-radius:16px; padding:13px 16px; box-shadow:var(--shadow); font-size:clamp(14px,1.9vw,16px); line-height:1.6; font-weight:600;} .bubble b{color:var(--blue); font-weight:900;}
+  .fact{background:#eef6ff; border-radius:14px; padding:9px 13px; font-size:13.5px; font-weight:600; color:#356690; display:flex; align-items:center; gap:8px;} .fact span{flex:1; line-height:1.55;} .fact b{color:var(--blue);}
+  .fact button{border:none; background:#d3e8fb; color:#2c5f8a; font-weight:800; border-radius:12px; padding:6px 10px; font-size:12px; cursor:pointer; white-space:nowrap;}
+  .controls{display:flex; gap:10px; margin-top:2px;}
+  .btn{flex:1; border:none; border-radius:16px; padding:14px 6px; font-size:17px; font-weight:900; color:#fff; cursor:pointer; box-shadow:var(--shadow);} .btn:active{transform:scale(.94);}
+  .btn.heat{background:linear-gradient(160deg,#ffa14d,#ff6a3d);} .btn.cool{background:linear-gradient(160deg,#7ad6ff,#2f9bff);} .btn.reset{flex:.5; background:linear-gradient(160deg,#c9d6e2,#95a9bd); font-size:14px;}
+  .btn .em{font-size:20px; display:block;}
+  /* 先猜后验 overlay */
+  .predict{position:absolute; inset:0; background:rgba(233,248,255,.9); backdrop-filter:blur(2px); z-index:5; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:14px; border-radius:16px;}
+  .predict.hide{display:none;}
+  .predict .pcard{background:#fff; border-radius:22px; padding:22px 26px; box-shadow:var(--shadow); max-width:460px;}
+  .predict h3{margin:0 0 4px; font-size:20px;} .predict .psub{color:var(--ink2); font-weight:700; font-size:14px; margin-bottom:14px;}
+  .predict .popts{display:flex; gap:10px; justify-content:center;}
+  .predict .popt{border:3px solid #cfe4f5; background:#f4fbff; border-radius:16px; padding:14px 18px; font-size:18px; font-weight:900; cursor:pointer; color:var(--ink);}
+  .predict .popt:active{transform:scale(.95);}
+  .predict .pfb{margin-top:14px; font-weight:800; min-height:22px; font-size:15px;}
+  /* 水循环 */
+  #ex-cycle{flex-direction:column; align-items:center; gap:10px;}
+  #cyc{width:100%; max-width:620px; height:auto; display:block; border-radius:20px; box-shadow:var(--shadow);}
+  .cycSteps{display:flex; gap:6px; justify-content:center;} .cycStep{width:11px; height:11px; border-radius:50%; background:#ffffffb0;} .cycStep.on{background:var(--blue); transform:scale(1.25);}
+  .cycCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(14px,2vw,17px); font-weight:700; max-width:620px; width:100%; text-align:center; min-height:50px; display:flex; align-items:center; justify-content:center;} .cycCap b{color:var(--blue);}
+
+  .nextHint{background:#eef6ff; border-radius:14px; padding:10px 14px; font-weight:800; color:#356690; font-size:14px; text-align:center;} .nextHint b{color:var(--blue);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#5bb6ff,#2f8fe0); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 6px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:16px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:12px; width:100%; max-width:760px; justify-content:center; flex-wrap:wrap;}
+  .bin{flex:1; min-width:150px; background:#ffffffcc; border:4px dashed #b7d3e6; border-radius:18px; padding:12px 8px; text-align:center; min-height:120px; transition:.2s;} .bin.over{border-color:var(--blue); background:#eaf6ff;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binName{font-weight:900; font-size:18px;} .bin .binHint{font-size:12px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .bin .binDrop{margin-top:10px; min-height:44px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:12px; margin-top:18px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:16px; box-shadow:var(--shadow); padding:12px 18px; text-align:center; cursor:grab; touch-action:none; font-weight:900; font-size:19px; color:var(--blue);} .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg);} .item.placed{cursor:default; box-shadow:none; padding:6px 12px; font-size:15px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #e3eef7; background:#f6fbff; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#5bb6ff,#2f8fe0); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--blue);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--blue); color:#fff;} .fb2{background:#eef3f8; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">水的三态<small>科学 · 固态/液态/气态与它们之间的变化</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <!-- 1 开场 -->
+  <section class="scene active" id="s-intro">
+    <div class="kico">💧</div>
+    <div class="introCard"><h2>水会“变身”，你能解释吗？</h2>
+      同样是水，它有时是硬硬的<b>冰</b>，有时是流动的<b>水</b>，有时又变成看不见的<b>水蒸气</b>。
+      这三种样子叫做<b>固态、液态、气态</b>。到底是什么让它变来变去？当一回小科学家，动手试试看。</div>
+    <button class="bigbtn" onclick="go('explore')">开始研究 ▶</button>
+  </section>
+
+  <!-- 2 探索 -->
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tab-change" onclick="switchEx('change')">🔬 加热与冷却</button>
+      <button class="exTab" id="tab-cycle" onclick="switchEx('cycle')">🌍 水的循环</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-change">
+        <div class="predict" id="predict">
+          <div class="pcard">
+            <h3>先猜一猜 🤔</h3>
+            <div class="psub">水要加热到多少度，才会沸腾变成水蒸气？</div>
+            <div class="popts">
+              <div class="popt" onclick="guess(50,this)">50℃</div>
+              <div class="popt" onclick="guess(100,this)">100℃</div>
+              <div class="popt" onclick="guess(200,this)">200℃</div>
+            </div>
+            <div class="pfb" id="pfb"></div>
+          </div>
+        </div>
+        <div class="beakerWrap"><canvas id="cv" width="340" height="470"></canvas></div>
+        <div class="panel">
+          <div class="stateBadge"><div class="face" id="face">💧</div><div><div class="stateName" id="stateName">液态 · 水</div><span class="stateTag" id="stateTag" style="background:#2f8fe0">0℃～100℃</span></div></div>
+          <div class="bubble" id="bubble">用【加热】和【冷却】改变温度，观察水在三种状态之间怎么变化，注意看温度计。</div>
+          <div class="fact"><span id="factText">💡 水结成冰时体积会变大，所以冰比水轻，能<b>浮</b>在水面上。</span><button onclick="nextFact()">下一条</button></div>
+          <div class="controls">
+            <button class="btn heat" onclick="heat()"><span class="em">🔥</span>加热</button>
+            <button class="btn cool" onclick="cool()"><span class="em">❄️</span>冷却</button>
+            <button class="btn reset" onclick="resetTemp()"><span class="em">🔄</span>复位</button>
+          </div>
+        </div>
+      </div>
+      <div class="subview" id="ex-cycle">
+        <canvas id="cyc" width="620" height="340"></canvas>
+        <div class="cycSteps" id="cycSteps"></div>
+        <div class="cycCap" id="cycCap">☀️ 太阳晒热江河湖海，水面的水不断<b>蒸发</b>，变成水蒸气升上天空……</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 把三种状态都变出来（<span id="seenCount">1</span>/3），就能去闯关！</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <!-- 3 闯关 -->
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 给变化起名字<br><small>把 融化 / 凝固 / 蒸发 / 凝结 拖到对应的变化上</small></div>
+    <div class="gsub on" id="g-sort">
+      <div class="bins">
+        <div class="bin" data-k="melt"><div class="binName">🧊 → 💧</div><div class="binHint">冰 变成 水</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="freeze"><div class="binName">💧 → 🧊</div><div class="binHint">水 变成 冰</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="evap"><div class="binName">💧 → ☁️</div><div class="binHint">水 变成 水蒸气</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="cond"><div class="binName">☁️ → 💧</div><div class="binHint">水蒸气 变成 水</div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray">
+        <div class="item" data-k="melt">融化</div>
+        <div class="item" data-k="freeze">凝固</div>
+        <div class="item" data-k="evap">蒸发</div>
+        <div class="item" data-k="cond">凝结</div>
+      </div>
+      <div class="roundNext" id="sortNext"><div class="ok">全部答对！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <!-- 4 徽章 -->
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>研究完成！</h2><div class="medalName">🎖 水的研究员</div>
+      <p>你搞清楚了：<br>• <b>加热</b>让水温升高：冰<b>融化</b>成水，水到 100℃ <b>沸腾</b>、<b>蒸发</b>成水蒸气；<br>• <b>冷却</b>让水温下降：水蒸气<b>凝结</b>成水，水到 0℃ 以下<b>凝固</b>成冰；<br>• 天上的雨，就是水不停<b>蒸发→凝结→降落</b>的“水循环”。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再来一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active');
+  const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-change').classList.toggle('on', v==='change'); document.getElementById('ex-cycle').classList.toggle('on', v==='cycle');
+  document.getElementById('tab-change').classList.toggle('on', v==='change'); document.getElementById('tab-cycle').classList.toggle('on', v==='cycle'); }
+
+/* 先猜后验 */
+function guess(v,el){ document.querySelectorAll('.predict .popt').forEach(o=>o.style.pointerEvents='none'); const fb=document.getElementById('pfb');
+  if(v===100){ el.style.borderColor='#41c98a'; fb.style.color='#2ba36a'; fb.innerHTML='✅ 没错！水在 <b>100℃</b> 沸腾。动手验证一下吧。'; }
+  else { el.style.borderColor='#ff8a8a'; fb.style.color='#e06060'; fb.innerHTML='其实是 <b>100℃</b>。一起加热看看是不是。'; }
+  setTimeout(()=>document.getElementById('predict').classList.add('hide'),1400); }
+
+/* 烧杯 */
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d'); const W=cv.width, H=cv.height;
+const B={x:64,y:64,w:210,h:360}; B.bottom=B.y+B.h;
+let temp=25,target=25; const N=120,parts=[]; const cols=12, latSpace=B.w/cols;
+function lat(i){const c=i%cols,r=Math.floor(i/cols);return{x:B.x+latSpace*.5+c*latSpace,y:B.bottom-12-r*(latSpace*.86)};}
+for(let i=0;i<N;i++){const l=lat(i);parts.push({x:B.x+Math.random()*B.w,y:B.bottom-Math.random()*B.h*.5,vx:(Math.random()-.5)*2,vy:0,hx:l.x,hy:l.y});}
+function stateOf(t){return t<0?'ice':t<100?'water':'steam';}
+const ORDER={ice:0,water:1,steam:2};
+const INFO={
+  ice:{name:'固态 · 冰',tag:'0℃ 以下',color:'#5aa0d8',face:'🧊',text:'温度降到 <b>0℃ 以下</b>，水<b>凝固</b>成冰。冰是<b>固态</b>——有固定的形状，又硬又不会流动。'},
+  water:{name:'液态 · 水',tag:'0℃～100℃',color:'#2f8fe0',face:'💧',
+    tN:'现在是<b>液态</b>的水。液体会流动，装进什么形状的容器，就变成什么形状。试试加热到 100℃，或冷却到 0℃ 以下。',
+    tH:'温度升过 <b>0℃</b>，冰<b>融化</b>成水（固态 → 液态）。',
+    tC:'水蒸气遇冷<b>凝结</b>，又变回液态的水（气态 → 液态）。'},
+  steam:{name:'气态 · 水蒸气',tag:'100℃ 沸腾',color:'#7b8cff',face:'☁️',text:'温度到 <b>100℃</b>，水<b>沸腾</b>，变成<b>气态</b>的水蒸气散进空气里。真正的水蒸气是<b>看不见</b>的。'},
+};
+let lastState='water'; const seen={ice:false,water:true,steam:false};
+function heat(){target=Math.min(130,target+30);} function cool(){target=Math.max(-20,target-30);} function resetTemp(){target=25;}
+const face=document.getElementById('face'),stateName=document.getElementById('stateName'),stateTag=document.getElementById('stateTag'),bubble=document.getElementById('bubble'),seenCount=document.getElementById('seenCount'),nextHint=document.getElementById('nextHint'),nextBtn=document.getElementById('nextBtn');
+function updateUI(s,prev){ const info=INFO[s];
+  stateName.textContent=info.name; stateTag.textContent=info.tag; stateTag.style.background=info.color;
+  face.textContent=info.face; face.style.transform='scale(1.25)'; setTimeout(()=>face.style.transform='scale(1)',200);
+  let text=info.text; if(s==='water'){ text=(prev===undefined)?info.tN:(ORDER[prev]<ORDER[s])?info.tH:info.tC; }
+  bubble.innerHTML=text; seen[s]=true; const c=(seen.ice?1:0)+(seen.water?1:0)+(seen.steam?1:0); seenCount.textContent=c;
+  if(c===3){ nextHint.style.display='none'; nextBtn.style.display='block'; } }
+updateUI('water');
+const FACTS=[
+ '💡 水结成冰时体积会变大，所以冰比水轻，能<b>浮</b>在水面上。',
+ '💡 烧水冒的“白气”，其实是水蒸气遇冷变成的<b>小水滴</b>；真正的水蒸气看不见。',
+ '💡 湿衣服会变干，是水慢慢<b>蒸发</b>跑掉了；有太阳、有风时蒸发更快。',
+ '💡 0℃ 结冰、100℃ 沸腾——这两个温度很特别，科学家用它们来标记温度。',
+ '💡 冬天呼出的白气，是嘴里的水蒸气遇到冷空气<b>凝结</b>成的小水珠。'
+]; let fi=0; function nextFact(){ fi=(fi+1)%FACTS.length; document.getElementById('factText').innerHTML=FACTS[fi]; }
+
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function drawBeaker(){ctx.save();ctx.strokeStyle='rgba(120,180,220,.9)';ctx.lineWidth=6;ctx.lineJoin='round';const r=20;ctx.beginPath();
+  ctx.moveTo(B.x-12,B.y-26);ctx.lineTo(B.x,B.y-6);ctx.lineTo(B.x,B.bottom-r);ctx.arcTo(B.x,B.bottom,B.x+r,B.bottom,r);ctx.lineTo(B.x+B.w-r,B.bottom);ctx.arcTo(B.x+B.w,B.bottom,B.x+B.w,B.bottom-r,r);ctx.lineTo(B.x+B.w,B.y-6);ctx.lineTo(B.x+B.w+12,B.y-26);ctx.stroke();ctx.fillStyle='rgba(200,235,255,.35)';ctx.fill();ctx.restore();}
+function drawThermo(){const tx=W-26,ty=80,th=290;ctx.fillStyle='#e7f2fb';rr(tx-9,ty-10,18,th+20,10);ctx.fill();
+  const p=Math.max(0,Math.min(1,(temp+20)/150)),fh=th*p;ctx.fillStyle=temp<0?'#54c8ff':temp<100?'#2f8fe0':'#ff6a3d';rr(tx-5,ty+th-fh,10,fh+16,5);ctx.fill();ctx.beginPath();ctx.arc(tx,ty+th+14,12,0,7);ctx.fill();
+  ctx.fillStyle='#25405a';ctx.font='bold 18px system-ui';ctx.textAlign='center';ctx.fillText(Math.round(temp)+'°',tx,ty-18);
+  ctx.strokeStyle='#9fb8ca';ctx.lineWidth=2;ctx.font='bold 10px system-ui';[[0,'0'],[100,'100']].forEach(([t,l])=>{const yy=ty+th-th*((t+20)/150);ctx.beginPath();ctx.moveTo(tx-14,yy);ctx.lineTo(tx-10,yy);ctx.stroke();ctx.fillStyle='#7a94a8';ctx.textAlign='right';ctx.fillText(l,tx-17,yy+3);});}
+function tickBeaker(){ temp+=(target-temp)*.06; const s=stateOf(temp); if(s!==lastState){const prev=lastState;lastState=s;updateUI(s,prev);}
+  ctx.clearRect(0,0,W,H);
+  if(target>temp+2){for(let i=0;i<3;i++){ctx.fillStyle=`rgba(255,${140+Math.random()*80|0},60,.85)`;const fx=B.x+B.w*(.35+i*.15)+(Math.random()-.5)*8;ctx.beginPath();ctx.ellipse(fx,B.bottom+20,6,12+Math.random()*7,0,0,7);ctx.fill();}}
+  const wt=B.bottom-B.h*.5; drawBeaker(); if(s==='water'){ctx.fillStyle='rgba(90,190,255,.22)';ctx.fillRect(B.x+3,wt,B.w-6,B.bottom-wt);}
+  for(const p of parts){ if(s==='ice'){p.x+=(p.hx-p.x)*.12+(Math.random()-.5)*.7;p.y+=(p.hy-p.y)*.12+(Math.random()-.5)*.7;}
+    else if(s==='water'){p.vy+=.18;p.vx+=(Math.random()-.5)*.5;p.vx*=.95;p.x+=p.vx;p.y+=p.vy;if(p.y>B.bottom-10){p.y=B.bottom-10;p.vy*=-.25;}if(p.y<wt){p.vy+=.4;}if(p.x<B.x+8){p.x=B.x+8;p.vx*=-.5;}if(p.x>B.x+B.w-8){p.x=B.x+B.w-8;p.vx*=-.5;}}
+    else{p.vx+=(Math.random()-.5)*1;p.vy+=(Math.random()-.5)*1-.06;p.vx*=.98;p.vy*=.98;p.x+=p.vx;p.y+=p.vy;if(p.x<B.x+8||p.x>B.x+B.w-8){p.vx*=-1;p.x=Math.max(B.x+8,Math.min(B.x+B.w-8,p.x));}if(p.y<B.y+6){p.vy*=-1;p.y=B.y+6;}if(p.y>B.bottom-8){p.vy*=-1;p.y=B.bottom-8;}}
+    ctx.fillStyle=s==='ice'?'#aee2ff':s==='water'?'#4db4ff':'#c9beff';const rad=s==='ice'?6:s==='steam'?5:6.5;
+    if(s==='ice'){ctx.fillRect(p.x-rad,p.y-rad,rad*2,rad*2);}else{ctx.beginPath();ctx.arc(p.x,p.y,rad,0,7);ctx.fill();} }
+  drawThermo(); requestAnimationFrame(tickBeaker); }
+tickBeaker();
+
+/* 水循环 */
+const cyc=document.getElementById('cyc'), cc=cyc.getContext('2d'); const CW=cyc.width, CH=cyc.height, seaY=CH-66;
+const vapor=Array.from({length:24},()=>({x:60+Math.random()*210,y:seaY+Math.random()*36,sp:.5+Math.random()*.8,r:2+Math.random()*2}));
+const rain=Array.from({length:24},()=>({x:360+Math.random()*170,y:118+Math.random()*38,sp:2+Math.random()*2}));
+const CAP=['☀️ 太阳晒热江河湖海，水面的水不断<b>蒸发</b>，变成看不见的水蒸气升上天空。',
+ '☁️ 水蒸气升到高空遇冷，<b>凝结</b>成许多小水滴，聚成一朵朵<b>云</b>。',
+ '🌧️ 云里的小水滴越聚越多、越来越重，就落下来形成<b>雨</b>（有时是雪）。',
+ '🔁 雨水汇进江河、流回大海，再被晒热蒸发……这样不停循环，叫<b>水循环</b>。'];
+const stepsBox=document.getElementById('cycSteps'); CAP.forEach((_,i)=>{const d=document.createElement('div');d.className='cycStep'+(i===0?' on':'');stepsBox.appendChild(d);});
+let cycStep=0, cycFrame=0;
+function drawCyc(){ cycFrame++; if(cycFrame%200===0){ cycStep=(cycStep+1)%CAP.length; document.getElementById('cycCap').innerHTML=CAP[cycStep]; [...stepsBox.children].forEach((d,i)=>d.classList.toggle('on',i===cycStep)); }
+  const g=cc.createLinearGradient(0,0,0,CH); g.addColorStop(0,'#cdeeff'); g.addColorStop(1,'#eaf8ff'); cc.fillStyle=g; cc.fillRect(0,0,CW,CH);
+  cc.fillStyle='#ffd257'; cc.beginPath(); cc.arc(66,60,28,0,7); cc.fill(); cc.strokeStyle='#ffd257'; cc.lineWidth=4;
+  for(let a=0;a<8;a++){const an=a/8*Math.PI*2+cycFrame*.01;cc.beginPath();cc.moveTo(66+Math.cos(an)*36,60+Math.sin(an)*36);cc.lineTo(66+Math.cos(an)*46,60+Math.sin(an)*46);cc.stroke();}
+  cc.fillStyle='#5cb8f0'; cc.beginPath(); cc.moveTo(0,seaY); for(let x=0;x<=CW;x+=20){cc.lineTo(x,seaY+Math.sin((x+cycFrame*2)*.04)*4);} cc.lineTo(CW,CH); cc.lineTo(0,CH); cc.closePath(); cc.fill();
+  cc.fillStyle='#fff'; [[420,100,32],[458,90,38],[496,100,32],[458,116,40]].forEach(([x,y,r])=>{cc.beginPath();cc.arc(x,y,r,0,7);cc.fill();});
+  cc.fillStyle='rgba(255,255,255,.85)'; vapor.forEach(v=>{v.y-=v.sp; v.x+=Math.sin(v.y*.05)*.4; if(v.y<120){v.y=seaY+Math.random()*28;v.x=60+Math.random()*210;} cc.beginPath();cc.arc(v.x,v.y,v.r,0,7);cc.fill();});
+  arrow(150,seaY-18,150,142,'#8fd0ff');
+  cc.strokeStyle='#4aa3e8'; cc.lineWidth=3; rain.forEach(r=>{r.y+=r.sp; if(r.y>seaY){r.y=120+Math.random()*28;r.x=360+Math.random()*170;} cc.beginPath();cc.moveTo(r.x,r.y);cc.lineTo(r.x-2,r.y+8);cc.stroke();});
+  arrow(458,seaY-14,458,164,'#bcd8ee',true);
+  requestAnimationFrame(drawCyc); }
+function arrow(x1,y1,x2,y2,col,down){ cc.strokeStyle=col; cc.lineWidth=5; cc.beginPath(); cc.moveTo(x1,y1); cc.lineTo(x2,y2); cc.stroke(); const ah=down?1:-1; cc.beginPath(); cc.moveTo(x2,y2); cc.lineTo(x2-7,y2+10*ah); cc.moveTo(x2,y2); cc.lineTo(x2+7,y2+10*ah); cc.stroke(); }
+drawCyc();
+
+/* 闯关1：给变化起名字（拖拽配对） */
+const tray=document.getElementById('tray'); let active=null,ox=0,oy=0,placed=0; const TOTAL=4;
+const binAt=(x,y)=>[...document.querySelectorAll('#g-sort .bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+document.querySelectorAll('#g-sort .item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return; active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top; el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el); el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px'; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b&&!b.classList.contains('filled'))b.classList.add('over'); }
+addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+  const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+  if(bin&&bin.dataset.k===el.dataset.k&&!bin.classList.contains('filled')){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); bin.classList.add('filled'); placed++; if(placed===TOTAL) document.getElementById('sortNext').style.display='block'; }
+  else { rst(); tray.appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+
+/* 闯关2：应用推理题 */
+const QUIZ=[
+  {ico:'❄️',q:'把一杯水放进冰箱冷冻室（约 -18℃），过几小时会怎样？',opts:[['结成冰（凝固）',1],['变成水蒸气',0],['一点都不变',0]],fb:'温度降到 0℃ 以下，水凝固成冰。'},
+  {ico:'🥤',q:'夏天，从冰箱拿出的可乐罐外壁很快出现小水珠。这些水珠是哪来的？',opts:[['空气里的水蒸气遇冷凝结成的',1],['可乐从罐子里漏出来的',0],['罐子自己“出汗”',0]],fb:'空气里看不见的水蒸气，碰到冰冷的罐子就凝结成小水珠。'},
+  {ico:'👕',q:'湿衣服晾在有太阳、有风的地方干得更快，主要是因为？',opts:[['温度高、有风，水蒸发得更快',1],['衣服变轻了',0],['风把水滴吹碎了',0]],fb:'蒸发的快慢和温度、风有关，越热越通风蒸发越快。'},
+  {ico:'🍲',q:'烧开水时锅口冒出的“白气”，其实是什么？',opts:[['水蒸气遇冷凝结成的小水滴',1],['水蒸气本身',0],['白色的烟',0]],fb:'水蒸气是看不见的，白气是它一遇到冷空气凝结成的小水滴。'},
+];
+let qi=0; function startQuiz(){ document.getElementById('g-sort').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 用一用<small>把学到的知识用到生活里</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想，联系一下温度和状态变化～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('water','💧','水的研究员'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#ff6a3d','#ffd36b','#2f8fe0','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='cycle'){go('explore');switchEx('cycle');document.getElementById('predict').classList.add('hide');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h)){go(h);if(h==='explore')document.getElementById('predict').classList.remove('hide');} }
+</script>
+</body>
+</html>

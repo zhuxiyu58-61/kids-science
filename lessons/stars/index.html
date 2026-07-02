@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>星空星座 · 知识乐园</title>
+<style>
+  :root{ --accent:#6c7bd6; --bg1:#e9ecfb; --bg2:#c1c8ef; --ink:#2f3357; --ink2:#5f668f; --card:#fff; --shadow:0 10px 30px rgba(60,70,140,.18); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:96px;}
+  .introCard{background:var(--card); border-radius:24px; padding:24px 30px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(16px,2.3vw,20px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#8a97e6,#535fc0); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:20px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  #ex-join{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  #cvS{width:100%; max-width:600px; height:auto; display:block; border-radius:18px; box-shadow:var(--shadow); background:#171a3a; touch-action:none;}
+  .sCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(14px,2vw,17px); font-weight:800; max-width:600px; text-align:center; min-height:44px; display:flex; align-items:center; justify-content:center;} .sCap b{color:var(--accent);}
+  #ex-know{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  .tipRow{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; width:100%; max-width:680px;}
+  @media (max-width:600px){ .tipRow{grid-template-columns:repeat(2,1fr);} }
+  .tc{background:var(--card); border-radius:16px; padding:14px 6px; text-align:center; box-shadow:var(--shadow); cursor:pointer; border:3px solid transparent;} .tc:active{transform:scale(.95);} .tc.on{border-color:var(--accent); background:#eef0fc;}
+  .tc .ti{font-size:36px;} .tc .tn{font-weight:900; font-size:12px; margin-top:4px;}
+  .tipCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(15px,2.2vw,18px); font-weight:800; max-width:680px; width:100%; text-align:center; min-height:48px; display:flex; align-items:center; justify-content:center;} .tipCap b{color:var(--accent);}
+  .nextHint{background:#eef0fc; border-radius:14px; padding:10px 14px; font-weight:800; color:#5765c4; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#8a97e6,#535fc0); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:14px; width:100%; max-width:560px; justify-content:center;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #c2c8ef; border-radius:20px; padding:12px 8px; text-align:center; min-height:150px; transition:.2s;} .bin.over{border-color:var(--accent); background:#eef0fc;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:34px;} .bin .binName{font-weight:900; font-size:17px; margin-top:4px;} .bin .binHint{font-size:12px; color:var(--ink2); font-weight:700;}
+  .bin .binDrop{margin-top:8px; min-height:70px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:12px; margin-top:20px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:16px; box-shadow:var(--shadow); padding:10px 14px; text-align:center; cursor:grab; touch-action:none;} .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg);} .item.placed{cursor:default; box-shadow:none; padding:5px 7px;}
+  .item .itIco{font-size:30px;} .item.placed .itIco{font-size:22px;} .item .itName{font-weight:800; font-size:12px;} .item.placed .itName{font-size:10px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #d7dcf4; background:#f6f7fe; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#8a97e6,#535fc0); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#eef0f8; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">星空星座<small>自然科学 · 夜空的秘密</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">✨</div>
+    <div class="introCard"><b>晚上的星星一闪一闪，古人早就在看它们了。</b><br>他们把亮星星像连点游戏一样连起来，想象成勺子、猎人、动物——这就是<b>星座</b>。<br>今天你来当<b>观星者</b>，亲手连出最有名的一个：<b>北斗七星</b>！</div>
+    <button class="bigbtn" onclick="go('explore')">抬头看星星 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">✨ 连北斗七星</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">🌌 夜空的秘密</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-join">
+        <canvas id="cvS" width="600" height="300"></canvas>
+        <div class="sCap" id="sCap">按<b>1 → 7</b> 的顺序，点亮夜空里发亮的大星星，把它们连成一个<b>大勺子</b>～</div>
+      </div>
+      <div class="subview" id="ex-know">
+        <div class="tipRow" id="tipRow">
+          <div class="tc on" data-i="0"><div class="ti">🔭</div><div class="tn">什么是星座</div></div>
+          <div class="tc" data-i="1"><div class="ti">💫</div><div class="tn">星星为啥眨眼</div></div>
+          <div class="tc" data-i="2"><div class="ti">☀️</div><div class="tn">太阳也是星</div></div>
+          <div class="tc" data-i="3"><div class="ti">🧭</div><div class="tn">北极星指北</div></div>
+        </div>
+        <div class="tipCap" id="tipCap"><b>星座</b>其实是人把天上亮星星连起来、想象出的图案。这些星星离得很远很远，并不是真的靠在一起。</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 把<b>7 颗星</b>按顺序连成北斗七星，就能去闯关！（<span id="cnt">0</span>/7）</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 谁自己会发光<small>拖到“自己发光”或“反光才亮”一边</small></div>
+    <div class="gsub on" id="g-sort">
+      <div class="bins">
+        <div class="bin" data-k="self"><div class="binIco">🌟</div><div class="binName">自己会发光</div><div class="binHint">恒星，像太阳一样自己发光发热</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="refl"><div class="binIco">🌑</div><div class="binName">自己不发光</div><div class="binHint">靠反射别人的光才亮</div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray">
+        <div class="item" data-k="self"><div class="itIco">☀️</div><div class="itName">太阳</div></div>
+        <div class="item" data-k="self"><div class="itIco">✨</div><div class="itName">夜空的星</div></div>
+        <div class="item" data-k="refl"><div class="itIco">🌙</div><div class="itName">月亮</div></div>
+        <div class="item" data-k="refl"><div class="itIco">🌍</div><div class="itName">地球</div></div>
+        <div class="item" data-k="refl"><div class="itIco">🪐</div><div class="itName">土星</div></div>
+        <div class="item" data-k="self"><div class="itIco">🌟</div><div class="itName">北极星</div></div>
+      </div>
+      <div class="roundNext" id="sortNext"><div class="ok">全部答对！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>连成星座啦！</h2><div class="medalName">🎖 星空观察员</div>
+      <p>你抬头看懂了夜空：<br>• <b>星座</b>是人把亮星星连起来想象的图案，星星其实离得很远；<br>• 会自己发光发热的星叫<b>恒星</b>，<b>太阳</b>就是离我们最近的一颗恒星；<br>• <b>月亮</b>和地球自己不发光，是<b>反射</b>太阳光才亮的；<br>• 星星“<b>眨眼</b>”，是它的光穿过晃动的空气被抖了一下；<br>• <b>北极星</b>差不多总在正北方，古人靠它<b>辨方向</b>。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再来一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-join').classList.toggle('on',v==='A'); document.getElementById('ex-know').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='block'; }
+
+/* ===== 连北斗七星 ===== */
+const cvS=document.getElementById('cvS'), sc=cvS.getContext('2d'); const SW=cvS.width, SH=cvS.height;
+// 北斗七星（勺子形）坐标 + 一堆背景小星
+const DIP=[[110,90],[190,80],[270,95],[345,130],[420,120],[430,200],[350,215]];
+const BG=Array.from({length:60},()=>({x:Math.random()*SW,y:Math.random()*SH,r:0.6+Math.random()*1.4,t:Math.random()*6}));
+let joined=0, digDone=false;
+function nearestNext(x,y){ const p=DIP[joined]; const dx=x-p[0],dy=y-p[1]; return dx*dx+dy*dy < 34*34; }
+function drawSky(){ sc.clearRect(0,0,SW,SH); sc.fillStyle='#171a3a'; sc.fillRect(0,0,SW,SH);
+  // 背景碎星（闪烁）
+  BG.forEach(s=>{ s.t+=0.05; const a=0.4+0.4*Math.sin(s.t); sc.fillStyle='rgba(255,255,255,'+a+')'; sc.beginPath(); sc.arc(s.x,s.y,s.r,0,7); sc.fill(); });
+  // 已连的线
+  sc.strokeStyle='#ffe98a'; sc.lineWidth=2.4; sc.beginPath();
+  for(let i=0;i<joined;i++){ const p=DIP[i]; if(i===0)sc.moveTo(p[0],p[1]); else sc.lineTo(p[0],p[1]); } sc.stroke();
+  // 七星
+  DIP.forEach((p,i)=>{ const lit=i<joined, next=i===joined;
+    sc.fillStyle = lit? '#fff2a8' : (next? '#fff' : '#8f97c8');
+    sc.shadowBlur = (lit||next)?14:0; sc.shadowColor='#ffe98a';
+    sc.beginPath(); sc.arc(p[0],p[1], next?7:6, 0,7); sc.fill(); sc.shadowBlur=0;
+    sc.fillStyle = next? '#ffd45b' : '#c9cff0'; sc.font='bold 13px system-ui'; sc.textAlign='center'; sc.textBaseline='bottom';
+    sc.fillText(i+1, p[0], p[1]-9);
+  });
+  requestAnimationFrame(drawSky);
+}
+drawSky();
+function tap(clientX,clientY){ if(joined>=7)return; const r=cvS.getBoundingClientRect();
+  const x=(clientX-r.left)*(SW/r.width), y=(clientY-r.top)*(SH/r.height);
+  if(nearestNext(x,y)){ joined++; document.getElementById('cnt').textContent=joined;
+    if(joined<7) document.getElementById('sCap').innerHTML='点亮啦！接着点第 <b>'+(joined+1)+'</b> 颗～';
+    else if(!digDone){ digDone=true; unlockGame();
+      document.getElementById('sCap').innerHTML='🥄 <b>北斗七星</b>连成一个大勺子！它的勺口两颗星，能帮你找到<b>北极星</b>。';
+      document.getElementById('nextHint').innerHTML='✅ 北斗七星连好啦！点下面去闯关～'; }
+  } else { document.getElementById('sCap').innerHTML='🤔 要按<b>1→7</b>顺序点哦，下一颗是第 <b>'+(joined+1)+'</b> 颗。'; }
+}
+cvS.addEventListener('pointerdown',e=>{ tap(e.clientX,e.clientY); e.preventDefault(); });
+
+/* ===== 夜空的秘密 ===== */
+const TIP=['<b>星座</b>是人把天上亮星星连起来、想象出的图案（勺子、猎人…）。这些星其实离得很远很远，并没真的靠在一起。',
+ '星星“<b>眨眼</b>”，其实是它的光在到你眼睛前，穿过了不停晃动的<b>空气</b>，被抖了一下，看起来就一闪一闪。',
+ '<b>太阳</b>也是一颗星星（<b>恒星</b>），只是离我们最近，所以又大又亮。别的恒星太远了，看起来只是小小的光点。',
+ '<b>北极星</b>差不多总挂在正北方的天上。古人晚上迷路时，找到它就知道哪边是<b>北</b>，好辨别方向。'];
+document.querySelectorAll('#tipRow .tc').forEach(c=>c.addEventListener('click',()=>{ document.querySelectorAll('#tipRow .tc').forEach(x=>x.classList.remove('on')); c.classList.add('on'); document.getElementById('tipCap').innerHTML=TIP[+c.dataset.i]; }));
+
+/* ===== 闯关1 拖拽 ===== */
+const tray=document.getElementById('tray'); let active=null,ox=0,oy=0,placed=0; const T2=6;
+const binAt=(x,y)=>[...document.querySelectorAll('#g-sort .bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+document.querySelectorAll('#g-sort .item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return; active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top; el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el); el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px'; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b&&!b.classList.contains('filled'))b.classList.add('over'); }
+addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+  const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+  if(bin&&bin.dataset.k===el.dataset.k){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); bin.classList.add('filled'); placed++; if(placed===T2) document.getElementById('sortNext').style.display='block'; }
+  else { rst(); tray.appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+
+/* ===== 闯关2 判断 ===== */
+const QUIZ=[
+ {ico:'🔭',q:'天上的“星座”，比如北斗七星，其实是？',opts:[['人把亮星星连起来想象的图案',1],['真的用线拴在一起的星星',0],['一大块会发光的云',0]],fb:'星座是人想象连出来的，星星其实离得很远。'},
+ {ico:'☀️',q:'我们最熟悉的太阳，其实是一颗？',opts:[['离我们最近的恒星（会自己发光的星）',1],['特别大的月亮',0],['地球点着的一团火',0]],fb:'太阳是恒星，只是离我们最近才这么亮。'},
+ {ico:'🌙',q:'月亮晚上很亮，它的光是哪来的？',opts:[['自己不发光，是反射太阳的光',1],['月亮自己在燃烧发光',0],['是星星借给它的光',0]],fb:'月亮不发光，靠反射太阳光才亮。'},
+ {ico:'💫',q:'星星看起来一闪一闪“眨眼睛”，是因为？',opts:[['星光穿过晃动的空气，被抖了一下',1],['星星在跟我们打招呼',0],['星星一会儿亮一会儿灭',0]],fb:'是空气晃动让星光看起来闪烁。'},
+];
+let qi=0; function startQuiz(){ document.getElementById('g-sort').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>用“恒星·反光·星座”推一推</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='想想哪些星自己发光～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('stars','✨','星空观察员'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#8a97e6','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

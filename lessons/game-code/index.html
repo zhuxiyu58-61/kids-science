@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>游戏怎么听你的指令 · 知识乐园</title>
+<style>
+  :root{ --accent:#5b6ee0; --bg1:#eef0ff; --bg2:#c6cbf2; --ink:#2b3060; --ink2:#5f6698; --card:#fff; --shadow:0 10px 30px rgba(70,80,180,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:96px;}
+  .introCard{background:var(--card); border-radius:24px; padding:24px 30px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(16px,2.3vw,20px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#7d8bf0,#4a5bd0); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:20px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  #ex-cmd{gap:16px;} @media (max-width:760px){ #ex-cmd{flex-direction:column; overflow:auto;} }
+  .cWrap{flex:1.1; display:flex; align-items:center; justify-content:center; min-height:0;}
+  #cvC{width:100%; max-width:360px; height:auto; display:block; background:#f2f4ff; border-radius:18px; box-shadow:var(--shadow);}
+  .panel{flex:1; display:flex; flex-direction:column; gap:10px; min-height:0; justify-content:center;}
+  .cmdGrid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .cmd{border:none; border-radius:14px; padding:14px; font-size:16px; font-weight:900; color:#fff; cursor:pointer; box-shadow:var(--shadow); background:linear-gradient(160deg,#7d8bf0,#4a5bd0); text-align:left;} .cmd:active{transform:scale(.95);} .cmd .ce{font-size:22px; margin-right:6px;}
+  .bubble{background:var(--card); border-radius:16px; padding:13px 16px; box-shadow:var(--shadow); font-size:clamp(14px,2vw,16px); line-height:1.6; font-weight:600;} .bubble b{color:var(--accent); font-weight:900;}
+  #ex-prog{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  .progRow{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; width:100%; max-width:560px;}
+  .pc{background:var(--card); border-radius:16px; padding:16px 8px; text-align:center; box-shadow:var(--shadow); cursor:pointer; border:3px solid transparent;} .pc:active{transform:scale(.95);} .pc.on{border-color:var(--accent); background:#eef0ff;}
+  .pc .pe{font-size:38px;} .pc .pn{font-weight:900; font-size:13px; margin-top:4px;}
+  .progCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(15px,2.2vw,18px); font-weight:800; max-width:560px; width:100%; text-align:center; min-height:48px; display:flex; align-items:center; justify-content:center;} .progCap b{color:var(--accent);}
+  .nextHint{background:#eef0ff; border-radius:14px; padding:10px 14px; font-weight:800; color:#4a55c0; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#7d8bf0,#4a5bd0); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:14px; width:100%; max-width:560px; justify-content:center;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #b6bdec; border-radius:20px; padding:12px 8px; text-align:center; min-height:150px; transition:.2s;} .bin.over{border-color:var(--accent); background:#eef0ff;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:34px;} .bin .binName{font-weight:900; font-size:17px; margin-top:4px;} .bin .binHint{font-size:12px; color:var(--ink2); font-weight:700;}
+  .bin .binDrop{margin-top:8px; min-height:70px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:12px; margin-top:20px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:16px; box-shadow:var(--shadow); padding:10px 12px; text-align:center; cursor:grab; touch-action:none;} .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg);} .item.placed{cursor:default; box-shadow:none; padding:5px 7px;}
+  .item .itIco{font-size:28px;} .item.placed .itIco{font-size:22px;} .item .itName{font-weight:800; font-size:12px;} .item.placed .itName{font-size:10px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #dbe0f6; background:#f6f7ff; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#7d8bf0,#4a5bd0); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#eef0f6; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">游戏怎么听你的指令<small>做游戏 · 程序 / 事件→动作</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🕹️</div>
+    <div class="introCard"><b>你按跳跃键，蛋仔就跳；按方向键，它就跑。</b><br>游戏怎么知道你要它干嘛？<br>因为程序员提前给它写好了<b>指令</b>。来，你也指挥一个蛋仔！</div>
+    <button class="bigbtn" onclick="go('explore')">开始指挥 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🎮 指挥蛋仔</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">📜 什么是程序</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-cmd">
+        <div class="cWrap"><canvas id="cvC" width="360" height="320"></canvas></div>
+        <div class="panel">
+          <div class="bubble" id="cBubble">下面每个按钮都是一条<b>指令</b>。点一下，蛋仔就照着做——这就是游戏“听懂”你的原理。</div>
+          <div class="cmdGrid">
+            <button class="cmd" onclick="run('jump')"><span class="ce">⬆️</span>跳一下</button>
+            <button class="cmd" onclick="run('walk')"><span class="ce">➡️</span>向前走</button>
+            <button class="cmd" onclick="run('color')"><span class="ce">🎨</span>换颜色</button>
+            <button class="cmd" onclick="run('spin')"><span class="ce">🔄</span>转个圈</button>
+          </div>
+        </div>
+      </div>
+      <div class="subview" id="ex-prog">
+        <div class="progRow" id="progRow">
+          <div class="pc on" data-i="0"><div class="pe">🕹️</div><div class="pn">事件</div></div>
+          <div class="pc" data-i="1"><div class="pe">📏</div><div class="pn">规则</div></div>
+          <div class="pc" data-i="2"><div class="pe">🎬</div><div class="pn">动作</div></div>
+        </div>
+        <div class="progCap" id="progCap"><b>事件</b>：你在手柄或屏幕上的操作，比如“按了跳跃键”，就是给游戏发了一个信号。</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 用不同的指令指挥蛋仔 <b>3</b> 次，就能去闯关！（<span id="cnt">0</span>/3）</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 分一分<small>哪些是“你按的键”，哪些是“角色的反应”</small></div>
+    <div class="gsub on" id="g-sort">
+      <div class="bins">
+        <div class="bin" data-k="event"><div class="binIco">🕹️</div><div class="binName">你按的键</div><div class="binHint">事件</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="action"><div class="binIco">🎬</div><div class="binName">角色的反应</div><div class="binHint">动作</div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray">
+        <div class="item" data-k="event"><div class="itIco">⬆️</div><div class="itName">按跳跃键</div></div>
+        <div class="item" data-k="event"><div class="itIco">➡️</div><div class="itName">按方向键</div></div>
+        <div class="item" data-k="event"><div class="itIco">🔫</div><div class="itName">按开火键</div></div>
+        <div class="item" data-k="action"><div class="itIco">🦘</div><div class="itName">角色跳起</div></div>
+        <div class="item" data-k="action"><div class="itIco">🏃</div><div class="itName">角色移动</div></div>
+        <div class="item" data-k="action"><div class="itIco">💥</div><div class="itName">子弹发射</div></div>
+      </div>
+      <div class="roundNext" id="sortNext"><div class="ok">全部答对！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>指挥成功！</h2><div class="medalName">🎖 小小程序员</div>
+      <p>你搞清楚了：<br>• 游戏靠<b>程序（一条条指令）</b>工作；<br>• 你的操作是<b>事件</b>，程序里写好<b>规则</b>（如果…就…），角色就做出<b>动作</b>；<br>• 计算机很听话但很“笨”，只会照着写好的指令一步步做。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再来一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-cmd').classList.toggle('on',v==='A'); document.getElementById('ex-prog').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='block'; }
+
+/* 指挥蛋仔 */
+const cvC=document.getElementById('cvC'), gc=cvC.getContext('2d'); const CW=cvC.width, CH=cvC.height;
+const COLORS=[['#ffd15b','#ff9f2e'],['#7ad6ff','#2f9bff'],['#7ee08a','#3aa860'],['#ff8ac0','#e0559a']];
+let px=0, tx=0, jump=0, vy=0, spin=0, ci=0, used=new Set(), toast='';
+function run(cmd){ if(cmd==='jump'){ if(jump<1) vy=-11; toast='跳！'; } else if(cmd==='walk'){ tx=Math.min(tx+50,120); toast='向前走'; } else if(cmd==='color'){ ci=(ci+1)%COLORS.length; toast='换颜色'; } else if(cmd==='spin'){ spin+=Math.PI*2; toast='转圈'; }
+  used.add(cmd); document.getElementById('cnt').textContent=Math.min(used.size,3); document.getElementById('cBubble').innerHTML='你发出了一条<b>指令</b>「'+({jump:'跳一下',walk:'向前走',color:'换颜色',spin:'转个圈'})[cmd]+'」，蛋仔立刻照做——游戏就是这样听懂你的。'; if(used.size>=3) unlockGame(); setTimeout(()=>toast='',700); }
+function drawCmd(){ px+=(tx-px)*0.15; vy+=0.6; jump+=vy*0.06; if(jump>0){jump=0;vy=0;} spin*=0.9;
+  gc.clearRect(0,0,CW,CH); const cx=CW/2-40+px, cy=CH/2+20;
+  gc.fillStyle='#e6e9f7'; gc.fillRect(0,cy+70,CW,CH-(cy+70));
+  gc.fillStyle='rgba(60,60,120,.12)'; gc.beginPath(); gc.ellipse(cx,cy+70,42,10,0,0,7); gc.fill();
+  gc.save(); gc.translate(cx,cy+jump*10); gc.rotate(spin);
+  const col=COLORS[ci]; const g=gc.createLinearGradient(-46,-56,46,56); g.addColorStop(0,col[0]); g.addColorStop(1,col[1]);
+  gc.fillStyle=g; gc.beginPath(); gc.ellipse(0,0,46,56,0,0,7); gc.fill();
+  gc.fillStyle='rgba(255,255,255,.35)'; gc.beginPath(); gc.ellipse(-16,-20,13,15,0,0,7); gc.fill();
+  gc.fillStyle='#3a2333'; gc.beginPath(); gc.arc(-14,-4,5,0,7); gc.arc(14,-4,5,0,7); gc.fill();
+  gc.strokeStyle='#3a2333'; gc.lineWidth=3; gc.lineCap='round'; gc.beginPath(); gc.arc(0,8,12,0.15*Math.PI,0.85*Math.PI); gc.stroke();
+  gc.restore();
+  if(toast){ gc.fillStyle='#4a5bd0'; gc.font='bold 20px system-ui'; gc.textAlign='center'; gc.fillText(toast, cx, cy-64); }
+  requestAnimationFrame(drawCmd); }
+drawCmd();
+
+/* 什么是程序 */
+const PROG=['<b>事件</b>：你在手柄或屏幕上的操作，比如“按了跳跃键”，就是给游戏发了一个信号。',
+ '<b>规则</b>：程序员提前写好“<b>如果…就…</b>”，比如“如果按了跳跃键，就让角色向上跳”。',
+ '<b>动作</b>：游戏按照规则，让角色做出反应——跳起来、跑起来、开火。'];
+document.querySelectorAll('#progRow .pc').forEach(c=>c.addEventListener('click',()=>{ document.querySelectorAll('#progRow .pc').forEach(x=>x.classList.remove('on')); c.classList.add('on'); document.getElementById('progCap').innerHTML=PROG[+c.dataset.i]; }));
+
+/* 闯关1 拖拽 */
+const tray=document.getElementById('tray'); let active=null,ox=0,oy=0,placed=0; const TOTAL=6;
+const binAt=(x,y)=>[...document.querySelectorAll('#g-sort .bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+document.querySelectorAll('#g-sort .item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return; active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top; el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el); el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px'; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b&&!b.classList.contains('filled'))b.classList.add('over'); }
+addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+  const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+  if(bin&&bin.dataset.k===el.dataset.k){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); bin.classList.add('filled'); placed++; if(placed===TOTAL) document.getElementById('sortNext').style.display='block'; }
+  else { rst(); tray.appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+
+/* 闯关2 判断 */
+const QUIZ=[{ico:'⬆️',q:'你按跳跃键，蛋仔就跳。游戏能这样，是因为？',opts:[['程序员提前写好了指令（规则）',1],['蛋仔自己想跳',0],['手机会魔法',0]],fb:'程序员写好“如果…就…”的规则，游戏才知道怎么反应。'},
+ {ico:'📜',q:'计算机执行的一条条命令，合起来叫什么？',opts:[['程序（代码）',1],['图画',0],['音乐',0]],fb:'一条条命令合起来就是程序，也叫代码。'},
+ {ico:'📏',q:'“如果按了跳跃键，就让角色向上跳”——这是一条？',opts:[['规则 / 指令',1],['颜色',0],['声音',0]],fb:'这是一条“如果…就…”的规则。'},
+ {ico:'🤖',q:'计算机很“听话”但也很“笨”，它只会？',opts:[['照着写好的指令一步步做',1],['自己乱想',0],['不用教就全会',0]],fb:'计算机只会照指令做，所以指令要写清楚。'}];
+let qi=0; function startQuiz(){ document.getElementById('g-sort').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>把程序的道理用起来</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1400);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='想想事件→规则→动作～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('game-code','🕹️','小小程序员'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#7d8bf0','#ffd36b','#3aa7ff','#41c98a','#ff9f43','#b58bff']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>游戏里的假重力 · 知识乐园</title>
+<style>
+  :root{ --accent:#1f9db5; --bg1:#e6faff; --bg2:#b2e4ef; --ink:#1d4a54; --ink2:#4f7b84; --card:#fff; --shadow:0 10px 30px rgba(30,120,140,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:96px;}
+  .introCard{background:var(--card); border-radius:24px; padding:24px 30px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(16px,2.3vw,20px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#4bc0d6,#178a9f); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:20px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  #ex-grav{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  #cvP{width:100%; max-width:400px; height:auto; display:block; background:#f0fbfe; border-radius:18px; box-shadow:var(--shadow);}
+  .gBtns{display:flex; gap:10px; flex-wrap:wrap; justify-content:center;} .gBtns button{border:none; border-radius:14px; padding:12px 16px; font-weight:900; font-size:15px; color:#fff; cursor:pointer; box-shadow:var(--shadow);} .b1{background:#33a3bb;} .b2{background:#95a6ad;} .b3{background:#e0783f;} .b4{background:#bcc7cb;}
+  .gCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(14px,2vw,17px); font-weight:800; max-width:400px; text-align:center; min-height:44px; display:flex; align-items:center; justify-content:center;} .gCap b{color:var(--accent);}
+  #ex-eng{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  .engRow{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; width:100%; max-width:560px;}
+  .ec{background:var(--card); border-radius:16px; padding:16px 8px; text-align:center; box-shadow:var(--shadow); cursor:pointer; border:3px solid transparent;} .ec:active{transform:scale(.95);} .ec.on{border-color:var(--accent); background:#e6f8fb;}
+  .ec .ee{font-size:38px;} .ec .en{font-weight:900; font-size:13px; margin-top:4px;}
+  .engCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(15px,2.2vw,18px); font-weight:800; max-width:560px; width:100%; text-align:center; min-height:48px; display:flex; align-items:center; justify-content:center;} .engCap b{color:var(--accent);}
+  .nextHint{background:#e5f6fa; border-radius:14px; padding:10px 14px; font-weight:800; color:#1f8397; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#4bc0d6,#178a9f); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:14px; width:100%; max-width:560px; justify-content:center;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #a7dbe6; border-radius:20px; padding:12px 8px; text-align:center; min-height:150px; transition:.2s;} .bin.over{border-color:var(--accent); background:#e6f8fb;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:34px;} .bin .binName{font-weight:900; font-size:17px; margin-top:4px;} .bin .binHint{font-size:12px; color:var(--ink2); font-weight:700;}
+  .bin .binDrop{margin-top:8px; min-height:70px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:12px; margin-top:20px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:16px; box-shadow:var(--shadow); padding:10px 12px; text-align:center; cursor:grab; touch-action:none;} .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg);} .item.placed{cursor:default; box-shadow:none; padding:5px 7px;}
+  .item .itIco{font-size:28px;} .item.placed .itIco{font-size:22px;} .item .itName{font-weight:800; font-size:12px;} .item.placed .itName{font-size:10px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #d3ebf0; background:#f4fcfd; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#4bc0d6,#178a9f); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#eef4f5; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">游戏里的假重力<small>做游戏 · 物理引擎</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">⚙️</div>
+    <div class="introCard"><b>蛋仔从高台掉下来、撞到墙弹开、踩上弹板飞老高。</b><br>游戏里的“重力”和“弹力”是真的吗？<br>其实是电脑在飞快地<b>“算”</b>出来的。来玩玩这套计算。</div>
+    <button class="bigbtn" onclick="go('explore')">开始实验 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🧪 开关重力</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">🧮 游戏帮你算</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-grav">
+        <canvas id="cvP" width="400" height="300"></canvas>
+        <div class="gBtns">
+          <button class="b3" onclick="bounce()">⬆️ 弹一下</button>
+          <button class="b1" onclick="setGrav(true)">🌍 开重力</button>
+          <button class="b2" onclick="setGrav(false)">🌙 关重力</button>
+          <button class="b4" onclick="resetBall()">🔄 复位</button>
+        </div>
+        <div class="gCap" id="gCap">点“弹一下”，蛋仔会往上蹦，再被<b>重力</b>拉回来，落地还会<b>弹几下</b>。</div>
+      </div>
+      <div class="subview" id="ex-eng">
+        <div class="engRow" id="engRow">
+          <div class="ec on" data-i="0"><div class="ee">⬇️</div><div class="en">重力</div></div>
+          <div class="ec" data-i="1"><div class="ee">💥</div><div class="en">碰撞</div></div>
+          <div class="ec" data-i="2"><div class="ee">🏀</div><div class="en">弹力</div></div>
+        </div>
+        <div class="engCap" id="engCap"><b>重力</b>：把东西往<b>下</b>拉。游戏里蛋仔会往下掉，就是在模仿真实世界的重力。</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 试试“开重力/关重力/弹一下”，感受一下，就能去闯关！（<span id="cnt">0</span>/2）</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 是谁在起作用<small>拖到“重力”或“碰撞”一边</small></div>
+    <div class="gsub on" id="g-sort">
+      <div class="bins">
+        <div class="bin" data-k="grav"><div class="binIco">⬇️</div><div class="binName">重力（往下掉）</div><div class="binHint"></div><div class="binDrop"></div></div>
+        <div class="bin" data-k="hit"><div class="binIco">💥</div><div class="binName">碰撞（撞上反应）</div><div class="binHint"></div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray">
+        <div class="item" data-k="grav"><div class="itIco">🍎</div><div class="itName">苹果落地</div></div>
+        <div class="item" data-k="grav"><div class="itIco">🥚</div><div class="itName">蛋仔下坠</div></div>
+        <div class="item" data-k="grav"><div class="itIco">🪂</div><div class="itName">跳起后落回</div></div>
+        <div class="item" data-k="hit"><div class="itIco">🧱</div><div class="itName">撞墙停下</div></div>
+        <div class="item" data-k="hit"><div class="itIco">🏀</div><div class="itName">球弹回来</div></div>
+        <div class="item" data-k="hit"><div class="itIco">💢</div><div class="itName">两蛋相撞</div></div>
+      </div>
+      <div class="roundNext" id="sortNext"><div class="ok">全部答对！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>算明白啦！</h2><div class="medalName">🎖 物理引擎师</div>
+      <p>你搞清楚了：<br>• 游戏里的<b>重力</b>把东西往下拉、<b>碰撞</b>让它撞上就停或弹、<b>弹力</b>让它弹回来；<br>• 这些都是电脑在飞快地<b>计算</b>，负责计算的部分叫<b>物理引擎</b>；<br>• 关掉重力，蛋仔就会飘在空中不掉下来。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再来一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-grav').classList.toggle('on',v==='A'); document.getElementById('ex-eng').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='block'; }
+
+/* 物理 */
+const cvP=document.getElementById('cvP'), pc=cvP.getContext('2d'); const PW=cvP.width, PH=cvP.height, floorY=PH-24;
+let bx=PW/2, by=90, vx=1.6, vy=0, grav=0.5, r=26, acts=0;
+function bounce(){ vy=-11; vx=(Math.random()-.5)*5; note('弹一下'); tick2(); }
+function setGrav(on){ grav=on?0.5:0; document.getElementById('gCap').innerHTML= on?'<b>开了重力</b>：蛋仔被往下拉，会落到地上，还会弹几下。':'<b>关了重力</b>：没有东西往下拉它，蛋仔就<b>飘在空中</b>啦！'; note('重力'); tick2(); }
+function resetBall(){ bx=PW/2; by=90; vx=1.6; vy=0; }
+function note(k){ acts++; document.getElementById('cnt').textContent=Math.min(acts,2); if(acts>=2) unlockGame(); }
+function tick2(){}
+function drawPhys(){ vy+=grav; bx+=vx; by+=vy;
+  if(by>floorY-r){ by=floorY-r; vy*=-0.7; if(Math.abs(vy)<1&&grav>0)vy=0; }
+  if(by<r){ by=r; vy*=-0.7; }
+  if(bx<r){bx=r;vx*=-0.85;} if(bx>PW-r){bx=PW-r;vx*=-0.85;}
+  if(grav===0){ vy*=0.995; vx*=0.999; }
+  pc.clearRect(0,0,PW,PH);
+  pc.fillStyle='#d7eef3'; pc.fillRect(0,floorY,PW,PH-floorY);
+  pc.strokeStyle='#a7d4de'; pc.lineWidth=3; pc.strokeRect(3,3,PW-6,PH-6);
+  // 蛋
+  const g=pc.createLinearGradient(bx-r,by-r,bx+r,by+r); g.addColorStop(0,'#ffd15b'); g.addColorStop(1,'#ff9f2e');
+  pc.fillStyle=g; pc.beginPath(); pc.ellipse(bx,by,r,r+6,0,0,7); pc.fill();
+  pc.fillStyle='#3a2333'; pc.beginPath(); pc.arc(bx-8,by-4,4,0,7); pc.arc(bx+8,by-4,4,0,7); pc.fill();
+  pc.strokeStyle='#3a2333'; pc.lineWidth=3; pc.lineCap='round'; pc.beginPath(); pc.arc(bx,by+4,8,0.15*Math.PI,0.85*Math.PI); pc.stroke();
+  pc.fillStyle=grav>0?'#178a9f':'#95a6ad'; pc.font='bold 14px system-ui'; pc.textAlign='left'; pc.fillText(grav>0?'重力：开':'重力：关', 12, 22);
+  requestAnimationFrame(drawPhys); }
+drawPhys();
+
+/* 物理引擎 */
+const ENG=['<b>重力</b>：把东西往<b>下</b>拉。游戏里蛋仔往下掉，就是在模仿真实世界的重力。',
+ '<b>碰撞</b>：两样东西<b>撞到一起</b>时，游戏让它们停下、弹开或反弹——比如蛋仔撞墙。',
+ '<b>弹力</b>：像皮球一样，撞到地面又<b>弹回来</b>。踩弹板飞起来，就是弹力。'];
+document.querySelectorAll('#engRow .ec').forEach(c=>c.addEventListener('click',()=>{ document.querySelectorAll('#engRow .ec').forEach(x=>x.classList.remove('on')); c.classList.add('on'); document.getElementById('engCap').innerHTML=ENG[+c.dataset.i]+' <br><span style="color:#178a9f">这些计算合起来，叫<b>物理引擎</b>。</span>'; }));
+
+/* 闯关1 拖拽 */
+const tray=document.getElementById('tray'); let active=null,ox=0,oy=0,placed=0; const TOTAL=6;
+const binAt=(x,y)=>[...document.querySelectorAll('#g-sort .bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+document.querySelectorAll('#g-sort .item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return; active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top; el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el); el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px'; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b&&!b.classList.contains('filled'))b.classList.add('over'); }
+addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+  const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+  if(bin&&bin.dataset.k===el.dataset.k){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); bin.classList.add('filled'); placed++; if(placed===TOTAL) document.getElementById('sortNext').style.display='block'; }
+  else { rst(); tray.appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+
+/* 闯关2 判断 */
+const QUIZ=[{ico:'⬇️',q:'蛋仔从高台上会往下掉，游戏里模仿的是真实世界的？',opts:[['重力',1],['风',0],['声音',0]],fb:'往下掉是在模仿重力。'},
+ {ico:'💥',q:'蛋仔撞到墙就停下或弹开，这叫？',opts:[['碰撞',1],['下雨',0],['变色',0]],fb:'两样东西撞到一起，叫碰撞。'},
+ {ico:'⚙️',q:'游戏里负责计算重力、碰撞、弹力的部分，叫什么？',opts:[['物理引擎',1],['音乐盒',0],['照相机',0]],fb:'这套计算叫物理引擎。'},
+ {ico:'🌙',q:'如果关掉重力，蛋仔会怎样？',opts:[['飘在空中，不往下掉',1],['马上消失',0],['一下变很大',0]],fb:'没有重力往下拉，它就飘着了。'}];
+let qi=0; function startQuiz(){ document.getElementById('g-sort').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>把物理引擎的道理用起来</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1400);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='想想开关重力的实验～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('game-physics','⚙️','物理引擎师'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#4bc0d6','#ffd36b','#3aa7ff','#41c98a','#ff9f43','#b58bff']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

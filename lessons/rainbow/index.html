@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>彩虹是怎么来的 · 知识乐园</title>
+<style>
+  :root{ --accent:#6a5bd0; --bg1:#f2f0ff; --bg2:#cfd0f2; --ink:#33305a; --ink2:#6a6896; --card:#fff; --shadow:0 10px 30px rgba(90,80,180,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:96px;}
+  .introCard{background:var(--card); border-radius:24px; padding:24px 30px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(16px,2.3vw,20px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#8a7bf0,#5a4bc8); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:20px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  #ex-prism,#ex-rain{flex-direction:column; align-items:center; justify-content:center; gap:14px;}
+  #cvP,#cvR{width:100%; max-width:600px; height:auto; background:#1a1f3a; border-radius:18px; box-shadow:var(--shadow);}
+  #cvR{background:linear-gradient(180deg,#bcd3f0,#e7f0fb);}
+  .prBtns{display:flex; gap:10px;} .prBtns button{border:none; border-radius:14px; padding:11px 20px; font-weight:800; font-size:15px; cursor:pointer; background:#e5e2fb; color:var(--accent);}
+  .prCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(14px,2vw,17px); font-weight:800; max-width:600px; text-align:center; min-height:46px; display:flex; align-items:center; justify-content:center; line-height:1.5;} .prCap b{color:var(--accent);}
+  .nextHint{background:#efedfc; border-radius:14px; padding:10px 14px; font-weight:800; color:#5b4fc0; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#8a7bf0,#5a4bc8); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .orderRow{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; max-width:760px;}
+  .ocard{background:#fff; border-radius:14px; box-shadow:var(--shadow); padding:12px 8px; text-align:center; width:82px; border:3px solid #ddd8f5; cursor:pointer; position:relative;} .ocard:active{transform:scale(.95);} .ocard.done{border-color:#41c98a;}
+  .ocard .osw{width:40px; height:40px; border-radius:10px; margin:0 auto 4px;} .ocard .oname{font-weight:800; font-size:13px;}
+  .ocard .onum{position:absolute; top:-9px; left:-9px; width:26px; height:26px; border-radius:50%; background:#41c98a; color:#fff; font-weight:900; display:none; align-items:center; justify-content:center; font-size:14px;} .ocard.done .onum{display:flex;}
+  .orderHint{margin-top:14px; font-weight:800; color:var(--ink2);}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #e0dcf5; background:#f8f7fe; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#8a7bf0,#5a4bc8); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#efeef6; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">彩虹是怎么来的<small>科学 · 白光里藏着七种颜色</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🌈</div>
+    <div class="introCard"><b>雨过天晴，天上有时会挂起一道彩虹。</b><br>它明明有七种颜色，可这些颜色是从哪来的？<br>秘密是：看起来白白的阳光里，其实<b>藏着七种颜色</b>！动手拆给你看。</div>
+    <button class="bigbtn" onclick="go('explore')">开始研究 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🔺 拆开白光</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">🌦️ 彩虹怎么形成</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-prism">
+        <canvas id="cvP" width="600" height="300"></canvas>
+        <div class="prBtns"><button onclick="shine()">☀️ 照一束白光进去</button></div>
+        <div class="prCap" id="prCap">这块三角形玻璃叫<b>三棱镜</b>。点按钮，让一束白光照进去，看看会发生什么。</div>
+      </div>
+      <div class="subview" id="ex-rain">
+        <canvas id="cvR" width="600" height="300"></canvas>
+        <div class="prCap" id="rainCap">下雨时空气里有很多<b>小雨滴</b>。太阳光照进雨滴，就像照进小三棱镜，被拆成七色，形成<b>彩虹</b>。</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 让白光照进三棱镜，看它散成七色，就能去闯关！</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 彩虹排排队<br><small>按彩虹的顺序，从最外圈（红）排到最里圈（紫）</small></div>
+    <div class="gsub on" id="g-order">
+      <div class="orderRow" id="orderRow"></div>
+      <div class="orderHint" id="orderHint">从最外圈的颜色（红）开始点～</div>
+      <div class="roundNext" id="orderNext"><div class="ok">排对啦！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>研究完成！</h2><div class="medalName">🎖 彩虹小博士</div>
+      <p>你搞清楚了：<br>• 白光其实由<b>七种颜色</b>组成：红橙黄绿蓝靛紫；<br>• 白光穿过三棱镜会散成七色，这叫<b>色散</b>；<br>• 彩虹，就是阳光照进空中的<b>小雨滴</b>被拆开形成的——所以要同时有<b>太阳和雨</b>。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再来一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-prism').classList.toggle('on',v==='A'); document.getElementById('ex-rain').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='block'; }
+
+const COLORS=[['红','#ff3b30'],['橙','#ff9500'],['黄','#ffcc00'],['绿','#34c759'],['蓝','#0a84ff'],['靛','#3634a3'],['紫','#8a4fc4']];
+
+/* 三棱镜 */
+const cvP=document.getElementById('cvP'), pc=cvP.getContext('2d'); const PW=cvP.width, PH=cvP.height;
+let lit=0;
+function shine(){ lit=0.001; document.getElementById('prCap').innerHTML='看！白光穿过三棱镜后，散开成 <b>红橙黄绿蓝靛紫</b> 七种颜色——这叫 <b>色散</b>。白光原来是七色合成的！'; unlockGame(); }
+function drawPrism(){ pc.fillStyle='#1a1f3a'; pc.fillRect(0,0,PW,PH); const apexX=PW*0.42, cy=PH/2;
+  // 入射白光
+  if(lit>0){ pc.strokeStyle='#fff'; pc.lineWidth=5; pc.beginPath(); pc.moveTo(0,cy-40); pc.lineTo(apexX-30,cy-4); pc.stroke(); lit=Math.min(1,lit+0.03); }
+  // 棱镜
+  pc.fillStyle='rgba(200,220,255,.25)'; pc.strokeStyle='#bcd0ff'; pc.lineWidth=3; pc.beginPath();
+  pc.moveTo(apexX,cy-70); pc.lineTo(apexX-40,cy+70); pc.lineTo(apexX+40,cy+70); pc.closePath(); pc.fill(); pc.stroke();
+  // 出射七色
+  if(lit>0){ COLORS.forEach((c,i)=>{ const sp=lit; pc.strokeStyle=c[1]; pc.lineWidth=4; pc.beginPath(); pc.moveTo(apexX+20,cy+6); const ang=(i-3)*0.06; const ex=apexX+20+(PW-apexX-30)*sp; const ey=cy+6+Math.tan(ang)*(ex-apexX-20)+i*3; pc.lineTo(ex,ey); pc.stroke(); }); }
+  requestAnimationFrame(drawPrism); }
+drawPrism();
+
+/* 彩虹形成 */
+const cvR=document.getElementById('cvR'), rc=cvR.getContext('2d'); const RW=cvR.width, RH=cvR.height; let rp=0;
+const drops=Array.from({length:30},()=>({x:Math.random()*RW,y:Math.random()*RH,sp:2+Math.random()*2}));
+function drawRain(){ rp=Math.min(1,rp+0.006);
+  const g=rc.createLinearGradient(0,0,0,RH); g.addColorStop(0,'#bcd3f0'); g.addColorStop(1,'#e7f0fb'); rc.fillStyle=g; rc.fillRect(0,0,RW,RH);
+  rc.fillStyle='#ffd257'; rc.beginPath(); rc.arc(70,60,26,0,7); rc.fill();
+  rc.strokeStyle='rgba(90,120,160,.5)'; rc.lineWidth=2; drops.forEach(d=>{ d.y+=d.sp; if(d.y>RH){d.y=-6;d.x=Math.random()*RW;} rc.beginPath(); rc.moveTo(d.x,d.y); rc.lineTo(d.x-1,d.y+7); rc.stroke(); });
+  const cxx=RW*0.62, cyy=RH+40;
+  COLORS.forEach((c,i)=>{ rc.strokeStyle=c[1]; rc.lineWidth=8; rc.beginPath(); rc.arc(cxx,cyy,150-i*9, Math.PI*1.15, Math.PI*(1.15+0.7*rp)); rc.stroke(); });
+  requestAnimationFrame(drawRain); }
+drawRain();
+
+/* 闯关1 排序 七色 */
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+let expect=0;
+shuffle(COLORS.map((c,idx)=>({c,idx}))).forEach(o=>{ const d=document.createElement('div'); d.className='ocard'; d.dataset.idx=o.idx; d.innerHTML=`<div class="onum"></div><div class="osw" style="background:${o.c[1]}"></div><div class="oname">${o.c[0]}</div>`;
+  d.onclick=()=>{ if(d.classList.contains('done'))return; if(+d.dataset.idx===expect){ d.classList.add('done'); d.querySelector('.onum').textContent=++expect; document.getElementById('orderHint').textContent = expect===COLORS.length?'七色排对啦！':'接着点第 '+(expect+1)+' 个（'+COLORS[expect][0]+'）～'; if(expect===COLORS.length) document.getElementById('orderNext').style.display='block'; } else { d.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); document.getElementById('orderHint').textContent='🤔 顺序是 红橙黄绿蓝靛紫，再想想～'; } };
+  document.getElementById('orderRow').appendChild(d); });
+
+/* 闯关2 判断 */
+const QUIZ=[{ico:'🌈',q:'彩虹其实是由几种颜色组成的？',opts:[['七种',1],['一种',0],['三种',0]],fb:'红橙黄绿蓝靛紫，共七种。'},
+ {ico:'🌦️',q:'想看到彩虹，天上通常要同时有？',opts:[['太阳和小雨滴',1],['只有乌云',0],['只有星星',0]],fb:'阳光照进空中的小雨滴，才会形成彩虹。'},
+ {ico:'🔺',q:'白光穿过三棱镜以后会怎样？',opts:[['散开成七种颜色（色散）',1],['直接消失',0],['变成黑色',0]],fb:'白光是七色合成的，过棱镜会被分开。'},
+ {ico:'🎨',q:'彩虹最外圈（最上面）通常是什么颜色？',opts:[['红色',1],['紫色',0],['绿色',0]],fb:'彩虹从外到内是 红橙黄绿蓝靛紫，最外是红。'}];
+let qi=0; function startQuiz(){ document.getElementById('g-order').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>把彩虹的知识用起来</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1400);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='想想白光和雨滴～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('rainbow','🌈','彩虹小博士'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=COLORS.map(c=>c[1]); const bits=Array.from({length:130},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

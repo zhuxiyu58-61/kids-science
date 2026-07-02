@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>神奇的磁铁 · 知识乐园</title>
+<style>
+  :root{ --accent:#e05a4f; --bg1:#fff2ef; --bg2:#f4cdc6; --ink:#5a3330; --ink2:#916660; --card:#fff; --shadow:0 10px 30px rgba(150,70,60,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;}
+  .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;}
+  .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;}
+  .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;}
+  .scene.active{display:flex;}
+
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .mascot{font-size:110px; animation:bob 2s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-14px) rotate(8deg)}}
+  .introCard{background:var(--card); border-radius:26px; padding:24px 30px; box-shadow:var(--shadow); max-width:560px; font-size:clamp(17px,2.5vw,22px); font-weight:800; line-height:1.7;}
+  .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:22px; padding:16px 40px; font-size:21px; font-weight:900; color:#fff; background:linear-gradient(160deg,#ff8a6b,#e0574f); box-shadow:var(--shadow); cursor:pointer; letter-spacing:2px; margin-top:20px; transition:transform .1s;}
+  .bigbtn:active{transform:scale(.95);}
+
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:16px; padding:9px 20px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);}
+  .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;}
+  .subview{flex:1; min-height:0; display:none;}
+  .subview.on{display:flex;}
+  .exFoot{margin-top:8px;}
+
+  .exRow{display:flex; gap:16px; width:100%; align-items:center;}
+  @media (max-width:760px){ .exRow{flex-direction:column; overflow:auto;} .subview.on{overflow:auto;} }
+  .magStage{flex:1; display:flex; flex-direction:column; align-items:center; gap:14px; min-height:0;}
+  .magnet{font-size:96px; filter:drop-shadow(0 10px 16px rgba(150,70,60,.3)); transition:transform .2s;}
+  .magnet.buzz{animation:buzz .3s;}
+  @keyframes buzz{0%,100%{transform:rotate(0)}25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
+  .objs{display:flex; flex-wrap:wrap; gap:12px; justify-content:center;}
+  .mobj{background:#fff; border:none; border-radius:16px; box-shadow:var(--shadow); padding:10px 12px; font-size:40px; display:flex; flex-direction:column; align-items:center; cursor:pointer; transition:transform .1s;}
+  .mobj:active{transform:scale(.94);}
+  .mobj.done{opacity:.85;}
+  .mobj span{font-size:12px; font-weight:800; color:var(--ink); margin-top:2px;}
+  .panel{flex:1; display:flex; flex-direction:column; gap:10px; min-height:0;}
+  .stateBadge{display:flex; align-items:center; gap:12px; background:var(--card); border-radius:20px; padding:12px 16px; box-shadow:var(--shadow);}
+  .stateBadge .face{font-size:40px;}
+  .stateBadge .stateName{font-size:22px; font-weight:900;}
+  .bubble{background:var(--card); border-radius:18px; padding:13px 16px; box-shadow:var(--shadow); font-size:clamp(14px,2vw,17px); line-height:1.6; font-weight:700;}
+  .bubble b{color:var(--accent);}
+  .life{background:#fff0ee; border-radius:14px; padding:9px 13px; font-size:14px; font-weight:800; color:#c05a4a;}
+  .fact{background:#fff7e0; border-radius:14px; padding:9px 13px; font-size:13.5px; font-weight:700; color:#b07d1e; display:flex; align-items:center; gap:8px;}
+  .fact span{flex:1; line-height:1.5;}
+  .fact button{border:none; background:#ffe0a3; color:#8a5d10; font-weight:800; border-radius:12px; padding:6px 10px; font-size:12px; cursor:pointer; white-space:nowrap;}
+  .controls{display:flex; gap:10px;}
+  .btn{flex:1; border:none; border-radius:18px; padding:12px 6px; font-size:16px; font-weight:900; color:#fff; cursor:pointer; box-shadow:var(--shadow);}
+  .btn.reset{background:linear-gradient(160deg,#e2c9c5,#bd958e);}
+
+  /* 两个头 */
+  #ex-poles{flex-direction:column; align-items:center; gap:14px; justify-content:center;}
+  .magRow{display:flex; align-items:center; justify-content:center; gap:20px; width:100%; max-width:640px; height:150px;}
+  .bar{display:flex; width:150px; height:64px; border-radius:12px; overflow:hidden; box-shadow:var(--shadow); transition:transform .5s cubic-bezier(.4,0,.3,1.3);}
+  .half{flex:1; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:900; font-size:30px;}
+  .half.N{background:#e0574f;} .half.S{background:#4a74d8;}
+  .gap{font-size:30px;}
+  .poleCtrl{display:flex; gap:12px; flex-wrap:wrap; justify-content:center;}
+  .poleCtrl button{border:none; border-radius:18px; padding:14px 22px; font-size:17px; font-weight:900; color:#fff; cursor:pointer; box-shadow:var(--shadow);}
+  .pc1{background:linear-gradient(160deg,#9a86ff,#6a5bd8);} .pc2{background:linear-gradient(160deg,#ff8a6b,#e0574f);}
+  .cap{background:var(--card); border-radius:18px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(15px,2.2vw,19px); font-weight:800; max-width:640px; width:100%; text-align:center; min-height:52px; display:flex; align-items:center; justify-content:center;}
+  .cap b{color:var(--accent);}
+
+  .nextHint{background:#fff7e0; border-radius:14px; padding:10px 14px; font-weight:800; color:#c98a2b; font-size:14px; text-align:center;}
+  .nextHint b{color:#e07a1e;}
+  .nextBtn{border:none; border-radius:18px; padding:14px; font-size:19px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#ffd36b,#ff9f43); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; display:none;}
+  .nextBtn:active{transform:scale(.97);}
+
+  #s-game{align-items:center;}
+  .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;}
+  .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;}
+  .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:19px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:14px; width:100%; max-width:560px; justify-content:center;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #e6b7b0; border-radius:20px; padding:12px 8px; text-align:center; min-height:150px; transition:.2s;}
+  .bin.over{border-color:var(--accent); background:#fff0ee;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:34px;} .bin .binName{font-weight:900; font-size:19px; margin-top:4px;} .bin .binHint{font-size:12px; color:var(--ink2); font-weight:700;}
+  .bin .binDrop{margin-top:8px; min-height:70px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:12px; margin-top:20px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:16px; box-shadow:var(--shadow); padding:10px 14px; text-align:center; cursor:grab; touch-action:none;}
+  .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg); box-shadow:0 18px 36px rgba(150,70,60,.3);}
+  .item.placed{cursor:default; box-shadow:none; padding:5px 7px;}
+  .item .itIco{font-size:36px;} .item.placed .itIco{font-size:26px;}
+  .item .itName{font-weight:800; font-size:13px;} .item.placed .itName{font-size:11px;}
+  .qcard{background:var(--card); border-radius:24px; box-shadow:var(--shadow); padding:22px 26px; max-width:560px; width:100%; text-align:center;}
+  .qcard .qico{font-size:52px;} .qcard .qtext{font-size:20px; font-weight:900; margin:8px 0 16px;}
+  .qopts{display:flex; flex-direction:column; gap:10px;}
+  .qopt{border:3px solid #f0dbd7; background:#fff7f5; border-radius:16px; padding:14px; font-size:17px; font-weight:800; color:var(--ink); cursor:pointer;}
+  .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:16px; font-weight:800; min-height:22px;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+
+  #s-finish{align-items:center; justify-content:center; text-align:center;}
+  .finishCard{background:var(--card); border-radius:28px; padding:26px 34px; box-shadow:var(--shadow); max-width:520px;}
+  .medal{font-size:110px; animation:pop .5s ease;}
+  @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:28px;}
+  .medalName{display:inline-block; background:linear-gradient(160deg,#ff9f7f,#e0574f); color:#fff; font-weight:900; font-size:19px; padding:8px 22px; border-radius:20px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:700; line-height:1.8; margin:0 0 18px; font-size:15px;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;}
+  .finishBtns button{border:none; border-radius:18px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;}
+  .fb1{background:var(--accent); color:#fff;} .fb2{background:#f5eeed; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">神奇的磁铁<small>科学 · 谁会被吸住、磁铁的两个头</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <!-- 1 开场 -->
+  <section class="scene active" id="s-intro">
+    <div class="mascot">🧲</div>
+    <div class="introCard">磁铁能<b>隔空</b>吸住一些东西，却对另一些完全没反应。<br><b>它到底吸什么、不吸什么？背后有什么规律？</b><br>当一回小科学家，动手试一试，自己找出规律。</div>
+    <button class="bigbtn" onclick="go('explore')">开始实验 ▶</button>
+  </section>
+
+  <!-- 2 探索 -->
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🧲 谁会被吸住</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">➕➖ 磁铁的两个头</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-A">
+        <div class="exRow">
+          <div class="magStage">
+            <div class="magnet" id="magnet">🧲</div>
+            <div class="objs" id="objs">
+              <button class="mobj" data-mag="1">📎<span>回形针</span></button>
+              <button class="mobj" data-mag="1">🔩<span>螺丝钉</span></button>
+              <button class="mobj" data-mag="1">✂️<span>剪刀</span></button>
+              <button class="mobj" data-mag="0">🧸<span>玩具</span></button>
+              <button class="mobj" data-mag="0">✏️<span>铅笔</span></button>
+              <button class="mobj" data-mag="0">📄<span>纸</span></button>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="stateBadge"><div class="face" id="mFace">🧲</div><div class="stateName" id="mName">点一个试试</div></div>
+            <div class="bubble" id="mBubble">点一个东西，看看磁铁能不能把它<b>吸过来</b>！</div>
+            <div class="life">🧲 生活里的磁铁：冰箱贴、书包搭扣、磁力积木、指南针</div>
+            <div class="fact"><span id="factText">💡 你知道吗？磁铁只喜欢“铁”一类的东西，塑料、木头、纸它都不理。</span><button onclick="nextFact()">换一个</button></div>
+            <div class="controls"><button class="btn reset" onclick="resetObjs()">🔄 都放回去</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="subview" id="ex-poles">
+        <div class="magRow" id="magRow">
+          <div class="bar" id="barL"></div>
+          <div class="gap" id="gapIco">↔️</div>
+          <div class="bar" id="barR"></div>
+        </div>
+        <div class="poleCtrl">
+          <button class="pc1" onclick="flipRight()">🔄 翻转右边磁铁</button>
+          <button class="pc2" onclick="approach()">👉 让它们靠近</button>
+        </div>
+        <div class="cap" id="poleCap">磁铁有两个头：<b style="color:#e0574f">红色 N 极</b> 和 <b style="color:#4a74d8">蓝色 S 极</b>。点“靠近”试试它们会怎样？</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 找出<b>吸得住</b>和<b>吸不住</b>的东西各一个，就能去闯关！</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <!-- 3 闯关 -->
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 吸得住吗？<small>把下面的东西，拖到对的筐里</small></div>
+    <div class="gsub on" id="g-sort">
+      <div class="bins">
+        <div class="bin" data-k="yes"><div class="binIco">🧲</div><div class="binName">吸得住</div><div class="binHint">铁做的</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="no"><div class="binIco">🚫</div><div class="binName">吸不住</div><div class="binHint">不是铁</div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray">
+        <div class="item" data-k="yes"><div class="itIco">📎</div><div class="itName">回形针</div></div>
+        <div class="item" data-k="yes"><div class="itIco">🔩</div><div class="itName">螺丝钉</div></div>
+        <div class="item" data-k="yes"><div class="itIco">✂️</div><div class="itName">剪刀</div></div>
+        <div class="item" data-k="no"><div class="itIco">🧸</div><div class="itName">玩具</div></div>
+        <div class="item" data-k="no"><div class="itIco">✏️</div><div class="itName">铅笔</div></div>
+        <div class="item" data-k="no"><div class="itIco">📄</div><div class="itName">纸</div></div>
+      </div>
+      <div class="roundNext" id="sortNext"><div class="ok">全对啦！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog">第 1 / 3 题</div>
+      <div class="qcard"><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <!-- 4 徽章 -->
+  <section class="scene" id="s-finish">
+    <div class="finishCard">
+      <div class="medal">🏅</div><h2>太棒啦！</h2>
+      <div class="medalName">🎖 磁力小侦探</div>
+      <p>你搞清楚了：<br>• 磁铁主要吸<b>含铁</b>的东西（铁、钢），塑料木头纸吸不住；<br>• <b>磁力</b>能隔着纸、玻璃起作用；<br>• 磁铁有两个<b>磁极</b>（N、S）：<b>同名相斥、异名相吸</b>。</p>
+      <div class="finishBtns">
+        <button class="fb2" onclick="location.reload()">再玩一次</button>
+        <button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button>
+      </div>
+    </div>
+  </section>
+
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+/* ===== 场景 ===== */
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s-'+name).classList.add('active');
+  const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx));
+  if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-A').classList.toggle('on',v==='A'); document.getElementById('ex-poles').classList.toggle('on',v==='B');
+  document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='block'; }
+
+/* ===== 探索A：谁会被吸住 ===== */
+const magnet=document.getElementById('magnet');
+const mFace=document.getElementById('mFace'), mName=document.getElementById('mName'), mBubble=document.getElementById('mBubble');
+const seen={yes:false,no:false};
+document.querySelectorAll('#objs .mobj').forEach(obj=>{
+  obj.addEventListener('click',()=>{
+    if(obj.dataset.busy) return;
+    const mr=magnet.getBoundingClientRect(), orr=obj.getBoundingClientRect();
+    const dx=(mr.left+mr.width/2)-(orr.left+orr.width/2), dy=(mr.top+mr.height/2)-(orr.top+orr.height/2);
+    if(obj.dataset.mag==='1'){
+      obj.dataset.busy='1'; obj.dataset.done='1'; obj.classList.add('done');
+      obj.style.transition='transform .5s cubic-bezier(.5,-.2,.3,1.4)';
+      obj.style.transform=`translate(${dx*0.82}px,${dy*0.82}px) scale(.7)`;
+      magnet.classList.add('buzz'); setTimeout(()=>magnet.classList.remove('buzz'),300);
+      mFace.textContent='🧲'; mName.textContent='吸住了！'; mBubble.innerHTML='它<b>含铁</b>（铁或钢做的），会被磁铁的<b>磁力</b>吸住。✨';
+      seen.yes=true;
+    } else {
+      obj.style.transition='transform .3s'; obj.style.transform=`translate(${dx*0.35}px,${dy*0.35}px)`;
+      setTimeout(()=>{ obj.style.transition='transform .3s'; obj.style.transform=''; },340);
+      mFace.textContent='🤷'; mName.textContent='吸不住'; mBubble.innerHTML='它<b>不含铁</b>（塑料/木头/纸），磁铁的磁力对它不起作用。';
+      seen.no=true;
+    }
+    if(seen.yes&&seen.no) unlockGame();
+  });
+});
+function resetObjs(){ document.querySelectorAll('#objs .mobj').forEach(o=>{ o.style.transition='transform .3s'; o.style.transform=''; delete o.dataset.busy; delete o.dataset.done; o.classList.remove('done'); }); }
+
+const FACTS=[
+ '💡 磁铁主要吸<b>含铁</b>的东西（铁、钢）；不是所有金属都被吸，铜、铝就吸不住。',
+ '💡 磁铁周围有看不见的<b>磁力</b>，能隔着纸、玻璃起作用，不用碰到也能吸。',
+ '💡 磁铁两端磁力最强，叫<b>磁极</b>——<b>N 极</b>和 <b>S 极</b>。同名相斥、异名相吸。',
+ '💡 <b>地球本身就是一块大磁铁</b>，指南针的磁针受它影响，才能指向南北。',
+ '💡 冰箱贴、书包搭扣、耳机里，都藏着小小的磁铁在工作。'
+]; let fi=0; function nextFact(){ fi=(fi+1)%FACTS.length; document.getElementById('factText').textContent=FACTS[fi]; }
+
+/* ===== 探索B：两个头（N/S 极） ===== */
+let barL=['N','S'];      // 左磁铁：右端(朝缝)=S，固定
+let barR=['N','S'];      // 右磁铁：左端(朝缝)=N，可翻转
+function renderBars(){
+  document.getElementById('barL').innerHTML=`<div class="half ${barL[0]}">${barL[0]}</div><div class="half ${barL[1]}">${barL[1]}</div>`;
+  document.getElementById('barR').innerHTML=`<div class="half ${barR[0]}">${barR[0]}</div><div class="half ${barR[1]}">${barR[1]}</div>`;
+  document.getElementById('barL').style.transform=''; document.getElementById('barR').style.transform=''; document.getElementById('gapIco').textContent='↔️';
+}
+renderBars();
+function flipRight(){ barR=[barR[1],barR[0]]; renderBars();
+  document.getElementById('poleCap').innerHTML='右边磁铁翻了个身，现在朝里的是 <b>'+barR[0]+' 极</b>。再点“靠近”看看～'; }
+function approach(){
+  const leftFace=barL[1], rightFace=barR[0];   // 相对的两个头
+  const L=document.getElementById('barL'), Rr=document.getElementById('barR'), cap=document.getElementById('poleCap');
+  if(leftFace!==rightFace){ // 异名相吸
+    L.style.transform='translateX(24px)'; Rr.style.transform='translateX(-24px)'; document.getElementById('gapIco').textContent='💗';
+    cap.innerHTML='一个 <b style="color:#e0574f">N</b>、一个 <b style="color:#4a74d8">S</b>——<b>不一样的头，吸在一起！</b>（异名相吸）';
+  } else { // 同名相斥
+    L.style.transform='translateX(-30px)'; Rr.style.transform='translateX(30px)'; document.getElementById('gapIco').textContent='⚡';
+    cap.innerHTML='两个都是 <b>'+leftFace+' 极</b>——<b>一样的头，互相推开！</b>（同名相斥）';
+  }
+}
+
+/* ===== 闯关1：拖拽 ===== */
+const tray=document.getElementById('tray'); let active=null,ox=0,oy=0,placed=0; const TOTAL=6;
+const binAt=(x,y)=>[...document.querySelectorAll('#g-sort .bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+document.querySelectorAll('#g-sort .item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return;
+  active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top;
+  el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el);
+  el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px';
+  document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b&&!b.classList.contains('filled'))b.classList.add('over'); }
+addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null;
+  document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+  const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+  if(bin&&bin.dataset.k===el.dataset.k){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); placed++;
+    bin.classList.add('filled'); if(placed===TOTAL) document.getElementById('sortNext').style.display='block'; }
+  else { rst(); tray.appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+
+/* ===== 闯关2：判断题 ===== */
+const QUIZ=[
+  {ico:'🔑',q:'下面关于磁铁吸什么，哪句最准确？',opts:[['主要吸含铁的东西，铜、铝这些金属吸不住',1],['所有金属都能吸住',0],['所有硬的东西都能吸住',0]],fb:'磁铁主要吸含铁的（铁、钢），不是所有金属都被吸。'},
+  {ico:'➕',q:'把两块磁铁的 N 极对着 N 极靠近，会怎样？',opts:[['互相推开（同名相斥）',1],['紧紧吸在一起',0],['一点反应都没有',0]],fb:'相同的磁极（N对N、S对S）会互相排斥、推开。'},
+  {ico:'📄',q:'隔着一张纸，磁铁还能吸住下面的回形针吗？',opts:[['能，磁力可以穿过纸',1],['不能，隔着就没用了',0],['要把纸戳破才行',0]],fb:'磁力能穿过纸、玻璃这些薄东西，所以隔着也能吸。'},
+  {ico:'🧭',q:'指南针的磁针能指方向，是因为？',opts:[['地球是个大磁铁，磁针受它影响指向南北',1],['磁针很轻会乱转',0],['磁针会自己发光',0]],fb:'地球本身是块大磁铁，磁针受地球磁力影响，稳定指向南北。'},
+];
+let qi=0;
+function startQuiz(){ document.getElementById('g-sort').classList.remove('on'); document.getElementById('g-quiz').classList.add('on');
+  document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>选一个正确的答案</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q;
+  qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([label,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=label;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none');
+    qfb.style.color='#2ba36a'; qfb.textContent='✅ 答对啦！'+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1300);
+  } else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='🤔 再想想～'; } }
+
+/* ===== 徽章记录 + 撒花 ===== */
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1';
+  const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}');
+  d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)};
+  const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t);
+  localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('magnet','🧲','磁力小侦探');
+  const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight;
+  const cols=['#ffd36b','#e0574f','#3aa7ff','#41c98a','#ff9f43','#b58bff'];
+  const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+
+/* 深链调试 */
+if(location.hash){const h=location.hash.slice(1);
+  if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

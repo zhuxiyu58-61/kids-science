@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>身体里的秘密 · 知识乐园</title>
+<style>
+  :root{ --accent:#e0576a; --bg1:#fff0f2; --bg2:#f6c6ce; --ink:#5a2b34; --ink2:#946069; --card:#fff; --shadow:0 10px 30px rgba(160,60,80,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:96px; animation:beat 1s ease-in-out infinite;} @keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.15)}30%{transform:scale(1)}}
+  .introCard{background:var(--card); border-radius:24px; padding:24px 30px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(16px,2.3vw,20px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#ff8497,#d9455c); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:20px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  #ex-heart{gap:16px;} @media (max-width:760px){ #ex-heart{flex-direction:column; overflow:auto;} }
+  .hWrap{flex:1; display:flex; align-items:center; justify-content:center; min-height:0;}
+  #cvH{width:100%; max-width:320px; height:auto; display:block;}
+  .panel{flex:1; display:flex; flex-direction:column; gap:10px; min-height:0;}
+  .stat{display:flex; gap:10px;} .statBox{flex:1; background:var(--card); border-radius:16px; padding:12px; box-shadow:var(--shadow); text-align:center;}
+  .statBox .sv{font-size:24px; font-weight:900; color:var(--accent);} .statBox .sl{font-size:12px; color:var(--ink2); font-weight:800;}
+  .bubble{background:var(--card); border-radius:16px; padding:13px 16px; box-shadow:var(--shadow); font-size:clamp(14px,2vw,16px); line-height:1.6; font-weight:600;} .bubble b{color:var(--accent); font-weight:900;}
+  .controls{display:flex; gap:10px;} .btn{flex:1; border:none; border-radius:16px; padding:14px 6px; font-size:16px; font-weight:900; color:#fff; cursor:pointer; box-shadow:var(--shadow);} .btn:active{transform:scale(.94);}
+  .btn.rest{background:linear-gradient(160deg,#8fd3e0,#4aa9bd);} .btn.run{background:linear-gradient(160deg,#ff9f6b,#f0693a);} .btn .em{font-size:20px; display:block;}
+  #ex-sense{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  .senseGrid{display:grid; grid-template-columns:repeat(5,1fr); gap:10px; width:100%; max-width:640px;}
+  @media (max-width:560px){ .senseGrid{grid-template-columns:repeat(3,1fr);} }
+  .sn{background:var(--card); border-radius:16px; padding:12px 6px; text-align:center; box-shadow:var(--shadow); cursor:pointer; border:3px solid transparent;} .sn:active{transform:scale(.95);} .sn.on{border-color:var(--accent); background:#fff0f2;}
+  .sn .sni{font-size:34px;} .sn .snn{font-weight:900; font-size:13px; margin-top:3px;}
+  .senseCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(15px,2.2vw,18px); font-weight:800; max-width:640px; width:100%; text-align:center; min-height:48px; display:flex; align-items:center; justify-content:center;} .senseCap b{color:var(--accent);}
+  .nextHint{background:#ffeef0; border-radius:14px; padding:10px 14px; font-weight:800; color:#c85068; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#ff8497,#d9455c); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:14px; width:100%; max-width:560px; justify-content:center;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #eab8c0; border-radius:20px; padding:12px 8px; text-align:center; min-height:150px; transition:.2s;} .bin.over{border-color:var(--accent); background:#fff0f2;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:34px;} .bin .binName{font-weight:900; font-size:18px; margin-top:4px;} .bin .binHint{font-size:12px; color:var(--ink2); font-weight:700;}
+  .bin .binDrop{margin-top:8px; min-height:70px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:12px; margin-top:20px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:16px; box-shadow:var(--shadow); padding:10px 12px; text-align:center; cursor:grab; touch-action:none;} .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg);} .item.placed{cursor:default; box-shadow:none; padding:5px 7px;}
+  .item .itIco{font-size:30px;} .item.placed .itIco{font-size:22px;} .item .itName{font-weight:800; font-size:12px;} .item.placed .itName{font-size:10px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #f0d7dc; background:#fff7f8; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#ff8497,#d9455c); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#f6ecee; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">身体里的秘密<small>生物 · 心跳、呼吸和五种感觉</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">❤️</div>
+    <div class="introCard"><b>你的身体里，有一个从不休息的“泵”。</b><br>它日夜不停地跳动，把血液送到全身。<br>为什么一跑起来，心跳和呼吸就都变快了？动手试试看。</div>
+    <button class="bigbtn" onclick="go('explore')">开始探索 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">❤️ 心跳和呼吸</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">👀 五种感觉</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-heart">
+        <div class="hWrap"><canvas id="cvH" width="320" height="360"></canvas></div>
+        <div class="panel">
+          <div class="stat">
+            <div class="statBox"><div class="sv" id="bpm">80</div><div class="sl">心跳（次/分）</div></div>
+            <div class="statBox"><div class="sv" id="brr">16</div><div class="sl">呼吸（次/分）</div></div>
+          </div>
+          <div class="bubble" id="hBubble">安静时，心脏慢慢跳，把血液送到全身；肺一呼一吸，吸进<b>氧气</b>。点“运动”看看有什么变化。</div>
+          <div class="controls">
+            <button class="btn rest" onclick="setMode('rest')"><span class="em">😌</span>安静休息</button>
+            <button class="btn run" onclick="setMode('run')"><span class="em">🏃</span>运动跑步</button>
+          </div>
+        </div>
+      </div>
+      <div class="subview" id="ex-sense">
+        <div class="senseGrid" id="senseGrid">
+          <div class="sn on" data-i="0"><div class="sni">👀</div><div class="snn">看</div></div>
+          <div class="sn" data-i="1"><div class="sni">👂</div><div class="snn">听</div></div>
+          <div class="sn" data-i="2"><div class="sni">👃</div><div class="snn">闻</div></div>
+          <div class="sn" data-i="3"><div class="sni">👅</div><div class="snn">尝</div></div>
+          <div class="sn" data-i="4"><div class="sni">✋</div><div class="snn">摸</div></div>
+        </div>
+        <div class="senseCap" id="senseCap">👀 <b>视觉</b>：用<b>眼睛</b>看，能看到颜色、形状和远近。</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 比一比“安静”和“运动”时身体的变化，就能去闯关！</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 心跳会怎样？<br><small>把活动拖到“让心跳变快”或“变慢”的一边</small></div>
+    <div class="gsub on" id="g-sort">
+      <div class="bins">
+        <div class="bin" data-k="fast"><div class="binIco">💓</div><div class="binName">心跳变快</div><div class="binHint">身体在用力</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="slow"><div class="binIco">😌</div><div class="binName">心跳变慢</div><div class="binHint">身体在放松</div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray">
+        <div class="item" data-k="fast"><div class="itIco">🏃</div><div class="itName">跑步</div></div>
+        <div class="item" data-k="fast"><div class="itIco">🤸</div><div class="itName">跳绳</div></div>
+        <div class="item" data-k="fast"><div class="itIco">🧗</div><div class="itName">爬楼梯</div></div>
+        <div class="item" data-k="slow"><div class="itIco">😴</div><div class="itName">睡觉</div></div>
+        <div class="item" data-k="slow"><div class="itIco">📖</div><div class="itName">坐着看书</div></div>
+        <div class="item" data-k="slow"><div class="itIco">🧘</div><div class="itName">深呼吸</div></div>
+      </div>
+      <div class="roundNext" id="sortNext"><div class="ok">全部答对！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>了不起！</h2><div class="medalName">🎖 人体小医生</div>
+      <p>你搞清楚了：<br>• <b>心脏</b>像水泵，日夜不停把血液送到全身；<br>• <b>运动</b>时心跳、呼吸都变快，为的是给身体送更多<b>氧气</b>；<br>• 我们靠<b>五种感觉</b>（看、听、闻、尝、摸）来认识世界。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再来一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-heart').classList.toggle('on',v==='A'); document.getElementById('ex-sense').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='block'; }
+
+/* 心跳 */
+const cvH=document.getElementById('cvH'), hg=cvH.getContext('2d'); const HW=cvH.width, HH=cvH.height;
+let bpm=80, tbpm=80, breath=16, tbreath=16, pulse=0, beatAcc=0, brPhase=0;
+const seen={rest:true,run:false};
+function setMode(m){ if(m==='run'){ tbpm=150; tbreath=40; seen.run=true; document.getElementById('hBubble').innerHTML='一运动，肌肉需要更多<b>氧气</b>和养分，心脏就跳得更快、呼吸更急，加紧“送货”。'; }
+  else { tbpm=80; tbreath=16; seen.rest=true; document.getElementById('hBubble').innerHTML='安静下来，身体需要的氧气变少，心跳和呼吸都慢慢<b>恢复</b>平稳。'; }
+  if(seen.rest&&seen.run) unlockGame(); }
+function heartPath(cx,cy,s){ hg.beginPath(); hg.moveTo(cx,cy+s*0.35);
+  hg.bezierCurveTo(cx-s*1.1,cy-s*0.5,cx-s*0.5,cy-s*1.15,cx,cy-s*0.5);
+  hg.bezierCurveTo(cx+s*0.5,cy-s*1.15,cx+s*1.1,cy-s*0.5,cx,cy+s*0.35); hg.closePath(); }
+function tickHeart(){ bpm+=(tbpm-bpm)*0.05; breath+=(tbreath-breath)*0.05;
+  document.getElementById('bpm').textContent=Math.round(bpm); document.getElementById('brr').textContent=Math.round(breath);
+  beatAcc+=1/60; if(beatAcc>=60/bpm){ beatAcc=0; pulse=1; } pulse*=0.9; brPhase+=breath/60*0.10;
+  hg.clearRect(0,0,HW,HH); const cx=HW/2, cy=HH*0.42, s=64*(1+pulse*0.16);
+  // 肺
+  const lung=1+Math.sin(brPhase)*0.10; hg.fillStyle='#bfe3ec';
+  hg.beginPath(); hg.ellipse(cx-60, cy+30, 34*lung, 56*lung, 0,0,7); hg.fill();
+  hg.beginPath(); hg.ellipse(cx+60, cy+30, 34*lung, 56*lung, 0,0,7); hg.fill();
+  // 心
+  hg.fillStyle='#e0455c'; heartPath(cx,cy,s); hg.fill();
+  hg.fillStyle='rgba(255,255,255,.35)'; heartPath(cx-s*0.22,cy-s*0.18,s*0.28); hg.fill();
+  hg.fillStyle='#7a3038'; hg.font='bold 13px system-ui'; hg.textAlign='center'; hg.fillText('心脏', cx, cy+s*0.9); hg.fillText('肺', cx-60, cy+96); hg.fillText('肺', cx+60, cy+96);
+  requestAnimationFrame(tickHeart); }
+tickHeart();
+
+/* 五感 */
+const SENSE=['👀 <b>视觉</b>：用<b>眼睛</b>看，能看到颜色、形状和远近。',
+ '👂 <b>听觉</b>：用<b>耳朵</b>听，能听到声音的高低和大小。',
+ '👃 <b>嗅觉</b>：用<b>鼻子</b>闻，能分辨香味、臭味。',
+ '👅 <b>味觉</b>：用<b>舌头</b>尝，能尝出酸甜苦咸。',
+ '✋ <b>触觉</b>：用<b>皮肤</b>摸，能感觉软硬、冷热、光滑粗糙。'];
+document.querySelectorAll('#senseGrid .sn').forEach(c=>c.addEventListener('click',()=>{ document.querySelectorAll('#senseGrid .sn').forEach(x=>x.classList.remove('on')); c.classList.add('on'); document.getElementById('senseCap').innerHTML=SENSE[+c.dataset.i]; }));
+
+/* 闯关1 拖拽 */
+const tray=document.getElementById('tray'); let active=null,ox=0,oy=0,placed=0; const TOTAL=6;
+const binAt=(x,y)=>[...document.querySelectorAll('#g-sort .bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+document.querySelectorAll('#g-sort .item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return; active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top; el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el); el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px'; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b&&!b.classList.contains('filled'))b.classList.add('over'); }
+addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+  const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+  if(bin&&bin.dataset.k===el.dataset.k){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); bin.classList.add('filled'); placed++; if(placed===TOTAL) document.getElementById('sortNext').style.display='block'; }
+  else { rst(); tray.appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+
+/* 闯关2 判断 */
+const QUIZ=[{ico:'🏃',q:'跑步之后，心跳和呼吸都变快，主要是为了？',opts:[['给身体送更多氧气和养分',1],['让你觉得累',0],['没有原因',0]],fb:'运动时肌肉需要更多氧气，心肺就加快“送货”。'},
+ {ico:'❤️',q:'心脏一刻不停地做什么？',opts:[['像泵一样，把血液送到全身',1],['帮我们思考',0],['储存食物',0]],fb:'心脏是个泵，推动血液在全身流动。'},
+ {ico:'👃',q:'捏住鼻子、只用嘴呼吸，你还能闻到饭菜的香味吗？',opts:[['不能，闻气味主要靠鼻子',1],['能，用眼睛闻',0],['能，用耳朵闻',0]],fb:'闻气味靠嗅觉，器官是鼻子。'},
+ {ico:'✋',q:'天黑时你摸黑找到门把手，主要用了哪种感觉？',opts:[['触觉（用手摸）',1],['视觉（用眼看）',0],['味觉（用舌尝）',0]],fb:'看不见时，我们靠触觉去感知。'}];
+let qi=0; function startQuiz(){ document.getElementById('g-sort').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>把身体的知识用起来</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1400);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想身体的反应～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('body','🫀','人体小医生'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#e0576a','#ffd36b','#3aa7ff','#41c98a','#ff9f43','#b58bff']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

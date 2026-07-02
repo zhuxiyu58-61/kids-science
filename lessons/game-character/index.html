@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>游戏角色怎么做出来 · 知识乐园</title>
+<style>
+  :root{ --accent:#d24bb0; --bg1:#fdeefb; --bg2:#f2c1e6; --ink:#4f2547; --ink2:#8a5c80; --card:#fff; --shadow:0 10px 30px rgba(170,60,150,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:96px;}
+  .introCard{background:var(--card); border-radius:24px; padding:24px 30px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(16px,2.3vw,20px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#f06fcf,#c23aa0); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:20px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  #ex-make{gap:16px;} @media (max-width:760px){ #ex-make{flex-direction:column; overflow:auto;} }
+  .cWrap{flex:1; display:flex; align-items:center; justify-content:center; min-height:0;}
+  #cvG{width:100%; max-width:320px; height:auto; display:block; background:#fff5fc; border-radius:18px; box-shadow:var(--shadow);}
+  .panel{flex:1.05; display:flex; flex-direction:column; gap:10px; min-height:0; justify-content:center;}
+  .stepBadge{display:flex; align-items:center; gap:12px; background:var(--card); border-radius:18px; padding:12px 16px; box-shadow:var(--shadow);} .stepBadge .sf{font-size:34px;} .stepBadge .snm{font-size:20px; font-weight:900;} .stepBadge .stag{font-size:12px; color:#fff; background:var(--accent); padding:3px 10px; border-radius:12px; font-weight:800; margin-top:3px; display:inline-block;}
+  .bubble{background:var(--card); border-radius:16px; padding:13px 16px; box-shadow:var(--shadow); font-size:clamp(14px,2vw,16px); line-height:1.6; font-weight:600;} .bubble b{color:var(--accent); font-weight:900;}
+  .makeBtn{border:none; border-radius:16px; padding:15px; font-size:17px; font-weight:900; color:#fff; background:linear-gradient(160deg,#f06fcf,#c23aa0); box-shadow:var(--shadow); cursor:pointer;} .makeBtn:active{transform:scale(.96);}
+  #ex-name{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  .nameRow{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; width:100%; max-width:560px;}
+  .nc{background:var(--card); border-radius:16px; padding:16px 8px; text-align:center; box-shadow:var(--shadow); cursor:pointer; border:3px solid transparent;} .nc:active{transform:scale(.95);} .nc.on{border-color:var(--accent); background:#fdeef9;}
+  .nc .ne{font-size:38px;} .nc .nn{font-weight:900; font-size:13px; margin-top:4px;}
+  .nameCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(15px,2.2vw,18px); font-weight:800; max-width:560px; width:100%; text-align:center; min-height:48px; display:flex; align-items:center; justify-content:center;} .nameCap b{color:var(--accent);}
+  .nextHint{background:#fdeef9; border-radius:14px; padding:10px 14px; font-weight:800; color:#b545a0; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#f06fcf,#c23aa0); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .orderRow{display:flex; gap:12px; flex-wrap:wrap; justify-content:center; max-width:720px;}
+  .ocard{background:#fff; border-radius:18px; box-shadow:var(--shadow); padding:14px; text-align:center; width:120px; border:3px solid #eccce4; cursor:pointer; position:relative;} .ocard:active{transform:scale(.96);} .ocard.done{border-color:#41c98a; background:#eefbf3;}
+  .ocard .oico{font-size:44px;} .ocard .oname{font-weight:800; font-size:13px; margin-top:4px;}
+  .ocard .onum{position:absolute; top:-10px; left:-10px; width:30px; height:30px; border-radius:50%; background:#41c98a; color:#fff; font-weight:900; display:none; align-items:center; justify-content:center; font-size:16px;} .ocard.done .onum{display:flex;}
+  .orderHint{margin-top:14px; font-weight:800; color:var(--ink2);}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #eccce4; background:#fdf4fb; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#f06fcf,#c23aa0); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#f4ecf2; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">游戏角色怎么做出来<small>做游戏 · 建模 / 上色 / 动画</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🥚</div>
+    <div class="introCard"><b>蛋仔派对里圆滚滚的蛋仔，是怎么做出来的？</b><br>它不是画在纸上的，也不是照片，<br>而是在电脑里<b>一步一步"做"</b>出来的。跟我做一个试试！</div>
+    <button class="bigbtn" onclick="go('explore')">开始制作 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🛠️ 三步做角色</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">📖 这三步叫什么</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-make">
+        <div class="cWrap"><canvas id="cvG" width="320" height="340"></canvas></div>
+        <div class="panel">
+          <div class="stepBadge"><div class="sf" id="sFace">📦</div><div><div class="snm" id="sName">还是空白</div><span class="stag" id="sTag">第 0 步</span></div></div>
+          <div class="bubble" id="gBubble">游戏角色要一步步做出来。点下面的按钮，看它怎么从“一团形状”变成会动的蛋仔。</div>
+          <button class="makeBtn" id="makeBtn" onclick="nextStep()">▶ 下一步</button>
+        </div>
+      </div>
+      <div class="subview" id="ex-name">
+        <div class="nameRow" id="nameRow">
+          <div class="nc on" data-i="0"><div class="ne">🧱</div><div class="nn">建模</div></div>
+          <div class="nc" data-i="1"><div class="ne">🎨</div><div class="nn">上色/贴图</div></div>
+          <div class="nc" data-i="2"><div class="ne">🦴</div><div class="nn">骨骼动画</div></div>
+        </div>
+        <div class="nameCap" id="nameCap"><b>建模</b>：先在电脑里把角色的<b>形状</b>捏出来，像捏橡皮泥一样做出一个立体的“空白模型”。</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 把角色 <b>3 步</b> 都做完（做出会动的蛋仔），就能去闯关！</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 排排队<small>做一个游戏角色，先做哪一步？</small></div>
+    <div class="gsub on" id="g-order">
+      <div class="orderRow" id="orderRow"></div>
+      <div class="orderHint" id="orderHint">从最开始的一步点起～</div>
+      <div class="roundNext" id="orderNext"><div class="ok">排对啦！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>做好啦！</h2><div class="medalName">🎖 角色设计师</div>
+      <p>你搞清楚了：游戏角色是电脑里一步步做出来的——<br>• <b>建模</b>：先把形状“捏”出来；<br>• <b>上色/贴图</b>：给它穿上颜色和花纹；<br>• <b>骨骼动画</b>：装上“骨架”，让它能挥手、能跳。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再来一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-make').classList.toggle('on',v==='A'); document.getElementById('ex-name').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='block'; }
+
+/* 三步做角色 */
+const cvG=document.getElementById('cvG'), gc=cvG.getContext('2d'); const GW=cvG.width, GH=cvG.height;
+let stp=0, t=0;
+const STEP=[{f:'📦',n:'还是空白',tag:'第 0 步',b:'游戏角色要一步步做出来。点“下一步”，看它怎么从形状变成会动的蛋仔。'},
+ {f:'🧱',n:'建模',tag:'第 1 步',b:'<b>建模</b>：先把角色的<b>形状</b>捏出来，做成一个灰色的“空白模型”，还没有颜色。'},
+ {f:'🎨',n:'上色 / 贴图',tag:'第 2 步',b:'<b>上色（贴图）</b>：给模型穿上<b>颜色和花纹</b>，再画上眼睛和笑脸——蛋仔活泼起来了！'},
+ {f:'🦴',n:'骨骼动画',tag:'第 3 步',b:'<b>骨骼动画</b>：给它装上看不见的<b>骨架</b>，这样它就能挥手、能跳、能跑啦！'}];
+function nextStep(){ if(stp<3){ stp++; updateStep(); } }
+function updateStep(){ const s=STEP[stp]; document.getElementById('sFace').textContent=s.f; document.getElementById('sName').textContent=s.n; document.getElementById('sTag').textContent=s.tag; document.getElementById('gBubble').innerHTML=s.b;
+  const btn=document.getElementById('makeBtn'); if(stp>=3){ btn.textContent='🎉 做好啦！'; btn.style.opacity='.6'; unlockGame(); } }
+updateStep();
+function egg(cx,cy,rx,ry,body,face,bounce){ gc.save();
+  gc.fillStyle='rgba(120,60,110,.12)'; gc.beginPath(); gc.ellipse(cx,cy+ry+10,rx*0.8,10,0,0,7); gc.fill(); // 影子
+  gc.translate(0,bounce);
+  const g=gc.createLinearGradient(cx-rx,cy-ry,cx+rx,cy+ry); g.addColorStop(0, body[0]); g.addColorStop(1, body[1]);
+  gc.fillStyle=g; gc.beginPath(); gc.ellipse(cx,cy,rx,ry,0,0,7); gc.fill();
+  gc.fillStyle='rgba(255,255,255,.35)'; gc.beginPath(); gc.ellipse(cx-rx*0.35,cy-ry*0.4,rx*0.28,ry*0.3,0,0,7); gc.fill();
+  if(face){ gc.fillStyle='#3a2333'; gc.beginPath(); gc.arc(cx-18,cy-6,6,0,7); gc.arc(cx+18,cy-6,6,0,7); gc.fill();
+    gc.strokeStyle='#3a2333'; gc.lineWidth=4; gc.lineCap='round'; gc.beginPath(); gc.arc(cx,cy+10,16,0.15*Math.PI,0.85*Math.PI); gc.stroke();
+    gc.fillStyle='rgba(255,120,170,.6)'; gc.beginPath(); gc.arc(cx-26,cy+6,7,0,7); gc.arc(cx+26,cy+6,7,0,7); gc.fill(); }
+  gc.restore(); return cy+bounce; }
+function drawGame(){ t+=0.08; gc.clearRect(0,0,GW,GH); const cx=GW/2, cy=GH/2;
+  if(stp===0){ gc.fillStyle='#d9c6d6'; gc.font='60px system-ui'; gc.textAlign='center'; gc.textBaseline='middle'; gc.fillText('❓', cx, cy); }
+  else if(stp===1){ egg(cx,cy,60,72,['#c9c4cf','#a8a2b4'],false,0);
+    gc.strokeStyle='#9a94a6'; gc.setLineDash([5,5]); gc.lineWidth=1.5; gc.beginPath(); gc.ellipse(cx,cy,60,72,0,0,7); gc.stroke(); gc.setLineDash([]); }
+  else if(stp===2){ egg(cx,cy,60,72,['#ffd15b','#ff9f2e'],true,0); }
+  else { const b=Math.sin(t)*14; const arm=Math.sin(t*2)*0.4; egg(cx,cy,60,72,['#ffd15b','#ff9f2e'],true,b);
+    gc.save(); gc.translate(0,b); gc.strokeStyle='#f0902a'; gc.lineWidth=8; gc.lineCap='round';
+    gc.beginPath(); gc.moveTo(cx+52,cy+4); gc.lineTo(cx+52+Math.cos(-0.6+arm)*26, cy+4+Math.sin(-0.6+arm)*26); gc.stroke();
+    gc.beginPath(); gc.moveTo(cx-52,cy+4); gc.lineTo(cx-52-24, cy+18); gc.stroke(); gc.restore();
+    gc.fillStyle='#c23aa0'; gc.font='bold 16px system-ui'; gc.textAlign='center'; gc.fillText('会动啦！', cx, 34); }
+  requestAnimationFrame(drawGame); }
+drawGame();
+
+/* 三步叫什么 */
+const NAME=['<b>建模</b>：先在电脑里把角色的<b>形状</b>捏出来，像捏橡皮泥一样，做出一个立体的“空白模型”。',
+ '<b>上色 / 贴图</b>：给做好的模型穿上<b>颜色和花纹</b>，画上眼睛、笑脸，角色就变好看了。',
+ '<b>骨骼动画</b>：在角色里装上看不见的<b>骨架</b>，动一动骨架，角色就能挥手、跑、跳，动起来。'];
+document.querySelectorAll('#nameRow .nc').forEach(c=>c.addEventListener('click',()=>{ document.querySelectorAll('#nameRow .nc').forEach(x=>x.classList.remove('on')); c.classList.add('on'); document.getElementById('nameCap').innerHTML=NAME[+c.dataset.i]; }));
+
+/* 闯关1 排序 */
+const ORDER=[{ico:'🧱',n:'建模'},{ico:'🎨',n:'上色'},{ico:'🦴',n:'骨骼动画'}];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+let expect=0;
+shuffle(ORDER.map((o,idx)=>({...o,idx}))).forEach(o=>{ const d=document.createElement('div'); d.className='ocard'; d.dataset.idx=o.idx; d.innerHTML=`<div class="onum"></div><div class="oico">${o.ico}</div><div class="oname">${o.n}</div>`;
+  d.onclick=()=>{ if(d.classList.contains('done'))return; if(+d.dataset.idx===expect){ d.classList.add('done'); d.querySelector('.onum').textContent=++expect; document.getElementById('orderHint').textContent = expect===ORDER.length?'排好啦！':'接着点第 '+(expect+1)+' 步～'; if(expect===ORDER.length) document.getElementById('orderNext').style.display='block'; } else { d.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); document.getElementById('orderHint').textContent='🤔 想想：先有形状，再上色，最后才能动～'; } };
+  document.getElementById('orderRow').appendChild(d); });
+
+/* 闯关2 判断 */
+const QUIZ=[{ico:'🥚',q:'游戏里的蛋仔角色，是怎么来的？',opts:[['在电脑里一步步做出来的',1],['用照相机拍的',0],['天生就有的',0]],fb:'游戏角色是美术师在电脑里一步步做出来的。'},
+ {ico:'🧱',q:'先把角色的形状“捏”出来，这一步叫什么？',opts:[['建模',1],['上色',0],['配音',0]],fb:'做出立体形状叫“建模”。'},
+ {ico:'🦴',q:'要让角色能挥手、能跳，需要给它装上？',opts:[['骨骼（骨架）',1],['电池',0],['轮子',0]],fb:'装上骨骼，动一动骨架，角色就会动，这叫骨骼动画。'},
+ {ico:'🎨',q:'给做好的模型穿上颜色和花纹，这叫？',opts:[['上色 / 贴图',1],['建模',0],['联网',0]],fb:'给模型上颜色、贴花纹，叫上色（贴图）。'}];
+let qi=0; function startQuiz(){ document.getElementById('g-order').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>把做角色的知识用起来</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1400);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='想想做角色的三步～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('game-character','🎮','角色设计师'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#f06fcf','#ffd36b','#3aa7ff','#41c98a','#ff9f43','#b58bff']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

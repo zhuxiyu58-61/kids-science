@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>推和拉 · 知识乐园</title>
+<style>
+  :root{ --accent:#4a7bd0; --bg1:#eef3fc; --bg2:#c3d2ee; --ink:#2a3a5a; --ink2:#5e6f92; --card:#fff; --shadow:0 10px 30px rgba(60,80,150,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:96px;}
+  .introCard{background:var(--card); border-radius:24px; padding:24px 30px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(16px,2.3vw,20px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#6f9bea,#3f6cc8); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:20px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex; position:relative;} .subview{flex:1; min-height:0; display:none;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  #ex-push{flex-direction:column; align-items:center; justify-content:center; gap:14px;}
+  #cvF{width:100%; max-width:600px; height:auto; background:var(--card); border-radius:18px; box-shadow:var(--shadow);}
+  .pushBtns{display:flex; gap:10px; flex-wrap:wrap; justify-content:center;} .pushBtns button{border:none; border-radius:14px; padding:12px 16px; font-weight:900; font-size:15px; color:#fff; cursor:pointer; box-shadow:var(--shadow);} .b1{background:#7ab0f0;} .b2{background:#3f6cc8;} .b3{background:#e0783f;} .b4{background:#95a0bd;}
+  .pushCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(14px,2vw,17px); font-weight:800; max-width:600px; text-align:center; min-height:44px; display:flex; align-items:center; justify-content:center;} .pushCap b{color:var(--accent);}
+  .predict{position:absolute; inset:0; background:rgba(238,243,252,.92); z-index:5; display:flex; align-items:center; justify-content:center; text-align:center; border-radius:16px;} .predict.hide{display:none;}
+  .predict .pcard{background:#fff; border-radius:22px; padding:22px 26px; box-shadow:var(--shadow); max-width:460px;}
+  .predict h3{margin:0 0 4px; font-size:20px;} .predict .psub{color:var(--ink2); font-weight:700; font-size:14px; margin-bottom:14px;}
+  .predict .popts{display:flex; gap:10px; justify-content:center; flex-wrap:wrap;} .predict .popt{border:3px solid #cfdcf2; background:#f4f8ff; border-radius:16px; padding:12px 16px; font-size:16px; font-weight:900; cursor:pointer; color:var(--ink);}
+  .predict .pfb{margin-top:14px; font-weight:800; min-height:22px; font-size:15px;}
+  #ex-can{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  .canRow{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; width:100%; max-width:680px;}
+  @media (max-width:600px){ .canRow{grid-template-columns:repeat(2,1fr);} }
+  .cc{background:var(--card); border-radius:16px; padding:14px 6px; text-align:center; box-shadow:var(--shadow); cursor:pointer; border:3px solid transparent;} .cc:active{transform:scale(.95);} .cc.on{border-color:var(--accent); background:#eef3fc;}
+  .cc .ci{font-size:38px;} .cc .cn{font-weight:900; font-size:13px; margin-top:3px;}
+  .canCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(15px,2.2vw,18px); font-weight:800; max-width:680px; width:100%; text-align:center; min-height:48px; display:flex; align-items:center; justify-content:center;} .canCap b{color:var(--accent);}
+  .nextHint{background:#eaf1fc; border-radius:14px; padding:10px 14px; font-weight:800; color:#3f66b8; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#6f9bea,#3f6cc8); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:14px; width:100%; max-width:560px; justify-content:center;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #b3c4e8; border-radius:20px; padding:12px 8px; text-align:center; min-height:150px; transition:.2s;} .bin.over{border-color:var(--accent); background:#eef3fc;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:34px;} .bin .binName{font-weight:900; font-size:18px; margin-top:4px;} .bin .binHint{font-size:12px; color:var(--ink2); font-weight:700;}
+  .bin .binDrop{margin-top:8px; min-height:70px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:12px; margin-top:20px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:16px; box-shadow:var(--shadow); padding:10px 12px; text-align:center; cursor:grab; touch-action:none;} .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg);} .item.placed{cursor:default; box-shadow:none; padding:5px 7px;}
+  .item .itIco{font-size:28px;} .item.placed .itIco{font-size:22px;} .item .itName{font-weight:800; font-size:12px;} .item.placed .itName{font-size:10px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #dce4f4; background:#f6f9ff; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#6f9bea,#3f6cc8); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#eef2f8; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">推和拉<small>科学 · 力能对物体做什么</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">📦</div>
+    <div class="introCard"><b>想让一个箱子动起来，你得推它，或者拉它。</b><br>这种“推”和“拉”的作用，科学里叫做<b>力</b>。<br>力到底能对东西做些什么？动手推推看。</div>
+    <button class="bigbtn" onclick="go('explore')">开始实验 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">📦 推推箱子</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">💪 力还能做什么</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-push">
+        <div class="predict" id="predict"><div class="pcard">
+          <h3>先猜一猜 🤔</h3><div class="psub">同样的箱子、同样的地面，用力推和轻轻推，哪个跑得更远？</div>
+          <div class="popts"><div class="popt" onclick="guess(1,this)">用力推</div><div class="popt" onclick="guess(0,this)">轻轻推</div><div class="popt" onclick="guess(0,this)">一样远</div></div>
+          <div class="pfb" id="pfb"></div>
+        </div></div>
+        <canvas id="cvF" width="600" height="240"></canvas>
+        <div class="pushBtns">
+          <button class="b1" onclick="push(3)">👉 轻轻推</button>
+          <button class="b2" onclick="push(7)">👉 用力推</button>
+          <button class="b3" onclick="brake()">✋ 拦住它</button>
+          <button class="b4" onclick="resetBox()">🔄 复位</button>
+        </div>
+        <div class="pushCap" id="pushCap">推箱子，看它跑多远。松手后它会慢慢停下——因为地面有<b>摩擦力</b>。</div>
+      </div>
+      <div class="subview" id="ex-can">
+        <div class="canRow" id="canRow">
+          <div class="cc on" data-i="0"><div class="ci">⛓️</div><div class="cn">让它动起来</div></div>
+          <div class="cc" data-i="1"><div class="ci">🧤</div><div class="cn">让它停下来</div></div>
+          <div class="cc" data-i="2"><div class="ci">↩️</div><div class="cn">改变方向</div></div>
+          <div class="cc" data-i="3"><div class="ci">🫓</div><div class="cn">改变形状</div></div>
+        </div>
+        <div class="canCap" id="canCap">力能让<b>静止</b>的东西<b>动起来</b>：推一把秋千，它就荡起来了。点卡片看更多。</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 用不同的力气推几次，感受一下，就能去闯关！（<span id="cnt">0</span>/2）</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 力在做什么<small>把动作拖到“让它动”或“让它停”</small></div>
+    <div class="gsub on" id="g-sort">
+      <div class="bins">
+        <div class="bin" data-k="go"><div class="binIco">🏃</div><div class="binName">让它动起来</div><div class="binHint"></div><div class="binDrop"></div></div>
+        <div class="bin" data-k="stop"><div class="binIco">🛑</div><div class="binName">让它停下来</div><div class="binHint"></div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray">
+        <div class="item" data-k="go"><div class="itIco">⛓️</div><div class="itName">推秋千</div></div>
+        <div class="item" data-k="go"><div class="itIco">⚽</div><div class="itName">踢皮球</div></div>
+        <div class="item" data-k="go"><div class="itIco">🛒</div><div class="itName">拉小车</div></div>
+        <div class="item" data-k="stop"><div class="itIco">🧤</div><div class="itName">接住飞球</div></div>
+        <div class="item" data-k="stop"><div class="itIco">🚲</div><div class="itName">捏刹车</div></div>
+        <div class="item" data-k="stop"><div class="itIco">✋</div><div class="itName">拦住滚球</div></div>
+      </div>
+      <div class="roundNext" id="sortNext"><div class="ok">全部答对！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>实验成功！</h2><div class="medalName">🎖 力气小专家</div>
+      <p>你搞清楚了：<br>• <b>推</b>和<b>拉</b>都是<b>力</b>；<br>• 力能让静止的东西<b>动起来</b>、让动的<b>停下来</b>、<b>改变方向</b>和<b>形状</b>；<br>• 力越大，箱子跑得越快越远；松手后<b>摩擦力</b>会让它慢慢停下。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再来一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-push').classList.toggle('on',v==='A'); document.getElementById('ex-can').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='block'; }
+function guess(ok,el){ document.querySelectorAll('.predict .popt').forEach(o=>o.style.pointerEvents='none'); const fb=document.getElementById('pfb'); if(ok){ el.style.borderColor='#41c98a'; fb.style.color='#2ba36a'; fb.innerHTML='✅ 对！力越大，箱子跑得越远。推推看。'; } else { el.style.borderColor='#ff8a8a'; fb.style.color='#e06060'; fb.innerHTML='其实是 <b>用力推</b> 跑得更远。试试就知道。'; } setTimeout(()=>document.getElementById('predict').classList.add('hide'),1300); }
+
+/* 推箱子物理 */
+const cvF=document.getElementById('cvF'), fc=cvF.getContext('2d'); const FW=cvF.width, FH=cvF.height, floorY=FH-40;
+let bx=70, vx=0, pushes=0; const boxW=54;
+function push(f){ vx+=f; pushes++; document.getElementById('cnt').textContent=Math.min(pushes,2); if(pushes>=2)unlockGame(); document.getElementById('pushCap').innerHTML = f>=7?'<b>用力推</b>！箱子冲得又快又远。':'<b>轻轻推</b>，箱子慢慢往前，很快就停。'; }
+function brake(){ vx=0; document.getElementById('pushCap').innerHTML='你用手<b>拦住</b>了箱子——力也能让运动的东西<b>停下来</b>。'; }
+function resetBox(){ bx=70; vx=0; }
+function drawForce(){ vx*=0.975; if(Math.abs(vx)<0.05)vx=0; bx+=vx; if(bx>FW-boxW-8){bx=FW-boxW-8;vx=0;} if(bx<8){bx=8;vx=0;}
+  fc.clearRect(0,0,FW,FH);
+  fc.fillStyle='#dfe8f5'; fc.fillRect(0,floorY,FW,FH-floorY); fc.strokeStyle='#b9c8e0'; fc.lineWidth=2; for(let x=0;x<FW;x+=24){fc.beginPath();fc.moveTo(x,floorY);fc.lineTo(x-10,FH);fc.stroke();}
+  // 箱子
+  fc.fillStyle='#c88a4a'; fc.fillRect(bx,floorY-boxW,boxW,boxW); fc.strokeStyle='#8a5a2b'; fc.lineWidth=3; fc.strokeRect(bx,floorY-boxW,boxW,boxW);
+  fc.beginPath(); fc.moveTo(bx,floorY-boxW); fc.lineTo(bx+boxW,floorY-8); fc.moveTo(bx+boxW,floorY-boxW); fc.lineTo(bx,floorY-8); fc.stroke();
+  // 速度箭头
+  if(vx>0.1){ fc.strokeStyle='#e0783f'; fc.lineWidth=5; const ay=floorY-boxW/2; fc.beginPath(); fc.moveTo(bx-6,ay); fc.lineTo(bx-6-Math.min(vx*5,50),ay); fc.stroke(); }
+  fc.fillStyle='#5e6f92'; fc.font='bold 13px system-ui'; fc.textAlign='left'; fc.fillText('速度：'+(vx>2?'快':vx>0.3?'慢':'停'), 12, 22);
+  requestAnimationFrame(drawForce); }
+drawForce();
+
+/* 力还能做什么 */
+const CAN=['力能让<b>静止</b>的东西<b>动起来</b>：推一把秋千，它就荡起来了。',
+ '力能让<b>运动</b>的东西<b>停下来</b>：守门员用手接住飞来的球。',
+ '力能<b>改变方向</b>：球飞过来，你一挡，它就拐向别处。',
+ '力能<b>改变形状</b>：用手一捏，橡皮泥就变扁了。'];
+document.querySelectorAll('#canRow .cc').forEach(c=>c.addEventListener('click',()=>{ document.querySelectorAll('#canRow .cc').forEach(x=>x.classList.remove('on')); c.classList.add('on'); document.getElementById('canCap').innerHTML=CAN[+c.dataset.i]; }));
+
+/* 闯关1 拖拽 */
+const tray=document.getElementById('tray'); let active=null,ox=0,oy=0,placed=0; const TOTAL=6;
+const binAt=(x,y)=>[...document.querySelectorAll('#g-sort .bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+document.querySelectorAll('#g-sort .item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return; active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top; el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el); el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px'; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b&&!b.classList.contains('filled'))b.classList.add('over'); }
+addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+  const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+  if(bin&&bin.dataset.k===el.dataset.k){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); bin.classList.add('filled'); placed++; if(placed===TOTAL) document.getElementById('sortNext').style.display='block'; }
+  else { rst(); tray.appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+
+/* 闯关2 判断 */
+const QUIZ=[{ico:'📦',q:'同样的地面，用力推和轻轻推箱子，哪个跑得更远？',opts:[['用力推的跑得更远',1],['轻轻推的更远',0],['两个一样远',0]],fb:'力越大，箱子跑得越快越远。'},
+ {ico:'⚽',q:'一个滚动的球在平地上慢慢停下来，是因为？',opts:[['地面的摩擦力',1],['球玩累了',0],['没有原因',0]],fb:'摩擦力会让运动的东西慢慢停下。'},
+ {ico:'🧤',q:'守门员用手接住飞来的球，这是力改变了球的什么？',opts:[['让它停下（改变了快慢）',1],['改变了颜色',0],['改变了重量',0]],fb:'力能让运动的物体停下来。'},
+ {ico:'💪',q:'下面哪件事，是“力”可以做到的？',opts:[['让静止的小车动起来',1],['让 1＋1 等于 3',0],['让白天变成黑夜',0]],fb:'力能改变物体的运动和形状。'}];
+let qi=0; function startQuiz(){ document.getElementById('g-sort').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>把力的道理用起来</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1400);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='想想推箱子的实验～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('force','⚖️','力气小专家'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#6f9bea','#ffd36b','#3aa7ff','#41c98a','#ff9f43','#b58bff']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');document.getElementById('predict').classList.add('hide');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h)){go(h);} }
+</script>
+</body>
+</html>

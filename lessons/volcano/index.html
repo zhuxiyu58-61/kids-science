@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>火山喷发 · 知识乐园</title>
+<style>
+  :root{ --accent:#e0632f; --bg1:#fff0e6; --bg2:#f4c3a3; --ink:#5a3423; --ink2:#8a6249; --card:#fff; --shadow:0 10px 30px rgba(160,80,40,.18); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:96px;}
+  .introCard{background:var(--card); border-radius:24px; padding:24px 30px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(16px,2.3vw,20px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#ff8a4c,#d0501f); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:20px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  #ex-erupt{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  #cvV{width:100%; max-width:600px; height:auto; display:block; border-radius:18px; box-shadow:var(--shadow);}
+  .vBtns{display:flex; gap:8px; flex-wrap:wrap; justify-content:center;} .vBtns button{border:none; border-radius:14px; padding:11px 16px; font-weight:900; font-size:15px; color:#fff; cursor:pointer; box-shadow:var(--shadow);} .bpr{background:#e0632f;} .brst{background:#9a8071;}
+  .vCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(14px,2vw,17px); font-weight:800; max-width:600px; text-align:center; min-height:44px; display:flex; align-items:center; justify-content:center;} .vCap b{color:var(--accent);}
+  #ex-know{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  .tipRow{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; width:100%; max-width:680px;}
+  @media (max-width:600px){ .tipRow{grid-template-columns:repeat(2,1fr);} }
+  .tc{background:var(--card); border-radius:16px; padding:14px 6px; text-align:center; box-shadow:var(--shadow); cursor:pointer; border:3px solid transparent;} .tc:active{transform:scale(.95);} .tc.on{border-color:var(--accent); background:#fff1e8;}
+  .tc .ti{font-size:36px;} .tc .tn{font-weight:900; font-size:12px; margin-top:4px;}
+  .tipCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(15px,2.2vw,18px); font-weight:800; max-width:680px; width:100%; text-align:center; min-height:48px; display:flex; align-items:center; justify-content:center;} .tipCap b{color:var(--accent);}
+  .nextHint{background:#fff0e4; border-radius:14px; padding:10px 14px; font-weight:800; color:#c05a2c; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#ff8a4c,#d0501f); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .orderRow{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; max-width:720px;}
+  .ocard{background:#fff; border-radius:16px; box-shadow:var(--shadow); padding:12px 8px; text-align:center; width:112px; border:3px solid #f0d8c6; cursor:pointer; position:relative;} .ocard:active{transform:scale(.96);} .ocard.done{border-color:#41c98a; background:#eefbf3; cursor:default;}
+  .ocard .oico{font-size:38px;} .ocard .oname{font-weight:800; font-size:12.5px; margin-top:4px; line-height:1.3;}
+  .ocard .onum{position:absolute; top:-10px; left:-10px; width:28px; height:28px; border-radius:50%; background:#41c98a; color:#fff; font-weight:900; display:none; align-items:center; justify-content:center; font-size:15px;} .ocard.done .onum{display:flex;}
+  .orderHint{margin-top:14px; font-weight:800; color:var(--ink2); text-align:center;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #f0dccb; background:#fff8f2; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#ff8a4c,#d0501f); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#f4ebe4; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">火山喷发<small>环球探险 · 地球的力量</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🌋</div>
+    <div class="introCard"><b>火山喷发时，红红烫烫的岩浆是从哪儿冒出来的？</b><br>其实我们脚下的地球，<b>越往里越热</b>，深处的石头都被烤化成了滚烫的<b>岩浆</b>。<br>今天你来当<b>火山科学家</b>，亲手让一座火山喷发看看！</div>
+    <button class="bigbtn" onclick="go('explore')">走进火山 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🌋 让它喷发</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">🔥 火山的秘密</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-erupt">
+        <canvas id="cvV" width="600" height="300"></canvas>
+        <div class="vBtns">
+          <button class="bpr" onclick="press()">⏫ 给地下加压力</button>
+          <button class="brst" onclick="resetV()">🔁 再来一次</button>
+        </div>
+        <div class="vCap" id="vCap">点“<b>给地下加压力</b>”，看看地底的岩浆会怎么样～</div>
+      </div>
+      <div class="subview" id="ex-know">
+        <div class="tipRow" id="tipRow">
+          <div class="tc on" data-i="0"><div class="ti">🫗</div><div class="tn">岩浆·熔岩</div></div>
+          <div class="tc" data-i="1"><div class="ti">🧩</div><div class="tn">为什么有火山</div></div>
+          <div class="tc" data-i="2"><div class="ti">💨</div><div class="tn">火山灰</div></div>
+          <div class="tc" data-i="3"><div class="ti">🌱</div><div class="tn">喷发之后</div></div>
+        </div>
+        <div class="tipCap" id="tipCap"><b>岩浆</b>是地下滚烫、被烤化的石头；等它冲出地面、流到外面，就改叫<b>熔岩</b>。冷下来又会变回硬硬的石头。</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 把压力加到火山<b>喷发一次</b>，就能去闯关！</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 喷发的顺序<small>从最开始点起，排出火山喷发的过程</small></div>
+    <div class="gsub on" id="g-order">
+      <div class="orderRow" id="orderRow"></div>
+      <div class="orderHint" id="orderHint">先想想：一切从地球深处的什么开始？🔥</div>
+      <div class="roundNext" id="orderNext"><div class="ok">排对啦！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>喷发成功！</h2><div class="medalName">🎖 火山探险家</div>
+      <p>你弄明白了地球的大力气：<br>• 地球<b>越往里越热</b>，深处的石头被烤化成滚烫的<b>岩浆</b>；<br>• 岩浆聚在地下，<b>压力越来越大</b>，冲破火山口就是<b>喷发</b>；<br>• 喷出的岩浆叫<b>熔岩</b>，冷了变成石头；还会喷出<b>火山灰</b>；<br>• 火山灰里有养分，很久以后火山附近反而<b>土地肥沃</b>、长满植物。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再来一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-erupt').classList.toggle('on',v==='A'); document.getElementById('ex-know').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='block'; }
+
+/* ===== 火山喷发动画 ===== */
+const cvV=document.getElementById('cvV'), vc=cvV.getContext('2d'); const VW=cvV.width, VH=cvV.height, ground=VH-70;
+let pressure=0, erupting=false, lava=[], ash=[], flow=0, doneOnce=false;
+function press(){ if(erupting)return; pressure=Math.min(pressure+22,100);
+  document.getElementById('vCap').innerHTML = pressure<100 ? '⏫ 地下岩浆越来越多，<b>压力</b>在变大……再加一点！' : '💥 压力到顶啦！';
+  if(pressure>=100){ erupting=true; document.getElementById('vCap').innerHTML='💥 <b>喷发</b>啦！岩浆冲出火山口变成<b>熔岩</b>，还喷出好多<b>火山灰</b>！';
+    for(let i=0;i<60;i++) lava.push({x:VW/2+(Math.random()-.5)*18,y:ground-90,vx:(Math.random()-.5)*5,vy:-6-Math.random()*6,life:60+Math.random()*40});
+    for(let i=0;i<40;i++) ash.push({x:VW/2+(Math.random()-.5)*30,y:ground-90,vx:(Math.random()-.5)*3,vy:-4-Math.random()*4,r:3+Math.random()*4,life:80+Math.random()*60});
+    if(!doneOnce){ doneOnce=true; setTimeout(()=>{ unlockGame(); nextHint.innerHTML='✅ 火山喷发过啦！点下面去闯关～'; },900); } }
+}
+function resetV(){ pressure=0; erupting=false; lava=[]; ash=[]; flow=0; document.getElementById('vCap').innerHTML='点“<b>给地下加压力</b>”，看看地底的岩浆会怎么样～'; }
+function drawVol(){ vc.clearRect(0,0,VW,VH);
+  const sky=vc.createLinearGradient(0,0,0,ground); sky.addColorStop(0,'#8fb8d8'); sky.addColorStop(1,'#dfeef7'); vc.fillStyle=sky; vc.fillRect(0,0,VW,ground);
+  // 地层
+  vc.fillStyle='#6b4a35'; vc.fillRect(0,ground,VW,VH-ground);
+  vc.fillStyle='#7d5940'; vc.fillRect(0,ground,VW,10);
+  // 火山体（梯形）
+  vc.fillStyle='#795548'; vc.beginPath(); vc.moveTo(VW/2-150,ground); vc.lineTo(VW/2-30,ground-120); vc.lineTo(VW/2+30,ground-120); vc.lineTo(VW/2+150,ground); vc.closePath(); vc.fill();
+  vc.fillStyle='#8d6e63'; vc.beginPath(); vc.moveTo(VW/2-150,ground); vc.lineTo(VW/2-30,ground-120); vc.lineTo(VW/2-6,ground-120); vc.lineTo(VW/2-40,ground); vc.closePath(); vc.fill();
+  // 地下岩浆房（随压力发亮变大）
+  const mr=26+pressure/100*20; vc.save();
+  const g=vc.createRadialGradient(VW/2,VH-24,4,VW/2,VH-24,mr); g.addColorStop(0,'#ffe66b'); g.addColorStop(1,'#e0632f'); vc.fillStyle=g;
+  vc.beginPath(); vc.ellipse(VW/2,VH-24,mr,mr*0.6,0,0,7); vc.fill(); vc.restore();
+  // 通道里上涌的岩浆
+  const chTop = ground-120 - (erupting?0:(100-pressure)/100*0); // 通道
+  vc.strokeStyle='#e0632f'; vc.lineWidth=10; vc.beginPath(); vc.moveTo(VW/2,VH-24);
+  const fill = ground-120 + (1-pressure/100)*(VH-24-(ground-120));
+  vc.lineTo(VW/2, fill); vc.stroke();
+  // 熔岩流
+  if(erupting){ flow=Math.min(flow+2,150);
+    vc.fillStyle='#ff6a2b'; vc.beginPath(); vc.moveTo(VW/2-8,ground-118);
+    vc.quadraticCurveTo(VW/2+40,ground-70, VW/2+30+flow*0.5, ground-2); vc.lineTo(VW/2+18+flow*0.5, ground-2);
+    vc.quadraticCurveTo(VW/2+18,ground-70, VW/2-8,ground-118); vc.fill(); }
+  // 岩浆颗粒
+  lava.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.vy+=0.35; p.life--; vc.fillStyle='#ff7a33'; vc.beginPath(); vc.arc(p.x,p.y,3.5,0,7); vc.fill(); });
+  lava=lava.filter(p=>p.life>0 && p.y<ground);
+  // 火山灰
+  ash.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.vy+=0.05; p.life--; vc.fillStyle='rgba(120,110,110,.7)'; vc.beginPath(); vc.arc(p.x,p.y,p.r,0,7); vc.fill(); });
+  ash=ash.filter(p=>p.life>0);
+  // 压力条
+  vc.fillStyle='#00000022'; vc.fillRect(16,16,120,14); vc.fillStyle=pressure<100?'#ff9f43':'#e0362f'; vc.fillRect(16,16,120*pressure/100,14);
+  vc.fillStyle='#5a3423'; vc.font='bold 12px system-ui'; vc.textAlign='left'; vc.textBaseline='middle'; vc.fillText('压力',144,23);
+  requestAnimationFrame(drawVol);
+}
+drawVol();
+
+/* ===== 火山的秘密 ===== */
+const TIP=['<b>岩浆</b>是地下滚烫、被烤化的石头；冲出地面流到外面就改叫<b>熔岩</b>。冷下来又变回硬硬的石头。',
+ '地球表面是一块块<b>地壳</b>拼起来的。它们交界、挤来挤去的地方最薄，岩浆容易冒出来，所以那里火山、<b>地震</b>都多。',
+ '喷发会喷出大量<b>火山灰</b>——很细的灰尘，能飞得很高很远，把天空遮得灰蒙蒙，飞机都要绕着飞。',
+ '火山虽然吓人，但火山灰里有养分。过了很久很久，火山附近反而<b>土地肥沃</b>，长满茂密的植物。'];
+document.querySelectorAll('#tipRow .tc').forEach(c=>c.addEventListener('click',()=>{ document.querySelectorAll('#tipRow .tc').forEach(x=>x.classList.remove('on')); c.classList.add('on'); document.getElementById('tipCap').innerHTML=TIP[+c.dataset.i]; }));
+
+/* ===== 闯关1 排顺序 ===== */
+const STEPS=[
+  {ico:'🔥', name:'地球深处的石头被烤化成岩浆'},
+  {ico:'🫙', name:'岩浆聚到地下岩浆房'},
+  {ico:'⏫', name:'越聚越多，压力越来越大'},
+  {ico:'🌋', name:'冲破火山口，喷发！'},
+  {ico:'🪨', name:'熔岩冷却，变成石头'},
+];
+let expect=0;
+function buildOrder(){ const row=document.getElementById('orderRow');
+  const arr=STEPS.map((o,idx)=>({...o,idx})); for(let i=arr.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[arr[i],arr[j]]=[arr[j],arr[i]];}
+  arr.forEach(o=>{ const d=document.createElement('div'); d.className='ocard'; d.dataset.idx=o.idx;
+    d.innerHTML=`<div class="onum"></div><div class="oico">${o.ico}</div><div class="oname">${o.name}</div>`;
+    d.onclick=()=>{ if(d.classList.contains('done'))return;
+      if(+d.dataset.idx===expect){ d.classList.add('done'); d.querySelector('.onum').textContent=++expect;
+        orderHint.textContent = expect===STEPS.length ? '全部排好啦！' : '接着点第 '+(expect+1)+' 步～';
+        if(expect===STEPS.length) document.getElementById('orderNext').style.display='block'; }
+      else { d.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); orderHint.textContent='🤔 还不到这一步，先想想上一步是什么？'; } };
+    row.appendChild(d); });
+}
+buildOrder();
+
+/* ===== 闯关2 判断 ===== */
+const QUIZ=[
+ {ico:'🌡️',q:'火山里红红的岩浆，是从哪里来的？',opts:[['地球深处很热，石头被烤化成了岩浆',1],['是有人往山里倒的红油漆',0],['太阳掉进山里烧起来的',0]],fb:'地球越往里越热，石头会被烤化成岩浆。'},
+ {ico:'⏫',q:'岩浆聚在地下，为什么最后会喷出来？',opts:[['越聚越多，压力太大冲破了火山口',1],['因为山上有人喊了一声',0],['因为下雨把它冲出来了',0]],fb:'压力越来越大，顶破火山口就喷发了。'},
+ {ico:'🧩',q:'为什么有的地方火山、地震特别多？',opts:[['那里正好在地壳交界、互相挤压的地带',1],['那里的人特别多',0],['那里离月亮近',0]],fb:'地壳交界带最不稳定，火山地震都多。'},
+ {ico:'🌱',q:'火山喷发过去很久很久之后，附近的土地往往会？',opts:[['因为火山灰有养分，变得肥沃、长满植物',1],['永远变成光秃秃的沙漠',0],['再也不会有生命',0]],fb:'火山灰含养分，日后土地反而肥沃。'},
+];
+let qi=0; function startQuiz(){ document.getElementById('g-order').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>用“岩浆·压力·地壳”推一推</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='想想刚才火山喷发的过程～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('volcano','🌋','火山探险家'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#ff8a4c','#ffd36b','#e0632f','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

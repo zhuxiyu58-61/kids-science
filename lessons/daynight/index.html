@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>白天和黑夜 · 知识乐园</title>
+<style>
+  :root{ --accent:#5170e0; --bg1:#eef2ff; --bg2:#c3cff5; --ink:#2b3a63; --ink2:#5f6f96; --card:#fff; --shadow:0 10px 30px rgba(50,60,120,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;}
+  .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;}
+  .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;}
+  .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;}
+  .scene.active{display:flex;}
+
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .mascot{font-size:110px; animation:spin3 8s linear infinite;}
+  @keyframes spin3{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+  .introCard{background:var(--card); border-radius:26px; padding:24px 30px; box-shadow:var(--shadow); max-width:560px; font-size:clamp(17px,2.5vw,22px); font-weight:800; line-height:1.7;}
+  .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:22px; padding:16px 40px; font-size:21px; font-weight:900; color:#fff; background:linear-gradient(160deg,#7a92ff,#4a63d8); box-shadow:var(--shadow); cursor:pointer; letter-spacing:2px; margin-top:20px; transition:transform .1s;}
+  .bigbtn:active{transform:scale(.95);}
+
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:16px; padding:9px 20px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);}
+  .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;}
+  .subview{flex:1; min-height:0; display:none;}
+  .subview.on{display:flex;}
+  .exFoot{margin-top:8px;}
+
+  .exRow{display:flex; gap:16px; width:100%; align-items:center;}
+  @media (max-width:760px){ .exRow{flex-direction:column; overflow:auto;} .subview.on{overflow:auto;} }
+  .cvWrap{flex:1; display:flex; align-items:center; justify-content:center; min-height:0;}
+  #cvE{width:100%; max-width:360px; height:auto; display:block; filter:drop-shadow(0 12px 22px rgba(50,60,120,.25));}
+  .panel{flex:1.05; display:flex; flex-direction:column; gap:10px; min-height:0;}
+  .stateBadge{display:flex; align-items:center; gap:12px; background:var(--card); border-radius:20px; padding:12px 16px; box-shadow:var(--shadow);}
+  .stateBadge .face{font-size:40px; transition:transform .3s;}
+  .stateBadge .stateName{font-size:22px; font-weight:900;}
+  .stateBadge .stateTag{font-size:12px; color:#fff; padding:3px 11px; border-radius:20px; font-weight:800; margin-top:3px; display:inline-block; background:var(--accent);}
+  .bubble{background:var(--card); border-radius:18px; padding:13px 16px; box-shadow:var(--shadow); font-size:clamp(14px,2vw,17px); line-height:1.6; font-weight:700;}
+  .bubble b{color:var(--accent);}
+  .life{background:#eef2ff; border-radius:14px; padding:9px 13px; font-size:14px; font-weight:800; color:#4a5fbe;}
+  .fact{background:#fff7e0; border-radius:14px; padding:9px 13px; font-size:13.5px; font-weight:700; color:#b07d1e; display:flex; align-items:center; gap:8px;}
+  .fact span{flex:1; line-height:1.5;}
+  .fact button{border:none; background:#ffe0a3; color:#8a5d10; font-weight:800; border-radius:12px; padding:6px 10px; font-size:12px; cursor:pointer; white-space:nowrap;}
+  .controls{display:flex; gap:10px; margin-top:2px;}
+  .btn{flex:1; border:none; border-radius:18px; padding:14px 6px; font-size:18px; font-weight:900; color:#fff; cursor:pointer; box-shadow:var(--shadow); transition:transform .1s;}
+  .btn:active{transform:scale(.94);}
+  .btn.spin{background:linear-gradient(160deg,#7a92ff,#4a63d8);}
+  .btn.reset{flex:.5; background:linear-gradient(160deg,#c9d0e2,#95a0bd); font-size:14px;}
+  .btn .em{font-size:22px; display:block;}
+
+  #ex-B{flex-direction:column; align-items:center; gap:10px;}
+  #cvS{width:100%; max-width:640px; height:auto; display:block; border-radius:20px; box-shadow:var(--shadow);}
+  .cycSteps{display:flex; gap:6px; justify-content:center;}
+  .cycStep{width:11px; height:11px; border-radius:50%; background:#ffffffb0;}
+  .cycStep.on{background:var(--accent); transform:scale(1.25);}
+  .cap{background:var(--card); border-radius:18px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(15px,2.2vw,19px); font-weight:800; max-width:640px; width:100%; text-align:center; min-height:52px; display:flex; align-items:center; justify-content:center;}
+  .cap b{color:var(--accent);}
+
+  .nextHint{background:#fff7e0; border-radius:14px; padding:10px 14px; font-weight:800; color:#c98a2b; font-size:14px; text-align:center;}
+  .nextHint b{color:#e07a1e;}
+  .nextBtn{border:none; border-radius:18px; padding:14px; font-size:19px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#ffd36b,#ff9f43); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; display:none;}
+  .nextBtn:active{transform:scale(.97);}
+
+  #s-game{align-items:center;}
+  .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;}
+  .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;}
+  .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:19px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:14px; width:100%; max-width:560px; justify-content:center;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #b7c0e6; border-radius:20px; padding:12px 8px; text-align:center; min-height:150px; transition:.2s;}
+  .bin.over{border-color:var(--accent); background:#eef2ff;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:34px;} .bin .binName{font-weight:900; font-size:19px; margin-top:4px;} .bin .binHint{font-size:12px; color:var(--ink2); font-weight:700;}
+  .bin .binDrop{margin-top:8px; min-height:70px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:12px; margin-top:20px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:16px; box-shadow:var(--shadow); padding:10px 14px; text-align:center; cursor:grab; touch-action:none; transition:transform .12s;}
+  .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg); box-shadow:0 18px 36px rgba(50,60,120,.3);}
+  .item.placed{cursor:default; box-shadow:none; padding:5px 7px;}
+  .item .itIco{font-size:36px;} .item.placed .itIco{font-size:26px;}
+  .item .itName{font-weight:800; font-size:13px;} .item.placed .itName{font-size:11px;}
+  .qcard{background:var(--card); border-radius:24px; box-shadow:var(--shadow); padding:22px 26px; max-width:560px; width:100%; text-align:center;}
+  .qcard .qico{font-size:52px;} .qcard .qtext{font-size:20px; font-weight:900; margin:8px 0 16px;}
+  .qopts{display:flex; flex-direction:column; gap:10px;}
+  .qopt{border:3px solid #e3e8f7; background:#f6f8ff; border-radius:16px; padding:14px; font-size:17px; font-weight:800; color:var(--ink); cursor:pointer; transition:.15s;}
+  .qopt:active{transform:scale(.97);} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:16px; font-weight:800; min-height:22px;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+
+  #s-finish{align-items:center; justify-content:center; text-align:center;}
+  .finishCard{background:var(--card); border-radius:28px; padding:26px 34px; box-shadow:var(--shadow); max-width:520px;}
+  .medal{font-size:110px; animation:pop .5s ease;}
+  @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:28px;}
+  .medalName{display:inline-block; background:linear-gradient(160deg,#8aa0ff,#4a63d8); color:#fff; font-weight:900; font-size:19px; padding:8px 22px; border-radius:20px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:700; line-height:1.8; margin:0 0 18px; font-size:15px;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;}
+  .finishBtns button{border:none; border-radius:18px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;}
+  .fb1{background:var(--accent); color:#fff;} .fb2{background:#eef1f8; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">白天和黑夜<small>科学 · 地球一转，就是一天</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <!-- 1 开场 -->
+  <section class="scene active" id="s-intro">
+    <div class="mascot">🌍</div>
+    <div class="introCard"><b>为什么会有白天和黑夜？</b><br>地球每时每刻都在<b>自转</b>（自己转圈）。<br>转动下面的地球，看看白天和黑夜到底是怎么来的。</div>
+    <button class="bigbtn" onclick="go('explore')">开始研究 ▶</button>
+  </section>
+
+  <!-- 2 探索 -->
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🌍 转地球</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">🌅 太阳的一天</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-A">
+        <div class="exRow">
+          <div class="cvWrap"><canvas id="cvE" width="400" height="400"></canvas></div>
+          <div class="panel">
+            <div class="stateBadge"><div class="face" id="dnFace">☀️</div><div><div class="stateName" id="dnName">白天</div><span class="stateTag" id="dnTag">面对太阳</span></div></div>
+            <div class="bubble" id="dnBubble">看，小房子<b>转到太阳这边</b>了，被阳光照到，就是<b>白天</b>！</div>
+            <div class="life" id="dnLife">🏙️ 白天：太阳照着，我们上学、玩耍、干活</div>
+            <div class="fact"><span id="factText">💡 你知道吗？地球每时每刻都在转，我们却一点都感觉不到。</span><button onclick="nextFact()">换一个</button></div>
+            <div class="controls">
+              <button class="btn spin" onclick="boost()"><span class="em">⏩</span>转快点</button>
+              <button class="btn reset" onclick="resetSpin()"><span class="em">↩️</span>重来</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="subview" id="ex-B">
+        <canvas id="cvS" width="640" height="360"></canvas>
+        <div class="cycSteps" id="cycSteps"></div>
+        <div class="cap" id="cap">🌅 清晨，太阳从东边升起来，天亮了。</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 转一转，把<b>白天</b>和<b>黑夜</b>都看到，就能去闯关！</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <!-- 3 闯关 -->
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 白天还是黑夜？<small>把下面的东西，拖到对的一边</small></div>
+    <div class="gsub on" id="g-sort">
+      <div class="bins">
+        <div class="bin" data-k="day"><div class="binIco">☀️</div><div class="binName">白天</div><div class="binHint">亮亮的</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="night"><div class="binIco">🌙</div><div class="binName">黑夜</div><div class="binHint">黑黑的</div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray">
+        <div class="item" data-k="day"><div class="itIco">☀️</div><div class="itName">太阳</div></div>
+        <div class="item" data-k="night"><div class="itIco">⭐</div><div class="itName">星星</div></div>
+        <div class="item" data-k="day"><div class="itIco">🎒</div><div class="itName">上学</div></div>
+        <div class="item" data-k="night"><div class="itIco">😴</div><div class="itName">睡觉</div></div>
+        <div class="item" data-k="day"><div class="itIco">⏰</div><div class="itName">起床</div></div>
+        <div class="item" data-k="night"><div class="itIco">🌙</div><div class="itName">月亮</div></div>
+      </div>
+      <div class="roundNext" id="sortNext"><div class="ok">全对啦！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog">第 1 / 3 题</div>
+      <div class="qcard"><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <!-- 4 徽章 -->
+  <section class="scene" id="s-finish">
+    <div class="finishCard">
+      <div class="medal">🏅</div><h2>太棒啦！</h2>
+      <div class="medalName">🎖 昼夜小博士</div>
+      <p>你搞清楚了：<br>• 地球一直在<b>自转</b>，转一圈约 <b>24 小时</b>=一天；<br>• 正对太阳的一面是<b>白天</b>，背对的一面是<b>黑夜</b>；<br>• 因为自转，太阳<b>东边升、西边落</b>；地球另一边和我们有<b>时差</b>。</p>
+      <div class="finishBtns">
+        <button class="fb2" onclick="location.reload()">再玩一次</button>
+        <button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button>
+      </div>
+    </div>
+  </section>
+
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+/* ===== 场景 ===== */
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s-'+name).classList.add('active');
+  const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx));
+  if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-A').classList.toggle('on',v==='A'); document.getElementById('ex-B').classList.toggle('on',v==='B');
+  document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='block'; }
+
+/* ===== 探索A：转地球 ===== */
+const cvE=document.getElementById('cvE'), ce=cvE.getContext('2d');
+const EW=cvE.width, EH=cvE.height, ex=EW*0.42, ey=EH*0.5, R=95, sunX=EW-30, sunY=ey;
+let ang=0.0, vel=0.008;
+const seenDN={day:false,night:false};
+const dnFace=document.getElementById('dnFace'),dnName=document.getElementById('dnName'),dnTag=document.getElementById('dnTag'),
+  dnBubble=document.getElementById('dnBubble'),dnLife=document.getElementById('dnLife');
+const DN={
+  day:  {face:'☀️',name:'白天',tag:'正对太阳',bubble:'房子所在的这一面<b>正对太阳</b>，被阳光照亮，这里就是<b>白天</b>。',life:'🏙️ 白天：这一面朝向太阳，被照亮'},
+  dusk: {face:'🌆',name:'傍晚',tag:'正在转离',bubble:'地球继续自转，房子慢慢<b>转离太阳</b>，光线变斜、变暗，这是<b>傍晚</b>。',life:'🌆 傍晚：太阳看起来从西边落下'},
+  night:{face:'🌙',name:'黑夜',tag:'背对太阳',bubble:'房子转到了<b>背对太阳</b>的一面，阳光照不到，这里就是<b>黑夜</b>。',life:'🌌 黑夜：这一面背对太阳，照不到光'},
+  dawn: {face:'🌅',name:'清晨',tag:'正在转回',bubble:'地球转着转着，房子又<b>快转回太阳这边</b>，天渐渐亮起来，这是<b>清晨</b>。',life:'🌅 清晨：太阳看起来从东边升起'},
+};
+function phaseOf(a){ const cs=Math.cos(a), sn=Math.sin(a);
+  if(cs>0.4) return 'day'; if(cs<-0.4) return 'night'; return sn>0?'dusk':'dawn'; }
+let lastPhase='';
+function boost(){ vel=0.055; }
+function resetSpin(){ ang=0; vel=0.008; }
+function nextFact(){ fi=(fi+1)%FACTS.length; document.getElementById('factText').textContent=FACTS[fi]; }
+const FACTS=[
+ '💡 地球<b>自转</b>一圈大约 24 小时，正好是一天。',
+ '💡 其实是地球在转，太阳没动。我们觉得“太阳在走”，是因为地球带着我们转。',
+ '💡 你睡觉时，地球另一边的国家正是白天——这就是各国有<b>时差</b>的原因。',
+ '💡 地球自转的方向，让我们看到太阳<b>东边升、西边落</b>。',
+ '💡 地球除了自转，还绕着太阳<b>公转</b>，公转一圈是一年。'
+]; let fi=0;
+function updateDN(p){ const d=DN[p]; dnFace.textContent=d.face; dnFace.style.transform='scale(1.25)'; setTimeout(()=>dnFace.style.transform='scale(1)',200);
+  dnName.textContent=d.name; dnTag.textContent=d.tag; dnBubble.innerHTML=d.bubble; dnLife.textContent=d.life;
+  if(p==='day')seenDN.day=true; if(p==='night')seenDN.night=true;
+  if(seenDN.day&&seenDN.night) unlockGame(); }
+function drawEarthScene(){
+  vel += (0.008-vel)*0.03; ang += vel;
+  const p=phaseOf(ang); if(p!==lastPhase){ lastPhase=p; updateDN(p); }
+  ce.clearRect(0,0,EW,EH);
+  // 太阳
+  ce.fillStyle='#ffd257'; ce.beginPath(); ce.arc(sunX,sunY,34,0,7); ce.fill();
+  ce.strokeStyle='#ffd257'; ce.lineWidth=4;
+  for(let a=0;a<10;a++){const an=a/10*Math.PI*2+ang*.3;ce.beginPath();ce.moveTo(sunX+Math.cos(an)*42,sunY+Math.sin(an)*42);ce.lineTo(sunX+Math.cos(an)*54,sunY+Math.sin(an)*54);ce.stroke();}
+  // 阳光箭头
+  ce.strokeStyle='rgba(255,200,80,.55)'; ce.lineWidth=3;
+  for(let k=-1;k<=1;k++){ const yy=ey+k*38; ce.beginPath(); ce.moveTo(sunX-40,yy); ce.lineTo(ex+R+12,yy); ce.stroke();
+    ce.beginPath(); ce.moveTo(ex+R+12,yy); ce.lineTo(ex+R+22,yy-5); ce.moveTo(ex+R+12,yy); ce.lineTo(ex+R+22,yy+5); ce.stroke(); }
+  // 地球：海洋
+  const g=ce.createRadialGradient(ex-30,ey-30,20,ex,ey,R); g.addColorStop(0,'#7fc3ff'); g.addColorStop(1,'#3a86d6');
+  ce.fillStyle=g; ce.beginPath(); ce.arc(ex,ey,R,0,7); ce.fill();
+  // 陆地（简单绿块）
+  ce.fillStyle='#6bc06b';
+  [[ -30,-20,34],[20,10,28],[-10,45,22],[45,-40,18]].forEach(([dx,dy,r])=>{ ce.beginPath(); ce.arc(ex+dx,ey+dy,r,0,7); ce.fill(); });
+  // 夜半球（背对太阳=左侧）压暗
+  ce.save(); ce.beginPath(); ce.arc(ex,ey,R,Math.PI*0.5,Math.PI*1.5); ce.closePath(); ce.clip();
+  ce.fillStyle='rgba(20,26,60,.6)'; ce.beginPath(); ce.arc(ex,ey,R,0,7); ce.fill(); ce.restore();
+  // 地球描边
+  ce.strokeStyle='#2b5a8a'; ce.lineWidth=3; ce.beginPath(); ce.arc(ex,ey,R,0,7); ce.stroke();
+  // 小房子（站在地球表面，随转动移动）
+  const hx=ex+Math.cos(ang)*R, hy=ey-Math.sin(ang)*R;
+  ce.font='30px system-ui'; ce.textAlign='center'; ce.textBaseline='middle';
+  ce.fillText('🏠', hx, hy-2);
+  requestAnimationFrame(drawEarthScene);
+}
+drawEarthScene();
+
+/* ===== 探索B：太阳的一天 ===== */
+const cvS=document.getElementById('cvS'), cs=cvS.getContext('2d');
+const SW=cvS.width, SH=cvS.height, groundY=SH-64;
+const CAP=[
+ '🌅 清晨，太阳从<b>东边</b>升起来，天亮了。',
+ '☀️ 中午，太阳升到最高，最亮最暖和。',
+ '🌆 傍晚，太阳往<b>西边</b>落下，天慢慢变暗。',
+ '🌙 夜晚，太阳转到地球另一边，我们这里是黑夜，能看到月亮和星星。'
+];
+const stepsBox=document.getElementById('cycSteps');
+CAP.forEach((_,i)=>{const d=document.createElement('div');d.className='cycStep'+(i===0?' on':'');stepsBox.appendChild(d);});
+let t=0, lastQ=-1;
+const stars=Array.from({length:40},()=>({x:Math.random()*SW,y:Math.random()*groundY*0.8,r:Math.random()*1.6+0.4}));
+function lerp(a,b,k){return a+(b-a)*k;}
+function mix(c1,c2,k){return `rgb(${c1.map((v,i)=>Math.round(lerp(v,c2[i],k))).join(',')})`;}
+function drawSunDay(){
+  t=(t+0.0011)%1;
+  const q=Math.min(3,Math.floor(t*4)); if(q!==lastQ){ lastQ=q; document.getElementById('cap').innerHTML=CAP[q];
+    [...stepsBox.children].forEach((d,i)=>d.classList.toggle('on',i===q)); }
+  const isDay = t<0.5;
+  const dayAmt = isDay ? Math.sin(t/0.5*Math.PI) : 0; // 0..1..0 白天亮度
+  // 天空
+  const top = mix([18,22,54], [120,190,255], dayAmt);
+  const bot = mix([40,46,86], [214,238,255], dayAmt);
+  const g=cs.createLinearGradient(0,0,0,SH); g.addColorStop(0,top); g.addColorStop(1,bot); cs.fillStyle=g; cs.fillRect(0,0,SW,SH);
+  // 星星（夜里显现）
+  if(dayAmt<0.35){ cs.fillStyle=`rgba(255,255,255,${(0.35-dayAmt)/0.35})`; stars.forEach(s=>{cs.beginPath();cs.arc(s.x,s.y,s.r,0,7);cs.fill();}); }
+  // 太阳 or 月亮 沿弧线（左=东 → 右=西）
+  const prog = isDay ? t/0.5 : (t-0.5)/0.5;
+  const bx = lerp(60, SW-60, prog), by = groundY - Math.sin(prog*Math.PI)*(groundY-50);
+  if(isDay){ cs.fillStyle='#ffd257'; cs.beginPath(); cs.arc(bx,by,26,0,7); cs.fill();
+    cs.strokeStyle='rgba(255,210,90,.7)'; cs.lineWidth=4; for(let a=0;a<10;a++){const an=a/10*Math.PI*2;cs.beginPath();cs.moveTo(bx+Math.cos(an)*32,by+Math.sin(an)*32);cs.lineTo(bx+Math.cos(an)*40,by+Math.sin(an)*40);cs.stroke();} }
+  else { cs.fillStyle='#fdf6c9'; cs.beginPath(); cs.arc(bx,by,22,0,7); cs.fill(); cs.fillStyle=mix([40,46,86],[214,238,255],dayAmt); cs.beginPath(); cs.arc(bx+8,by-6,20,0,7); cs.fill(); }
+  // 地面
+  cs.fillStyle='#6bbf6b'; cs.fillRect(0,groundY,SW,SH-groundY);
+  // 房子 + 树
+  cs.font='40px system-ui'; cs.textAlign='center'; cs.textBaseline='alphabetic';
+  cs.fillText('🌳', 120, groundY+8); cs.fillText('🏠', SW/2, groundY+10); cs.fillText('🌲', SW-120, groundY+8);
+  // 东/西 标记
+  cs.fillStyle='rgba(255,255,255,.8)'; cs.font='bold 16px system-ui';
+  cs.fillText('东', 40, groundY-6); cs.fillText('西', SW-40, groundY-6);
+  requestAnimationFrame(drawSunDay);
+}
+drawSunDay();
+
+/* ===== 闯关1：拖拽 ===== */
+const tray=document.getElementById('tray'); let active=null,ox=0,oy=0,placed=0; const TOTAL=6;
+const binAt=(x,y)=>[...document.querySelectorAll('#g-sort .bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+document.querySelectorAll('#g-sort .item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return;
+  active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top;
+  el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el);
+  el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px';
+  document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b&&!b.classList.contains('filled'))b.classList.add('over'); }
+addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null;
+  document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+  const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+  if(bin&&bin.dataset.k===el.dataset.k){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); placed++;
+    if([...bin.querySelectorAll('.binDrop .item')].length) bin.classList.add('filled');
+    if(placed===TOTAL) document.getElementById('sortNext').style.display='block'; }
+  else { rst(); tray.appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+
+/* ===== 闯关2：判断题 ===== */
+const QUIZ=[
+  {ico:'🌍',q:'白天和黑夜是怎么来的？',opts:[['地球自转，转向太阳的一面是白天，背对的一面是黑夜',1],['太阳绕着地球走',0],['月亮把太阳挡住了',0]],fb:'是地球自转造成的：朝太阳=白天，背太阳=黑夜。'},
+  {ico:'🌏',q:'当我们这里是中午白天时，地球另一边的国家大多是？',opts:[['黑夜',1],['也是中午',0],['永远没有太阳',0]],fb:'地球是圆的，一面朝太阳时，另一面正好背对——所以是黑夜（这就是时差）。'},
+  {ico:'🕓',q:'早上太阳在东边。根据地球自转，傍晚太阳会出现在？',opts:[['西边',1],['还在东边',0],['正头顶',0]],fb:'太阳东边升、西边落，所以傍晚在西边。'},
+  {ico:'⏰',q:'地球自转一圈，大约需要多长时间？',opts:[['一天，约 24 小时',1],['一个月',0],['一年',0]],fb:'自转一圈≈24 小时=一天；绕太阳公转一圈才是一年。'},
+];
+let qi=0;
+function startQuiz(){ document.getElementById('g-sort').classList.remove('on'); document.getElementById('g-quiz').classList.add('on');
+  document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>选一个正确的答案</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q;
+  qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([label,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=label;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none');
+    qfb.style.color='#2ba36a'; qfb.textContent='✅ 答对啦！'+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1300);
+  } else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='🤔 再想想～'; } }
+
+/* ===== 徽章记录 + 撒花 ===== */
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1';
+  const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}');
+  d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)};
+  const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t);
+  localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('daynight','🌗','昼夜小博士');
+  const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight;
+  const cols=['#ffd36b','#7a92ff','#3aa7ff','#41c98a','#ff9f43','#ff8ac0'];
+  const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+
+/* 深链调试 */
+if(location.hash){const h=location.hash.slice(1);
+  if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

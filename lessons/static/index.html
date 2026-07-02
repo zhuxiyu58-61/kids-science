@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>静电 · 知识乐园</title>
+<style>
+  :root{ --accent:#c58a1e; --bg1:#fff7e0; --bg2:#f2dca0; --ink:#5a4718; --ink2:#8a7440; --card:#fff; --shadow:0 10px 30px rgba(160,120,30,.18); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:96px;}
+  .introCard{background:var(--card); border-radius:24px; padding:24px 30px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(16px,2.3vw,20px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#f0b93e,#c58a1e); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:20px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  #ex-rub{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  #cvE{width:100%; max-width:600px; height:auto; display:block; border-radius:18px; box-shadow:var(--shadow); background:#fffdf5; touch-action:none;}
+  .eBtns{display:flex; gap:8px; flex-wrap:wrap; justify-content:center;} .eBtns button{border:none; border-radius:14px; padding:11px 16px; font-weight:900; font-size:15px; color:#fff; cursor:pointer; box-shadow:var(--shadow);} .brub{background:#c58a1e;} .brst{background:#9a8a60;}
+  .eCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(14px,2vw,17px); font-weight:800; max-width:600px; text-align:center; min-height:44px; display:flex; align-items:center; justify-content:center;} .eCap b{color:var(--accent);}
+  #ex-know{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  .tipRow{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; width:100%; max-width:680px;}
+  @media (max-width:600px){ .tipRow{grid-template-columns:repeat(2,1fr);} }
+  .tc{background:var(--card); border-radius:16px; padding:14px 6px; text-align:center; box-shadow:var(--shadow); cursor:pointer; border:3px solid transparent;} .tc:active{transform:scale(.95);} .tc.on{border-color:var(--accent); background:#fff7e2;}
+  .tc .ti{font-size:36px;} .tc .tn{font-weight:900; font-size:12px; margin-top:4px;}
+  .tipCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(15px,2.2vw,18px); font-weight:800; max-width:680px; width:100%; text-align:center; min-height:48px; display:flex; align-items:center; justify-content:center;} .tipCap b{color:var(--accent);}
+  .nextHint{background:#fff6df; border-radius:14px; padding:10px 14px; font-weight:800; color:#b3801d; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#f0b93e,#c58a1e); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:14px; width:100%; max-width:560px; justify-content:center;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #e6d09a; border-radius:20px; padding:12px 8px; text-align:center; min-height:150px; transition:.2s;} .bin.over{border-color:var(--accent); background:#fff7e2;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:34px;} .bin .binName{font-weight:900; font-size:17px; margin-top:4px;} .bin .binHint{font-size:12px; color:var(--ink2); font-weight:700;}
+  .bin .binDrop{margin-top:8px; min-height:70px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:12px; margin-top:20px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:16px; box-shadow:var(--shadow); padding:10px 14px; text-align:center; cursor:grab; touch-action:none;} .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg);} .item.placed{cursor:default; box-shadow:none; padding:5px 7px;}
+  .item .itIco{font-size:30px;} .item.placed .itIco{font-size:22px;} .item .itName{font-weight:800; font-size:12px;} .item.placed .itName{font-size:10px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #ecdcb0; background:#fffbf0; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#f0b93e,#c58a1e); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#f4eeddd0; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">静电<small>自然科学 · 看不见的电</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">⚡</div>
+    <div class="introCard"><b>冬天脱毛衣“噼啪”响，摸门把手被“啪”电一下——是谁在搞鬼？</b><br>其实是一种看不见的<b>静电</b>。今天你来当<b>静电小博士</b>，<br>用一个气球摩擦几下，看它能不能把头发和小纸屑<b>吸起来</b>！</div>
+    <button class="bigbtn" onclick="go('explore')">去做实验 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🎈 摩擦气球</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">⚡ 静电的秘密</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-rub">
+        <canvas id="cvE" width="600" height="300"></canvas>
+        <div class="eBtns">
+          <button class="brub" onclick="rub()">🧣 用毛衣摩擦气球</button>
+          <button class="brst" onclick="resetE()">🔁 放电重来</button>
+        </div>
+        <div class="eCap" id="eCap">先点几下“<b>用毛衣摩擦气球</b>”给它充上静电，再把气球靠近纸屑试试～</div>
+      </div>
+      <div class="subview" id="ex-know">
+        <div class="tipRow" id="tipRow">
+          <div class="tc on" data-i="0"><div class="ti">🧣</div><div class="tn">摩擦起电</div></div>
+          <div class="tc" data-i="1"><div class="ti">❄️</div><div class="tn">冬天为啥多</div></div>
+          <div class="tc" data-i="2"><div class="ti">🏠</div><div class="tn">生活里的它</div></div>
+          <div class="tc" data-i="3"><div class="ti">🛡️</div><div class="tn">怎么少被电</div></div>
+        </div>
+        <div class="tipCap" id="tipCap"><b>摩擦起电</b>：毛衣和气球互相蹭，会把看不见的电“蹭”到气球上。带了电的气球，就能隔空吸小纸屑、让头发竖起来。</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 把气球摩擦到<b>带电</b>，再吸起纸屑一次，就能去闯关！</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 这是不是静电<small>拖到“是静电现象”或“不是”一边</small></div>
+    <div class="gsub on" id="g-sort">
+      <div class="bins">
+        <div class="bin" data-k="yes"><div class="binIco">⚡</div><div class="binName">是静电</div><div class="binHint">摩擦、干燥、噼啪吸东西</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="no"><div class="binIco">🚫</div><div class="binName">不是静电</div><div class="binHint">跟摩擦起电没关系</div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray">
+        <div class="item" data-k="yes"><div class="itIco">🧣</div><div class="itName">脱毛衣噼啪响</div></div>
+        <div class="item" data-k="yes"><div class="itIco">💇</div><div class="itName">梳子吸头发</div></div>
+        <div class="item" data-k="yes"><div class="itIco">🚪</div><div class="itName">摸门把手被电</div></div>
+        <div class="item" data-k="no"><div class="itIco">🧲</div><div class="itName">磁铁吸铁钉</div></div>
+        <div class="item" data-k="no"><div class="itIco">💡</div><div class="itName">开灯灯亮</div></div>
+        <div class="item" data-k="no"><div class="itIco">🌈</div><div class="itName">雨后出彩虹</div></div>
+      </div>
+      <div class="roundNext" id="sortNext"><div class="ok">全部答对！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>实验成功！</h2><div class="medalName">🎖 静电小博士</div>
+      <p>你亲手玩明白了静电：<br>• <b>摩擦</b>会让东西带上看不见的电，叫<b>摩擦起电</b>；<br>• 带了电的气球、梳子，能隔空<b>吸</b>起小纸屑、让头发竖起来；<br>• <b>冬天又冷又干</b>，静电特别多，所以脱毛衣爱噼啪、摸门把手会被电；<br>• 想少被电：先用手<b>摸一下墙</b>或木头，把电悄悄放掉就好啦。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再来一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-rub').classList.toggle('on',v==='A'); document.getElementById('ex-know').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='block'; }
+
+/* ===== 摩擦气球 ===== */
+const cvE=document.getElementById('cvE'), ec=cvE.getContext('2d'); const EW=cvE.width, EH=cvE.height, floor=EH-40;
+let charge=0, bx=EW/2, by=140, drag=false, doneOnce=false;
+// 纸屑
+const bits=Array.from({length:14},()=>({x:120+Math.random()*(EW-240),y:floor-4,ax:0,ay:0,stuck:false}));
+function rub(){ charge=Math.min(charge+25,100);
+  document.getElementById('eCap').innerHTML = charge<100 ? '🧣 蹭蹭蹭……气球上的<b>电</b>越来越多啦！再多蹭几下～' : '⚡ 气球充满电啦！用手指<b>拖动气球</b>靠近下面的纸屑试试！'; }
+function resetE(){ charge=0; document.getElementById('eCap').innerHTML='先点几下“<b>用毛衣摩擦气球</b>”给它充上静电，再把气球靠近纸屑试试～'; bits.forEach(b=>{b.stuck=false;b.y=floor-4;b.ax=0;b.ay=0;}); }
+function drawE(){ ec.clearRect(0,0,EW,EH);
+  ec.fillStyle='#fffdf5'; ec.fillRect(0,0,EW,EH);
+  // 桌面
+  ec.fillStyle='#e7d6a8'; ec.fillRect(0,floor,EW,EH-floor);
+  // 毛衣提示
+  ec.font='34px system-ui'; ec.textAlign='center'; ec.textBaseline='middle'; ec.fillText('🧣',40,60);
+  // 纸屑物理：带电且够近就被吸起
+  bits.forEach(b=>{ const dx=bx-b.x, dy=(by+28)-b.y, d=Math.hypot(dx,dy);
+    if(charge>=100 && d<130){ const f=(130-d)/130*0.9; b.ax=dx/d*f; b.ay=dy/d*f; b.stuck=true; }
+    else if(!(charge>=100 && d<150)){ b.ay=Math.min(b.ay+0.25,4); b.ax*=0.9; b.stuck=false; }
+    b.x+=b.ax; b.y+=b.ay; if(b.y>floor-4){b.y=floor-4;b.ay=0;} if(b.x<110)b.x=110; if(b.x>EW-110)b.x=EW-110;
+    ec.fillStyle=b.stuck?'#c58a1e':'#b9a56a'; ec.fillRect(b.x-3,b.y-3,6,6); });
+  const anyStuck=bits.some(b=>b.stuck && b.y<floor-20);
+  if(anyStuck && !doneOnce){ doneOnce=true; unlockGame();
+    document.getElementById('eCap').innerHTML='🎉 纸屑被<b>隔空吸起来</b>啦！这就是带电气球的静电力。去闯关吧～';
+    document.getElementById('nextHint').innerHTML='✅ 纸屑吸起来啦！点下面去闯关～'; }
+  // 气球（发光表示带电）
+  ec.save(); if(charge>=100){ ec.shadowBlur=18; ec.shadowColor='#ffe08a'; }
+  const g=ec.createRadialGradient(bx-8,by-10,4,bx,by,34); g.addColorStop(0,'#ffe27a'); g.addColorStop(1,charge>=100?'#f0a81e':'#f3c96a');
+  ec.fillStyle=g; ec.beginPath(); ec.ellipse(bx,by,30,36,0,0,7); ec.fill(); ec.restore();
+  ec.strokeStyle='#d0a83a'; ec.lineWidth=2; ec.beginPath(); ec.moveTo(bx,by+36); ec.lineTo(bx-4,by+62); ec.stroke();
+  // 电符号
+  if(charge>0){ ec.fillStyle='#a9701a'; ec.font='16px system-ui'; for(let i=0;i<charge/25;i++){ ec.fillText('＋', bx-18+i*12, by); } }
+  // 充电条
+  ec.fillStyle='#00000018'; ec.fillRect(16,16,120,14); ec.fillStyle=charge<100?'#f0b93e':'#e08a1e'; ec.fillRect(16,16,120*charge/100,14);
+  ec.fillStyle='#5a4718'; ec.font='bold 12px system-ui'; ec.textAlign='left'; ec.fillText('静电',144,23);
+  requestAnimationFrame(drawE);
+}
+drawE();
+cvE.addEventListener('pointerdown',e=>{ const r=cvE.getBoundingClientRect(); const x=(e.clientX-r.left)*(EW/r.width), y=(e.clientY-r.top)*(EH/r.height); if(Math.hypot(x-bx,y-by)<48){ drag=true; } e.preventDefault(); });
+cvE.addEventListener('pointermove',e=>{ if(!drag)return; const r=cvE.getBoundingClientRect(); bx=(e.clientX-r.left)*(EW/r.width); by=(e.clientY-r.top)*(EH/r.height); bx=Math.max(50,Math.min(EW-50,bx)); by=Math.max(50,Math.min(floor-30,by)); });
+addEventListener('pointerup',()=>drag=false);
+
+/* ===== 静电的秘密 ===== */
+const TIP=['<b>摩擦起电</b>：两样东西互相蹭，会把看不见的电“蹭”到其中一个上。带电的气球、梳子，就能隔空吸小纸屑、让头发竖起来。',
+ '<b>冬天</b>又冷又干，空气里水汽少，电不容易悄悄跑掉，就攒得多。所以冬天脱毛衣爱噼啪、摸门把手常被电。',
+ '生活里到处有静电：梳头发时头发飘、保鲜膜黏手、脱化纤衣服噼啪、气球蹭一蹭能贴墙上。',
+ '想<b>少被电</b>：碰金属前先用手摸一下墙壁或木头，把身上的电悄悄放掉；屋里放点水汽（加湿）也会好很多。'];
+document.querySelectorAll('#tipRow .tc').forEach(c=>c.addEventListener('click',()=>{ document.querySelectorAll('#tipRow .tc').forEach(x=>x.classList.remove('on')); c.classList.add('on'); document.getElementById('tipCap').innerHTML=TIP[+c.dataset.i]; }));
+
+/* ===== 闯关1 拖拽 ===== */
+const tray=document.getElementById('tray'); let active=null,ox=0,oy=0,placed=0; const T2=6;
+const binAt=(x,y)=>[...document.querySelectorAll('#g-sort .bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+document.querySelectorAll('#g-sort .item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return; active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top; el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el); el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px'; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b&&!b.classList.contains('filled'))b.classList.add('over'); }
+addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+  const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+  if(bin&&bin.dataset.k===el.dataset.k){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); bin.classList.add('filled'); placed++; if(placed===T2) document.getElementById('sortNext').style.display='block'; }
+  else { rst(); tray.appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+
+/* ===== 闯关2 判断 ===== */
+const QUIZ=[
+ {ico:'🎈',q:'气球在毛衣上蹭几下，就能吸起小纸屑。这是因为？',opts:[['摩擦让气球带了静电',1],['气球里装了磁铁',0],['气球变重了',0]],fb:'摩擦起电，带电的气球能吸小纸屑。'},
+ {ico:'❄️',q:'为什么静电常在冬天特别明显？',opts:[['冬天又冷又干，电不容易跑掉，攒得多',1],['冬天电特别便宜',0],['夏天根本没有静电',0]],fb:'干燥时电难散掉，所以冬天静电多。'},
+ {ico:'🚪',q:'冬天伸手去摸金属门把手，被“啪”电一下，最可能是？',opts:[['身上攒的静电，一下子放掉了',1],['门把手漏电了很危险',0],['门把手会咬人',0]],fb:'那是身上的静电放电，一般不危险。'},
+ {ico:'🛡️',q:'想少被静电电到，下面哪个办法有用？',opts:[['碰金属前先摸一下墙或木头把电放掉',1],['把手藏进兜里再开门',0],['对着门把手吹口气',0]],fb:'先摸墙/木头放掉电，就不容易被电了。'},
+];
+let qi=0; function startQuiz(){ document.getElementById('g-sort').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>用“摩擦起电·干燥·放电”推一推</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='想想摩擦和干燥～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('static','⚡','静电小博士'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#f0b93e','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>颜色变变变 · 知识乐园</title>
+<style>
+  :root{ --accent:#9a6df0; --bg1:#f6f0ff; --bg2:#dcc7f7; --ink:#3f2f5a; --ink2:#7a6a96; --card:#fff; --shadow:0 10px 30px rgba(110,70,180,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:96px;}
+  .introCard{background:var(--card); border-radius:24px; padding:24px 30px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(16px,2.3vw,20px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#b58bff,#8a4fe0); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:20px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  /* 调色台 */
+  #ex-mix{flex-direction:column; align-items:center; justify-content:center; gap:16px;}
+  .mixTop{display:flex; align-items:center; gap:20px; flex-wrap:wrap; justify-content:center;}
+  .prims{display:flex; gap:14px;}
+  .prim{width:74px; height:74px; border-radius:50%; border:4px solid #fff; box-shadow:var(--shadow); cursor:pointer; position:relative; display:flex; align-items:flex-end; justify-content:center; padding-bottom:6px; color:#fff; font-weight:900; font-size:14px; text-shadow:0 1px 2px rgba(0,0,0,.3);}
+  .prim:active{transform:scale(.94);} .prim.sel{outline:5px solid var(--accent); outline-offset:2px;}
+  .mixEq{font-size:30px; font-weight:900; color:var(--ink2);}
+  .result{width:110px; height:110px; border-radius:50%; border:5px solid #fff; box-shadow:var(--shadow); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:900; font-size:20px; text-shadow:0 1px 3px rgba(0,0,0,.35); background:#eee;}
+  .mixCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(15px,2.2vw,18px); font-weight:800; max-width:520px; text-align:center; min-height:48px; display:flex; align-items:center; justify-content:center; line-height:1.5;} .mixCap b{color:var(--accent);}
+  .mixBtns{display:flex; gap:10px;} .mixBtns button{border:none; border-radius:14px; padding:10px 18px; font-weight:800; font-size:14px; cursor:pointer; background:#efe6ff; color:var(--accent);}
+  /* 冷暖 */
+  #ex-warm{flex-direction:column; align-items:center; justify-content:center; gap:14px;}
+  .wcRow{display:flex; gap:16px; width:100%; max-width:620px;}
+  .wcCol{flex:1; background:var(--card); border-radius:20px; padding:14px; box-shadow:var(--shadow); text-align:center;}
+  .wcCol h4{margin:0 0 10px; font-size:17px;}
+  .chips{display:flex; gap:8px; justify-content:center;}
+  .chip{width:44px; height:44px; border-radius:12px; cursor:pointer; border:3px solid #fff; box-shadow:0 3px 8px rgba(0,0,0,.12);} .chip:active{transform:scale(.9);}
+  .wcCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(15px,2.2vw,18px); font-weight:800; max-width:620px; width:100%; text-align:center; min-height:48px; display:flex; align-items:center; justify-content:center;} .wcCap b{color:var(--accent);}
+  .nextHint{background:#f2ebff; border-radius:14px; padding:10px 14px; font-weight:800; color:#7a53c8; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#b58bff,#8a4fe0); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:14px; width:100%; max-width:560px; justify-content:center;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #cdb9ee; border-radius:20px; padding:12px 8px; text-align:center; min-height:150px; transition:.2s;} .bin.over{border-color:var(--accent); background:#f4eeff;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:34px;} .bin .binName{font-weight:900; font-size:19px; margin-top:4px;} .bin .binHint{font-size:12px; color:var(--ink2); font-weight:700;}
+  .bin .binDrop{margin-top:8px; min-height:70px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:12px; margin-top:20px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:16px; box-shadow:var(--shadow); padding:8px; text-align:center; cursor:grab; touch-action:none;} .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg);} .item.placed{cursor:default; box-shadow:none;}
+  .swatch{width:40px; height:40px; border-radius:10px; margin:0 auto 3px;} .item.placed .swatch{width:28px;height:28px;} .item .itName{font-weight:800; font-size:13px;} .item.placed .itName{font-size:11px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #e6dbf7; background:#faf6ff; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#b58bff,#8a4fe0); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#f0ebf8; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">颜色变变变<small>艺术 · 三原色与冷暖色</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🎨</div>
+    <div class="introCard"><b>红、黄、蓝这三种颜色，能调出好多别的颜色。</b><br>它们很特别，叫做<b>三原色</b>。<br>你能用它们，调出橙色、绿色和紫色吗？动手试试。</div>
+    <button class="bigbtn" onclick="go('explore')">开始调色 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🎨 调色台</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">🔥❄️ 冷色和暖色</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-mix">
+        <div class="mixTop">
+          <div class="prims">
+            <div class="prim" data-c="red" style="background:#e23b3b" onclick="pickPrim(this)">红</div>
+            <div class="prim" data-c="yellow" style="background:#f4c534;color:#5a4a10;text-shadow:none" onclick="pickPrim(this)">黄</div>
+            <div class="prim" data-c="blue" style="background:#3a7be0" onclick="pickPrim(this)">蓝</div>
+          </div>
+          <div class="mixEq">=</div>
+          <div class="result" id="result">?</div>
+        </div>
+        <div class="mixCap" id="mixCap">选<b>两种</b>原色，先猜猜会调出什么颜色，再看看对不对～</div>
+        <div class="mixBtns"><button onclick="clearMix()">🔄 重新选</button></div>
+      </div>
+      <div class="subview" id="ex-warm">
+        <div class="wcRow">
+          <div class="wcCol"><h4>🔥 暖色</h4><div class="chips">
+            <div class="chip" style="background:#e23b3b" onclick="wc('warm','红')"></div>
+            <div class="chip" style="background:#ef8b2e" onclick="wc('warm','橙')"></div>
+            <div class="chip" style="background:#f4c534" onclick="wc('warm','黄')"></div>
+          </div></div>
+          <div class="wcCol"><h4>❄️ 冷色</h4><div class="chips">
+            <div class="chip" style="background:#3a7be0" onclick="wc('cool','蓝')"></div>
+            <div class="chip" style="background:#3fae5a" onclick="wc('cool','绿')"></div>
+            <div class="chip" style="background:#8a4fc4" onclick="wc('cool','紫')"></div>
+          </div></div>
+        </div>
+        <div class="wcCap" id="wcCap">红、橙、黄让人想到<b>太阳和火</b>，感觉温暖，叫<b>暖色</b>；蓝、绿、紫让人想到<b>水和冰</b>，感觉清凉，叫<b>冷色</b>。点一点试试。</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 用原色调出 <b>2</b> 种新颜色，就能去闯关！（<span id="mixCount">0</span>/2）</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 冷色暖色分一分<small>把颜色拖到对的一边</small></div>
+    <div class="gsub on" id="g-sort">
+      <div class="bins">
+        <div class="bin" data-k="warm"><div class="binIco">🔥</div><div class="binName">暖色</div><div class="binHint">像太阳、火</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="cool"><div class="binIco">❄️</div><div class="binName">冷色</div><div class="binHint">像水、冰</div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray">
+        <div class="item" data-k="warm"><div class="swatch" style="background:#e23b3b"></div><div class="itName">红</div></div>
+        <div class="item" data-k="warm"><div class="swatch" style="background:#ef8b2e"></div><div class="itName">橙</div></div>
+        <div class="item" data-k="warm"><div class="swatch" style="background:#f4c534"></div><div class="itName">黄</div></div>
+        <div class="item" data-k="cool"><div class="swatch" style="background:#3a7be0"></div><div class="itName">蓝</div></div>
+        <div class="item" data-k="cool"><div class="swatch" style="background:#3fae5a"></div><div class="itName">绿</div></div>
+        <div class="item" data-k="cool"><div class="swatch" style="background:#8a4fc4"></div><div class="itName">紫</div></div>
+      </div>
+      <div class="roundNext" id="sortNext"><div class="ok">全部答对！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>调色成功！</h2><div class="medalName">🎖 调色小画家</div>
+      <p>你搞清楚了：<br>• <b>三原色</b>是红、黄、蓝，能调出很多别的颜色；<br>• 红+黄=<b>橙</b>，蓝+黄=<b>绿</b>，红+蓝=<b>紫</b>；<br>• 红橙黄是<b>暖色</b>，蓝绿紫是<b>冷色</b>。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再来一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-mix').classList.toggle('on',v==='A'); document.getElementById('ex-warm').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='block'; }
+
+/* 调色 */
+const MIX={ 'blue,red':{n:'紫色',c:'#8a4fc4'}, 'red,yellow':{n:'橙色',c:'#ef8b2e'}, 'blue,yellow':{n:'绿色',c:'#3fae5a'} };
+let sel=[]; const made=new Set();
+function pickPrim(el){ const c=el.dataset.c;
+  if(el.classList.contains('sel')){ el.classList.remove('sel'); sel=sel.filter(x=>x!==c); }
+  else { if(sel.length>=2) return; el.classList.add('sel'); sel.push(c); }
+  const res=document.getElementById('result'), cap=document.getElementById('mixCap');
+  if(sel.length===2){ const key=[...sel].sort().join(','); const m=MIX[key];
+    if(m){ res.style.background=m.c; res.textContent=m.n; cap.innerHTML='<b>'+primName(sel[0])+' + '+primName(sel[1])+'</b> 调在一起，变成了 <b>'+m.n+'</b>！';
+      made.add(m.n); document.getElementById('mixCount').textContent=Math.min(made.size,2); if(made.size>=2) unlockGame(); }
+  } else { res.style.background='#eee'; res.textContent='?'; cap.innerHTML='再选一种原色，凑成<b>两种</b>就能调色～'; }
+}
+function primName(c){ return {red:'红',yellow:'黄',blue:'蓝'}[c]; }
+function clearMix(){ sel=[]; document.querySelectorAll('.prim').forEach(p=>p.classList.remove('sel')); const res=document.getElementById('result'); res.style.background='#eee'; res.textContent='?'; document.getElementById('mixCap').innerHTML='选<b>两种</b>原色，先猜猜会调出什么颜色，再看看对不对～'; }
+
+/* 冷暖 */
+const WC={ warm:'红、橙、黄这类颜色让人想到太阳和火，感觉<b>温暖</b>，叫<b>暖色</b>。',
+  cool:'蓝、绿、紫这类颜色让人想到水和冰，感觉<b>清凉</b>，叫<b>冷色</b>。' };
+function wc(type,name){ document.getElementById('wcCap').innerHTML='<b>'+name+'</b>色 —— '+WC[type]; }
+
+/* 闯关1 拖拽 */
+const tray=document.getElementById('tray'); let active=null,ox=0,oy=0,placed=0; const TOTAL=6;
+const binAt=(x,y)=>[...document.querySelectorAll('#g-sort .bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+document.querySelectorAll('#g-sort .item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return; active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top; el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el); el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px'; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b&&!b.classList.contains('filled'))b.classList.add('over'); }
+addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+  const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+  if(bin&&bin.dataset.k===el.dataset.k){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); bin.classList.add('filled'); placed++; if(placed===TOTAL) document.getElementById('sortNext').style.display='block'; }
+  else { rst(); tray.appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+
+/* 闯关2 判断 */
+const QUIZ=[{ico:'🟠',q:'红色和黄色调在一起，会变成什么颜色？',opts:[['橙色',1],['绿色',0],['紫色',0]],fb:'红 + 黄 = 橙。'},
+ {ico:'🟢',q:'想调出绿色，应该把哪两种颜色混合？',opts:[['蓝色和黄色',1],['红色和黄色',0],['红色和蓝色',0]],fb:'蓝 + 黄 = 绿。'},
+ {ico:'🏞️',q:'画一片凉凉的湖水，用哪一类颜色更合适？',opts:[['蓝、绿这些冷色',1],['红、橙这些暖色',0],['只能用黑色',0]],fb:'冷色能表现清凉、安静的感觉。'},
+ {ico:'🎨',q:'红、黄、蓝叫“三原色”，是因为？',opts:[['用它们能调出很多别的颜色，别的颜色却调不出它们',1],['它们最好看',0],['它们最亮',0]],fb:'三原色是“最基本”的颜色，可以调配出许多其它颜色。'}];
+let qi=0; function startQuiz(){ document.getElementById('g-sort').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 用一用<small>把学到的颜色知识用起来</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1400);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想调色台上的结果～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('color','🎨','调色小画家'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#e23b3b','#f4c534','#3a7be0','#3fae5a','#8a4fc4','#ef8b2e']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

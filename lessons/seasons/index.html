@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>四季是怎么来的 · 知识乐园</title>
+<style>
+  :root{ --accent:#d98a3a; --bg1:#fff4e2; --bg2:#f3ce9a; --ink:#5a3f1c; --ink2:#8a6a3a; --card:#fff; --shadow:0 10px 30px rgba(160,110,40,.18); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:96px;}
+  .introCard{background:var(--card); border-radius:24px; padding:22px 28px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(15px,2.2vw,19px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .idiom{margin-top:12px; background:#fff3df; border-radius:14px; padding:10px 14px; font-size:14px; color:#9a6a2a; font-weight:800;} .idiom b{color:#c07d1e;}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#f0a94e,#c8792a); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:18px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  #ex-orbit{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  #cvO{width:100%; max-width:600px; height:auto; display:block; border-radius:18px; box-shadow:var(--shadow); background:#141830;}
+  .oBtns{display:flex; gap:8px; flex-wrap:wrap; justify-content:center;} .oBtns button{border:none; border-radius:14px; padding:11px 18px; font-weight:900; font-size:15px; color:#fff; cursor:pointer; box-shadow:var(--shadow); background:#d98a3a;}
+  .oCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(14px,2vw,17px); font-weight:800; max-width:600px; text-align:center; min-height:44px; display:flex; align-items:center; justify-content:center;} .oCap b{color:var(--accent);}
+  #ex-know{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  .tipRow{display:grid; grid-template-columns:repeat(5,1fr); gap:10px; width:100%; max-width:700px;}
+  @media (max-width:600px){ .tipRow{grid-template-columns:repeat(3,1fr);} }
+  .tc{background:var(--card); border-radius:16px; padding:14px 4px; text-align:center; box-shadow:var(--shadow); cursor:pointer; border:3px solid transparent;} .tc:active{transform:scale(.95);} .tc.on{border-color:var(--accent); background:#fff3df;}
+  .tc .ti{font-size:32px;} .tc .tn{font-weight:900; font-size:11.5px; margin-top:4px;}
+  .tc.subj{background:#eef4ff;} .tc.subj.on{border-color:#3f7ae0; background:#e3edff;}
+  .tipCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(15px,2.2vw,18px); font-weight:800; max-width:700px; width:100%; text-align:center; min-height:48px; display:flex; align-items:center; justify-content:center;} .tipCap b{color:var(--accent);} .tipCap .en{color:#3f7ae0;}
+  .nextHint{background:#fff3df; border-radius:14px; padding:10px 14px; font-weight:800; color:#a67320; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#f0a94e,#c8792a); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .orderRow{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; max-width:720px;}
+  .ocard{background:#fff; border-radius:16px; box-shadow:var(--shadow); padding:12px 8px; text-align:center; width:112px; border:3px solid #f0dcbc; cursor:pointer; position:relative;} .ocard:active{transform:scale(.96);} .ocard.done{border-color:#41c98a; background:#eefbf3; cursor:default;}
+  .ocard .oico{font-size:38px;} .ocard .oname{font-weight:800; font-size:12.5px; margin-top:4px; line-height:1.3;}
+  .ocard .onum{position:absolute; top:-10px; left:-10px; width:28px; height:28px; border-radius:50%; background:#41c98a; color:#fff; font-weight:900; display:none; align-items:center; justify-content:center; font-size:15px;} .ocard.done .onum{display:flex;}
+  .orderHint{margin-top:14px; font-weight:800; color:var(--ink2); text-align:center;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qtag{display:inline-block; font-size:12px; font-weight:900; padding:3px 10px; border-radius:10px; margin-bottom:6px;} .qtag.math{background:#e6f0ff;color:#2f7fe0;} .qtag.en{background:#e3edff;color:#3f7ae0;} .qtag.sci{background:#eaf6ee;color:#2ba36a;} .qtag.cn{background:#fff1d6;color:#c98a2b;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #eed9bc; background:#fff9f0; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#f0a94e,#c8792a); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#f4ecdd; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">四季是怎么来的<small>环球探险 · 地球绕太阳</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🍂</div>
+    <div class="introCard"><b>为什么会有春、夏、秋、冬？是谁在换季节？</b><br>秘密在天上：地球<b>斜着身子</b>，一边自转、一边绕着太阳转一大圈。转一圈刚好是<b>一年</b>。
+      <div class="idiom">📖 语文小课堂 · 古人写四季：「<b>春</b>有百花<b>秋</b>有月，<b>夏</b>有凉风<b>冬</b>有雪」——一句诗，四个季节的样子全在里面。</div>
+    </div>
+    <button class="bigbtn" onclick="go('explore')">去看地球转 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🌍 地球绕太阳</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">🍁 四季的样子</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-orbit">
+        <canvas id="cvO" width="600" height="300"></canvas>
+        <div class="oBtns"><button onclick="nextSeason()">🔄 转到下一个季节 ▶</button></div>
+        <div class="oCap" id="oCap">点“<b>转到下一个季节</b>”，让地球绕太阳走一走，看看我们这边（北半球）是什么季节～</div>
+      </div>
+      <div class="subview" id="ex-know">
+        <div class="tipRow" id="tipRow">
+          <div class="tc on" data-i="0"><div class="ti">🌸</div><div class="tn">春</div></div>
+          <div class="tc" data-i="1"><div class="ti">☀️</div><div class="tn">夏</div></div>
+          <div class="tc" data-i="2"><div class="ti">🍁</div><div class="tn">秋</div></div>
+          <div class="tc" data-i="3"><div class="ti">❄️</div><div class="tn">冬</div></div>
+          <div class="tc subj" data-i="4"><div class="ti">🔤</div><div class="tn">英语角</div></div>
+        </div>
+        <div class="tipCap" id="tipCap"><b>春天</b>：天气变暖，冰雪化了，草发芽、花开放，小动物醒过来。「春暖花开」说的就是它。</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 让地球转完<b>一整圈</b>（春→夏→秋→冬），就能去闯关！（<span id="cnt">1</span>/4）</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 四季的顺序<small>从春天开始，把四季按顺序排好</small></div>
+    <div class="gsub on" id="g-order">
+      <div class="orderRow" id="orderRow"></div>
+      <div class="orderHint" id="orderHint">先点最先到来的季节～🌸</div>
+      <div class="roundNext" id="orderNext"><div class="ok">排对啦！一年转一圈～🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qtag" id="qtag"></div><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>转完一圈啦！</h2><div class="medalName">🎖 四季小博士</div>
+      <p>你看懂了季节的秘密：<br>• 地球<b>斜着身子</b>绕太阳转，转一圈是<b>一年</b>；<br>• 某段时间我们这边被太阳晒得<b>正、时间长</b>，就是<b>夏天</b>；晒得<b>斜、时间短</b>，就是<b>冬天</b>；<br>• 顺序永远是 春 → 夏 → 秋 → 冬，转个不停；<br>• 🔢 数学：一年 12 个月分给 4 季，每季 <b>3</b> 个月；🔤 英语：spring / summer / autumn / winter。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再来一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-orbit').classList.toggle('on',v==='A'); document.getElementById('ex-know').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='block'; }
+
+/* ===== 地球绕太阳 ===== */
+const cvO=document.getElementById('cvO'), oc=cvO.getContext('2d'); const OW=cvO.width, OH=cvO.height, sunx=OW/2, suny=OH/2, ra=200, rb=95;
+const SEA=[{n:'春天',e:'🌸',c:'#6fbf73'},{n:'夏天',e:'☀️',c:'#f0a83a'},{n:'秋天',e:'🍁',c:'#d97a3a'},{n:'冬天',e:'❄️',c:'#7fb0e0'}];
+let si=0; const visited=new Set([0]); let ang=Math.PI; // 起始在左(春)
+function nextSeason(){ si=(si+1)%4; visited.add(si); document.getElementById('cnt').textContent=visited.size;
+  const s=SEA[si];
+  oc._target = Math.PI - si*Math.PI/2; // 目标角度
+  document.getElementById('oCap').innerHTML = si===1 ? '☀️ 现在北半球正对太阳、被晒得又正又久——这就是<b>夏天</b>，最热！'
+    : si===3 ? '❄️ 现在北半球斜对太阳、晒得又斜又短——这就是<b>冬天</b>，最冷！'
+    : `🌍 地球转到了<b>${s.n}</b>。地球斜着身子转，被晒的角度一直在变，季节就跟着换。`;
+  if(visited.size>=4 && !document.getElementById('nextBtn').style.display.includes('block')){ unlockGame(); document.getElementById('nextHint').innerHTML='✅ 四季都看过啦！点下面去闯关～'; }
+}
+let cur=Math.PI;
+function drawO(){ oc.clearRect(0,0,OW,OH); oc.fillStyle='#141830'; oc.fillRect(0,0,OW,OH);
+  // 轨道
+  oc.strokeStyle='rgba(255,255,255,.25)'; oc.lineWidth=2; oc.setLineDash([4,7]); oc.beginPath(); oc.ellipse(sunx,suny,ra,rb,0,0,7); oc.stroke(); oc.setLineDash([]);
+  // 四季标记点
+  SEA.forEach((s,i)=>{ const a=Math.PI - i*Math.PI/2; const x=sunx+ra*Math.cos(a), y=suny+rb*Math.sin(a);
+    oc.globalAlpha = i===si?1:.4; oc.font='20px system-ui'; oc.textAlign='center'; oc.textBaseline='middle'; oc.fillText(s.e,x,y-26); oc.globalAlpha=1; });
+  // 太阳
+  oc.save(); oc.shadowBlur=30; oc.shadowColor='#ffcf5a'; oc.font='52px system-ui'; oc.textAlign='center'; oc.textBaseline='middle'; oc.fillText('☀️',sunx,suny); oc.restore();
+  // 地球平滑转到目标
+  const tgt = Math.PI - si*Math.PI/2; let d=tgt-cur; while(d>Math.PI)d-=2*Math.PI; while(d<-Math.PI)d+=2*Math.PI; cur+=d*0.12;
+  const ex=sunx+ra*Math.cos(cur), ey=suny+rb*Math.sin(cur);
+  // 地球（带倾斜地轴，始终指右上）
+  oc.beginPath(); oc.arc(ex,ey,20,0,7); const g=oc.createRadialGradient(ex-6,ey-6,3,ex,ey,20); g.addColorStop(0,'#8fd0ff'); g.addColorStop(1,'#2f7fc0'); oc.fillStyle=g; oc.fill();
+  oc.strokeStyle='#fff'; oc.lineWidth=2; oc.beginPath(); oc.moveTo(ex-8,ey+12); oc.lineTo(ex+8,ey-12); oc.stroke(); // 倾斜地轴
+  // 朝太阳一面的阳光提示
+  const toSun=Math.atan2(suny-ey,sunx-ex); oc.strokeStyle='rgba(255,210,90,.6)'; oc.lineWidth=3; oc.beginPath(); oc.moveTo(ex,ey); oc.lineTo(ex+Math.cos(toSun)*26,ey+Math.sin(toSun)*26); oc.stroke();
+  // 季节名
+  oc.fillStyle=SEA[si].c; oc.font='bold 16px system-ui'; oc.textAlign='center'; oc.fillText('北半球：'+SEA[si].n, sunx, OH-16);
+  requestAnimationFrame(drawO);
+}
+drawO();
+
+/* ===== 四季的样子（含英语角）===== */
+const TIP=['<b>春天</b>：天气变暖，冰雪化了，草发芽、花开放，小动物醒来。「春暖花开」说的就是它。',
+ '<b>夏天</b>：太阳晒得最正最久，天气最热，白天很长。可以游泳、吃西瓜，还常有雷阵雨。',
+ '<b>秋天</b>：天气转凉，树叶变黄变红飘落，稻子、水果成熟。「秋高气爽」形容秋天天高气清。',
+ '<b>冬天</b>：太阳晒得最斜最短，天气最冷，白天很短，有的地方会下雪，动物会冬眠。',
+ '🔤 <span class="en">英语角</span>：春 <b class="en">spring</b>、夏 <b class="en">summer</b>、秋 <b class="en">autumn</b>、冬 <b class="en">winter</b>。读一读四季的英文吧！'];
+document.querySelectorAll('#tipRow .tc').forEach(c=>c.addEventListener('click',()=>{ document.querySelectorAll('#tipRow .tc').forEach(x=>x.classList.remove('on')); c.classList.add('on'); document.getElementById('tipCap').innerHTML=TIP[+c.dataset.i]; }));
+
+/* ===== 闯关1 排顺序 ===== */
+const STEPS=[{ico:'🌸',name:'春（花开）'},{ico:'☀️',name:'夏（最热）'},{ico:'🍁',name:'秋（叶落）'},{ico:'❄️',name:'冬（下雪）'}];
+let expect=0;
+function buildOrder(){ const row=document.getElementById('orderRow');
+  const arr=STEPS.map((o,idx)=>({...o,idx})); for(let i=arr.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[arr[i],arr[j]]=[arr[j],arr[i]];}
+  arr.forEach(o=>{ const d=document.createElement('div'); d.className='ocard'; d.dataset.idx=o.idx;
+    d.innerHTML=`<div class="onum"></div><div class="oico">${o.ico}</div><div class="oname">${o.name}</div>`;
+    d.onclick=()=>{ if(d.classList.contains('done'))return;
+      if(+d.dataset.idx===expect){ d.classList.add('done'); d.querySelector('.onum').textContent=++expect;
+        orderHint.textContent = expect===STEPS.length ? '全部排好啦！' : '接着点第 '+(expect+1)+' 个季节～';
+        if(expect===STEPS.length) document.getElementById('orderNext').style.display='block'; }
+      else { d.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); orderHint.textContent='🤔 想想上一个季节是什么？'; } };
+    row.appendChild(d); });
+}
+buildOrder();
+
+/* ===== 闯关2 判断（含数学题）===== */
+const QUIZ=[
+ {tag:'sci',tl:'科学',ico:'🌍',q:'一年有春夏秋冬，是因为地球在做什么？',opts:[['斜着身子绕太阳转一大圈',1],['离太阳一会儿近一会儿远地跳',0],['太阳自己在换颜色',0]],fb:'地球斜着绕太阳转，被晒的角度变，就有四季。'},
+ {tag:'math',tl:'数学',ico:'🔢',q:'一年有 12 个月，平均分成 4 个季节，每个季节有几个月？',opts:[['3 个月',1],['4 个月',0],['2 个月',0]],fb:'12 ÷ 4 = 3，每季 3 个月。'},
+ {tag:'sci',tl:'科学',ico:'☀️',q:'一年里最热的夏天，是因为我们这边？',opts:[['被太阳晒得又正又久',1],['离月亮特别近',0],['地球停下来不转了',0]],fb:'夏天太阳晒得最正、白天最长，所以最热。'},
+ {tag:'en',tl:'英语',ico:'🔤',q:'“夏天”用英语怎么说？',opts:[['summer',1],['winter',0],['spring',0]],fb:'summer 夏 / winter 冬 / spring 春 / autumn 秋。'},
+];
+let qi=0; function startQuiz(){ document.getElementById('g-order').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>科学 + 数学 + 英语，一起来</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; const tag=document.getElementById('qtag'); tag.className='qtag '+it.tag; tag.textContent=it.tl; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('seasons','🍂','四季小博士'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#6fbf73','#f0a83a','#d97a3a','#7fb0e0','#ffd36b','#b58bff']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

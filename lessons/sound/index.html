@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>好听的声音 · 知识乐园</title>
+<style>
+  :root{ --accent:#2fa2b8; --bg1:#e9fafd; --bg2:#b6e4ee; --ink:#204b56; --ink2:#547b86; --card:#fff; --shadow:0 10px 30px rgba(40,120,140,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:96px;}
+  .introCard{background:var(--card); border-radius:24px; padding:24px 30px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(16px,2.3vw,20px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#5fc6d8,#2296ac); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:20px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  #ex-pitch{flex-direction:column; align-items:center; justify-content:center; gap:14px;}
+  #wave{width:100%; max-width:560px; height:auto; background:var(--card); border-radius:18px; box-shadow:var(--shadow);}
+  .keys{display:flex; gap:10px;}
+  .key{width:64px; height:96px; border-radius:14px; background:var(--card); box-shadow:var(--shadow); cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; border:3px solid transparent;}
+  .key:active{transform:scale(.95);} .key.on{border-color:var(--accent); background:#e6f8fb;}
+  .key .ke{font-size:34px;} .key .kn{font-size:12px; font-weight:900; color:var(--ink2); margin-top:2px;}
+  .pitchCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(14px,2vw,17px); font-weight:800; max-width:560px; text-align:center; min-height:46px; display:flex; align-items:center; justify-content:center; line-height:1.5;} .pitchCap b{color:var(--accent);}
+  #ex-vib{flex-direction:column; align-items:center; justify-content:center; gap:14px;}
+  #vib{width:100%; max-width:560px; height:auto; background:var(--card); border-radius:18px; box-shadow:var(--shadow); cursor:pointer;}
+  .vibBtns{display:flex; gap:10px;} .vibBtns button{border:none; border-radius:14px; padding:11px 18px; font-weight:800; font-size:15px; cursor:pointer; background:#dff3f7; color:var(--accent);}
+  .nextHint{background:#e2f5f9; border-radius:14px; padding:10px 14px; font-weight:800; color:#2b7f8f; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#5fc6d8,#2296ac); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:14px; width:100%; max-width:560px; justify-content:center;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #a9d8e2; border-radius:20px; padding:12px 8px; text-align:center; min-height:150px; transition:.2s;} .bin.over{border-color:var(--accent); background:#e6f8fb;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:34px;} .bin .binName{font-weight:900; font-size:19px; margin-top:4px;} .bin .binHint{font-size:12px; color:var(--ink2); font-weight:700;}
+  .bin .binDrop{margin-top:8px; min-height:70px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:12px; margin-top:20px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:16px; box-shadow:var(--shadow); padding:10px 14px; text-align:center; cursor:grab; touch-action:none;} .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg);} .item.placed{cursor:default; box-shadow:none; padding:5px 7px;}
+  .item .itIco{font-size:34px;} .item.placed .itIco{font-size:24px;} .item .itName{font-weight:800; font-size:13px;} .item.placed .itName{font-size:11px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #d3ebf0; background:#f4fbfc; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#5fc6d8,#2296ac); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#eef4f5; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">好听的声音<small>艺术/科学 · 高音低音与声音的来源</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🎹</div>
+    <div class="introCard"><b>声音是从哪来的？为什么有的又高又尖，有的又低又粗？</b><br>戴上耳朵当乐器，敲一敲、听一听，<br>你会发现声音里藏着一个小秘密。</div>
+    <button class="bigbtn" onclick="go('explore')">开始听 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🎵 高音和低音</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">〰️ 声音怎么来的</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-pitch">
+        <canvas id="wave" width="560" height="150"></canvas>
+        <div class="keys" id="keys"></div>
+        <div class="pitchCap" id="pitchCap">点下面的键，从左到右听一听。注意：<b>大的东西</b>声音低，<b>小的东西</b>声音高。</div>
+      </div>
+      <div class="subview" id="ex-vib">
+        <canvas id="vib" width="560" height="220"></canvas>
+        <div class="vibBtns"><button onclick="pluck()">👆 拨一下</button><button onclick="damp()">✋ 按住让它停</button></div>
+        <div class="pitchCap" id="vibCap">点一下那根弦：它会来回<b>震动</b>，同时发出声音。震动停止，声音也会停止。</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 又低又粗、又高又尖的声音都听一听，就能去闯关！（<span id="cnt">0</span>/2）</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 高音还是低音<small>把它们拖到对的一边</small></div>
+    <div class="gsub on" id="g-sort">
+      <div class="bins">
+        <div class="bin" data-k="high"><div class="binIco">🔺</div><div class="binName">高音</div><div class="binHint">又细又尖</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="low"><div class="binIco">🔻</div><div class="binName">低音</div><div class="binHint">又粗又低</div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray">
+        <div class="item" data-k="high"><div class="itIco">🐭</div><div class="itName">老鼠叫</div></div>
+        <div class="item" data-k="high"><div class="itIco">🐦</div><div class="itName">小鸟叫</div></div>
+        <div class="item" data-k="high"><div class="itIco">🔔</div><div class="itName">小铃铛</div></div>
+        <div class="item" data-k="low"><div class="itIco">🐘</div><div class="itName">大象叫</div></div>
+        <div class="item" data-k="low"><div class="itIco">🥁</div><div class="itName">大鼓</div></div>
+        <div class="item" data-k="low"><div class="itIco">🦁</div><div class="itName">狮子吼</div></div>
+      </div>
+      <div class="roundNext" id="sortNext"><div class="ok">全部答对！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>听懂啦！</h2><div class="medalName">🎖 声音小耳朵</div>
+      <p>你搞清楚了：<br>• 声音是物体<b>震动</b>产生的，震动停、声音停；<br>• 震动快 → <b>高音</b>（细尖）；震动慢 → <b>低音</b>（粗低）；<br>• 一般来说，<b>越大的东西声音越低</b>（大鼓、大象），越小的越高（铃铛、小鸟）。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再来一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-pitch').classList.toggle('on',v==='A'); document.getElementById('ex-vib').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='block'; }
+
+/* 音频 */
+let AC; function tone(f,dur){ try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended')AC.resume(); const o=AC.createOscillator(), g=AC.createGain(); o.type='sine'; o.frequency.value=f; o.connect(g); g.connect(AC.destination); const t=AC.currentTime; g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.22,t+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+(dur||0.6)); o.start(t); o.stop(t+(dur||0.6)+0.02);}catch(e){} }
+
+/* Tab A 音调 */
+const KEYS=[{f:150,e:'🐘',n:'很低'},{f:230,e:'🐮',n:'低'},{f:340,e:'🐱',n:'中'},{f:500,e:'🐭',n:'高'},{f:720,e:'🐦',n:'很高'}];
+const seen={low:false,high:false};
+const keysBox=document.getElementById('keys');
+KEYS.forEach((k,i)=>{ const d=document.createElement('div'); d.className='key'; d.innerHTML=`<div class="ke">${k.e}</div><div class="kn">${k.n}</div>`;
+  d.onclick=()=>{ document.querySelectorAll('.key').forEach(x=>x.classList.remove('on')); d.classList.add('on'); tone(k.f); waveF=k.f/120; waveT=1;
+    document.getElementById('pitchCap').innerHTML = k.f>=500?'这是<b>高音</b>：又细又尖，波形又密又挤（震动快）。':k.f<=230?'这是<b>低音</b>：又粗又沉，波形又疏又缓（震动慢）。':'中间的音。左边更低、右边更高，听出区别了吗？';
+    if(k.f<=230)seen.low=true; if(k.f>=500)seen.high=true; const n=(seen.low?1:0)+(seen.high?1:0); document.getElementById('cnt').textContent=n; if(seen.low&&seen.high) unlockGame(); };
+  keysBox.appendChild(d); });
+const wc=document.getElementById('wave'), wg=wc.getContext('2d'); let waveF=3, waveT=0, phase=0;
+function drawWave(){ wg.clearRect(0,0,wc.width,wc.height); phase+=0.15; const amp=(30+waveT*30); waveT*=0.985;
+  wg.strokeStyle='#2fa2b8'; wg.lineWidth=3; wg.beginPath();
+  for(let x=0;x<=wc.width;x+=3){ const y=wc.height/2 + Math.sin(x*0.03*waveF + phase)*amp*(0.4+0.6*waveT); if(x===0)wg.moveTo(x,y);else wg.lineTo(x,y); } wg.stroke();
+  requestAnimationFrame(drawWave); }
+drawWave();
+
+/* Tab B 震动的弦 */
+const vc=document.getElementById('vib'), vg=vc.getContext('2d'); let vAmp=0, vPhase=0;
+function drawVib(){ vg.clearRect(0,0,vc.width,vc.height); const y0=vc.height/2;
+  vg.fillStyle='#8a5a2b'; vg.fillRect(40,y0-40,10,80); vg.fillRect(vc.width-50,y0-40,10,80);
+  vPhase+=0.5; vAmp*=0.975; vg.strokeStyle='#2296ac'; vg.lineWidth=4; vg.beginPath();
+  for(let x=50;x<=vc.width-50;x+=4){ const t=(x-50)/(vc.width-100); const env=Math.sin(t*Math.PI); const y=y0+Math.sin(vPhase)*vAmp*env; if(x===50)vg.moveTo(x,y);else vg.lineTo(x,y); } vg.stroke();
+  vg.fillStyle='#547b86'; vg.font='bold 14px system-ui'; vg.textAlign='center'; vg.fillText(vAmp>3?'弦在震动……发出声音':'弦静止……没有声音', vc.width/2, vc.height-14);
+  requestAnimationFrame(drawVib); }
+drawVib();
+vc.addEventListener('click', pluck);
+function pluck(){ vAmp=34; tone(240,0.8); document.getElementById('vibCap').innerHTML='弦在快速<b>来回震动</b>，推动空气，就产生了声音。看到波动了吗？'; }
+function damp(){ vAmp=0; document.getElementById('vibCap').innerHTML='你按住了弦，<b>震动停止</b>——声音也立刻停了。物体不动，就没有声音。'; }
+
+/* 闯关1 拖拽 */
+const tray=document.getElementById('tray'); let active=null,ox=0,oy=0,placed=0; const TOTAL=6;
+const binAt=(x,y)=>[...document.querySelectorAll('#g-sort .bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+document.querySelectorAll('#g-sort .item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return; active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top; el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el); el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px'; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b&&!b.classList.contains('filled'))b.classList.add('over'); }
+addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+  const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+  if(bin&&bin.dataset.k===el.dataset.k){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); bin.classList.add('filled'); placed++; if(placed===TOTAL) document.getElementById('sortNext').style.display='block'; }
+  else { rst(); tray.appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+
+/* 闯关2 判断 */
+const QUIZ=[{ico:'〰️',q:'声音是怎么产生的？',opts:[['物体在震动',1],['物体在发光',0],['物体在变冷',0]],fb:'一切声音都来自物体的震动。'},
+ {ico:'🥁',q:'一般来说，越大的东西（大鼓、大象）发出的声音会？',opts:[['越低越粗',1],['越高越尖',0],['一样高',0]],fb:'大的东西震动慢，声音就低。'},
+ {ico:'✋',q:'敲响的鼓，用手一按鼓面，声音会怎样？',opts:[['马上变小、停下（震动被按停了）',1],['变得更响',0],['变高',0]],fb:'按住鼓面，震动停止，声音也停。'},
+ {ico:'🐦',q:'又细又尖的声音，我们叫它？',opts:[['高音',1],['低音',0],['没有名字',0]],fb:'震动快=高音；震动慢=低音。'}];
+let qi=0; function startQuiz(){ document.getElementById('g-sort').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>把声音的道理用起来</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1400);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='想想震动和大小～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('sound','🎹','声音小耳朵'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#5fc6d8','#ffd36b','#2296ac','#41c98a','#ff9f43','#b58bff']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

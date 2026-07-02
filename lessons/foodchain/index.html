@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>谁吃谁 · 知识乐园</title>
+<style>
+  :root{ --accent:#6f9e35; --bg1:#f4faea; --bg2:#d3e8b0; --ink:#3d4a26; --ink2:#6b7a4c; --card:#fff; --shadow:0 10px 30px rgba(110,140,50,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:96px;}
+  .introCard{background:var(--card); border-radius:24px; padding:24px 30px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(16px,2.3vw,20px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#9ec95a,#5f8a2c); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:20px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  #ex-chain{flex-direction:column; align-items:center; justify-content:center; gap:14px;}
+  .chainView{display:flex; align-items:center; gap:6px; min-height:80px; flex-wrap:wrap; justify-content:center;}
+  .cv-item{background:var(--card); border-radius:14px; box-shadow:var(--shadow); padding:8px 12px; text-align:center;} .cv-item .ce{font-size:34px;} .cv-item .cn{font-size:12px; font-weight:800;}
+  .cv-arr{font-size:24px; color:var(--accent); font-weight:900;}
+  .pool{display:flex; gap:12px; flex-wrap:wrap; justify-content:center;}
+  .pc{background:var(--card); border-radius:14px; box-shadow:var(--shadow); padding:10px 14px; text-align:center; cursor:pointer; border:3px solid transparent;} .pc:active{transform:scale(.94);} .pc.used{opacity:.35; pointer-events:none;}
+  .pc .pe{font-size:34px;} .pc .pn{font-size:12px; font-weight:800;}
+  .chainCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(14px,2vw,17px); font-weight:800; max-width:560px; text-align:center; min-height:46px; display:flex; align-items:center; justify-content:center; line-height:1.5;} .chainCap b{color:var(--accent);}
+  #ex-sun{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  .sunRow{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; width:100%; max-width:680px;}
+  @media (max-width:600px){ .sunRow{grid-template-columns:repeat(2,1fr);} }
+  .sc{background:var(--card); border-radius:16px; padding:14px 6px; text-align:center; box-shadow:var(--shadow); cursor:pointer; border:3px solid transparent;} .sc:active{transform:scale(.95);} .sc.on{border-color:var(--accent); background:#f2f9e6;}
+  .sc .sci{font-size:38px;} .sc .scn{font-weight:900; font-size:13px; margin-top:3px;} .sc .scr{font-size:11px; color:var(--ink2); font-weight:800;}
+  .sunCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(15px,2.2vw,18px); font-weight:800; max-width:680px; width:100%; text-align:center; min-height:48px; display:flex; align-items:center; justify-content:center;} .sunCap b{color:var(--accent);}
+  .nextHint{background:#f0f7df; border-radius:14px; padding:10px 14px; font-weight:800; color:#6a8a35; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#9ec95a,#5f8a2c); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:14px; width:100%; max-width:560px; justify-content:center;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #cbe0a5; border-radius:20px; padding:12px 8px; text-align:center; min-height:150px; transition:.2s;} .bin.over{border-color:var(--accent); background:#f2f9e6;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:34px;} .bin .binName{font-weight:900; font-size:18px; margin-top:4px;} .bin .binHint{font-size:12px; color:var(--ink2); font-weight:700;}
+  .bin .binDrop{margin-top:8px; min-height:70px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:12px; margin-top:20px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:16px; box-shadow:var(--shadow); padding:10px 14px; text-align:center; cursor:grab; touch-action:none;} .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg);} .item.placed{cursor:default; box-shadow:none; padding:5px 7px;}
+  .item .itIco{font-size:32px;} .item.placed .itIco{font-size:24px;} .item .itName{font-weight:800; font-size:12px;} .item.placed .itName{font-size:10px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #dcebc4; background:#f8fcef; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#9ec95a,#5f8a2c); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#eff3e6; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">谁吃谁<small>生物 · 大自然里的食物链</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🦁</div>
+    <div class="introCard"><b>草被虫子吃，虫子被青蛙吃，青蛙又被蛇吃……</b><br>大自然里，谁吃谁是有顺序的。<br>把它们一环一环连起来，就是一条<b>食物链</b>。来连一条看看。</div>
+    <button class="bigbtn" onclick="go('explore')">开始连 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🔗 连成食物链</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">☀️ 能量从太阳来</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-chain">
+        <div class="chainView" id="chainView"></div>
+        <div class="pool" id="pool"></div>
+        <div class="chainCap" id="chainCap">按“谁被谁吃”的顺序，从最开始的 <b>稻子</b> 开始，一个一个点下去～</div>
+      </div>
+      <div class="subview" id="ex-sun">
+        <div class="sunRow" id="sunRow">
+          <div class="sc on" data-i="0"><div class="sci">☀️</div><div class="scn">太阳</div><div class="scr">能量来源</div></div>
+          <div class="sc" data-i="1"><div class="sci">🌿</div><div class="scn">绿色植物</div><div class="scr">生产者</div></div>
+          <div class="sc" data-i="2"><div class="sci">🐛</div><div class="scn">吃植物的动物</div><div class="scr">消费者</div></div>
+          <div class="sc" data-i="3"><div class="sci">🦅</div><div class="scn">吃动物的动物</div><div class="scr">消费者</div></div>
+        </div>
+        <div class="sunCap" id="sunCap">一切食物的能量，最早都来自<b>太阳</b>。点卡片，看能量怎么一步步传下去。</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 把食物链完整连起来，就能去闯关！</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 吃草还是吃肉<small>把动物拖到对的一边</small></div>
+    <div class="gsub on" id="g-sort">
+      <div class="bins">
+        <div class="bin" data-k="plant"><div class="binIco">🌿</div><div class="binName">吃植物</div><div class="binHint">植食动物</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="meat"><div class="binIco">🍖</div><div class="binName">吃动物</div><div class="binHint">肉食动物</div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray">
+        <div class="item" data-k="plant"><div class="itIco">🐰</div><div class="itName">兔子</div></div>
+        <div class="item" data-k="plant"><div class="itIco">🐐</div><div class="itName">山羊</div></div>
+        <div class="item" data-k="plant"><div class="itIco">🐛</div><div class="itName">毛毛虫</div></div>
+        <div class="item" data-k="meat"><div class="itIco">🦊</div><div class="itName">狐狸</div></div>
+        <div class="item" data-k="meat"><div class="itIco">🦅</div><div class="itName">老鹰</div></div>
+        <div class="item" data-k="meat"><div class="itIco">🐍</div><div class="itName">蛇</div></div>
+      </div>
+      <div class="roundNext" id="sortNext"><div class="ok">全部答对！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>连对啦！</h2><div class="medalName">🎖 食物链小侦探</div>
+      <p>你搞清楚了：<br>• <b>食物链</b>是“谁被谁吃”的一串关系，如 稻子→蝗虫→青蛙→蛇；<br>• 开头通常是能自己造养分的<b>绿色植物</b>（靠阳光）；<br>• 一环出问题，整条链上的动物都会受影响。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再来一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-chain').classList.toggle('on',v==='A'); document.getElementById('ex-sun').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='block'; }
+
+/* 连食物链 */
+const CHAIN=[{e:'🌾',n:'稻子'},{e:'🦗',n:'蝗虫'},{e:'🐸',n:'青蛙'},{e:'🐍',n:'蛇'}];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+const pool=document.getElementById('pool'), chainView=document.getElementById('chainView'); let expect=0;
+shuffle(CHAIN.map((o,idx)=>({...o,idx}))).forEach(o=>{ const d=document.createElement('div'); d.className='pc'; d.dataset.idx=o.idx; d.innerHTML=`<div class="pe">${o.e}</div><div class="pn">${o.n}</div>`;
+  d.onclick=()=>{ if(+d.dataset.idx===expect){ d.classList.add('used');
+      if(expect>0){ const arr=document.createElement('div'); arr.className='cv-arr'; arr.textContent='→'; chainView.appendChild(arr); }
+      const it=document.createElement('div'); it.className='cv-item'; it.innerHTML=`<div class="ce">${CHAIN[expect].e}</div><div class="cn">${CHAIN[expect].n}</div>`; chainView.appendChild(it);
+      if(expect>0) document.getElementById('chainCap').innerHTML=`<b>${CHAIN[expect-1].n}</b> 被 <b>${CHAIN[expect].n}</b> 吃掉。箭头指向“吃它的一方”。`;
+      expect++; if(expect===CHAIN.length){ document.getElementById('chainCap').innerHTML='🎉 完整的<b>食物链</b>：稻子→蝗虫→青蛙→蛇。能量就这样一环环传下去。'; unlockGame(); }
+    } else { d.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); document.getElementById('chainCap').innerHTML='🤔 顺序不对～ 想想：最开始是能自己长的植物，然后谁吃它？'; } };
+  pool.appendChild(d); });
+
+/* 太阳能量 */
+const SUN=['一切能量最早都来自<b>太阳</b>。植物晒太阳，把阳光变成养分。',
+ '<b>绿色植物</b>能自己制造养分（光合作用），叫做<b>生产者</b>，是食物链的开头。',
+ '<b>吃植物的动物</b>（如毛毛虫、兔子）叫<b>消费者</b>，从植物那里得到能量。',
+ '<b>吃动物的动物</b>（如老鹰、蛇）也是消费者，从别的动物那里得到能量。'];
+document.querySelectorAll('#sunRow .sc').forEach(c=>c.addEventListener('click',()=>{ document.querySelectorAll('#sunRow .sc').forEach(x=>x.classList.remove('on')); c.classList.add('on'); document.getElementById('sunCap').innerHTML=SUN[+c.dataset.i]; }));
+
+/* 闯关1 拖拽 */
+const tray=document.getElementById('tray'); let active=null,ox=0,oy=0,placed=0; const TOTAL=6;
+const binAt=(x,y)=>[...document.querySelectorAll('#g-sort .bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+document.querySelectorAll('#g-sort .item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return; active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top; el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el); el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px'; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b&&!b.classList.contains('filled'))b.classList.add('over'); }
+addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+  const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+  if(bin&&bin.dataset.k===el.dataset.k){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); bin.classList.add('filled'); placed++; if(placed===TOTAL) document.getElementById('sortNext').style.display='block'; }
+  else { rst(); tray.appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+
+/* 闯关2 判断 */
+const QUIZ=[{ico:'🌿',q:'食物链最开始、能自己制造养分的，通常是？',opts:[['绿色植物',1],['老鹰',0],['青蛙',0]],fb:'绿色植物靠阳光造养分，是食物链的起点。'},
+ {ico:'🦊',q:'在“草→兔→狐”里，如果兔子全都消失了，狐狸会？',opts:[['缺少食物，跟着挨饿',1],['变得更多',0],['一点影响都没有',0]],fb:'食物链上一环出问题，后面的动物就会受影响。'},
+ {ico:'☀️',q:'植物能自己制造养分，靠的是？',opts:[['阳光（光合作用）',1],['吃小虫子',0],['喝牛奶',0]],fb:'植物用阳光、水和空气自己造养分。'},
+ {ico:'🐰',q:'下面哪种动物是“吃植物的”？',opts:[['兔子',1],['老虎',0],['狐狸',0]],fb:'兔子吃草，是植食动物。'}];
+let qi=0; function startQuiz(){ document.getElementById('g-sort').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>把食物链的道理用起来</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1400);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='想想谁吃谁～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('foodchain','🦁','食物链小侦探'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#9ec95a','#ffd36b','#3aa7ff','#41c98a','#ff9f43','#b58bff']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

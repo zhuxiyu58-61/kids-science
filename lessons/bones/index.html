@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>我们的骨头 · 知识乐园</title>
+<style>
+  :root{ --accent:#b5854a; --bg1:#fbf5ea; --bg2:#e7d5b6; --ink:#4f4127; --ink2:#8a7550; --card:#fff; --shadow:0 10px 30px rgba(140,110,60,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:96px;}
+  .introCard{background:var(--card); border-radius:24px; padding:24px 30px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(16px,2.3vw,20px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#d0a768,#a8783a); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:20px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  #ex-skel{gap:16px;} @media (max-width:760px){ #ex-skel{flex-direction:column; overflow:auto;} }
+  .skelWrap{flex:1; display:flex; align-items:center; justify-content:center; min-height:0;}
+  .boneArea{position:relative; display:inline-block; width:100%; max-width:260px; line-height:0;}
+  #cvS{width:100%; height:auto; display:block;}
+  .mk{position:absolute; transform:translate(-50%,-50%); background:#fff; border:none; border-radius:50%; width:44px; height:44px; font-size:22px; box-shadow:var(--shadow); cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1;}
+  .mk:active{transform:translate(-50%,-50%) scale(.9);} .mk.on{outline:4px solid var(--accent);}
+  .panel{flex:1.05; display:flex; flex-direction:column; gap:10px; min-height:0; justify-content:center;}
+  .boneBadge{display:flex; align-items:center; gap:12px; background:var(--card); border-radius:18px; padding:12px 16px; box-shadow:var(--shadow);} .boneBadge .bf{font-size:36px;} .boneBadge .bn{font-size:20px; font-weight:900;}
+  .bubble{background:var(--card); border-radius:16px; padding:13px 16px; box-shadow:var(--shadow); font-size:clamp(14px,2vw,16px); line-height:1.6; font-weight:600;} .bubble b{color:var(--accent); font-weight:900;}
+  #ex-use{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  .useRow{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; width:100%; max-width:560px;}
+  .uc{background:var(--card); border-radius:16px; padding:16px 8px; text-align:center; box-shadow:var(--shadow); cursor:pointer; border:3px solid transparent;} .uc:active{transform:scale(.95);} .uc.on{border-color:var(--accent); background:#fbf3e6;}
+  .uc .ue{font-size:38px;} .uc .un{font-weight:900; font-size:13px; margin-top:4px;}
+  .useCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(15px,2.2vw,18px); font-weight:800; max-width:560px; width:100%; text-align:center; min-height:48px; display:flex; align-items:center; justify-content:center;} .useCap b{color:var(--accent);}
+  .nextHint{background:#fbf2e0; border-radius:14px; padding:10px 14px; font-weight:800; color:#a87c3a; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#d0a768,#a8783a); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:10px; width:100%; max-width:640px; justify-content:center;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #e2cba0; border-radius:18px; padding:10px 6px; text-align:center; min-height:140px; transition:.2s;} .bin.over{border-color:var(--accent); background:#fbf3e6;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:28px;} .bin .binName{font-weight:900; font-size:15px; margin-top:2px;} .bin .binHint{font-size:11px; color:var(--ink2); font-weight:700;}
+  .bin .binDrop{margin-top:6px; min-height:60px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:3px;}
+  .tray{display:flex; gap:10px; margin-top:18px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:14px; box-shadow:var(--shadow); padding:8px 12px; text-align:center; cursor:grab; touch-action:none;} .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg);} .item.placed{cursor:default; box-shadow:none; padding:4px 7px;}
+  .item .itIco{font-size:26px;} .item.placed .itIco{font-size:20px;} .item .itName{font-weight:800; font-size:12px;} .item.placed .itName{font-size:10px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #ecdcbe; background:#fdf8ee; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#d0a768,#a8783a); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#f4eee2; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">我们的骨头<small>生物 · 骨骼有什么用</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🦴</div>
+    <div class="introCard"><b>如果身体里没有骨头，人会像一摊软软的泥，站都站不起来。</b><br>骨头到底有什么用？摸摸你的脑袋、胸口、胳膊，都能摸到硬硬的骨头。<br>一起看看它们都在哪、都做些什么。</div>
+    <button class="bigbtn" onclick="go('explore')">开始探索 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🦴 点点骨头</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">💪 骨头的本领</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-skel">
+        <div class="skelWrap">
+          <div class="boneArea" id="boneArea">
+            <canvas id="cvS" width="260" height="420"></canvas>
+            <button class="mk" data-i="0" style="left:50%;top:9%">💀</button>
+            <button class="mk" data-i="1" style="left:50%;top:31%">🫁</button>
+            <button class="mk" data-i="2" style="left:61%;top:47%">🦴</button>
+            <button class="mk" data-i="3" style="left:23%;top:40%">💪</button>
+            <button class="mk" data-i="4" style="left:41%;top:80%">🦵</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="boneBadge"><div class="bf" id="bFace">🦴</div><div class="bn" id="bName">点点身体的骨头</div></div>
+          <div class="bubble" id="bBubble">点左边小人身上的图标，看看每块骨头叫什么、有什么用。成年人全身大约有 <b>206</b> 块骨头。</div>
+        </div>
+      </div>
+      <div class="subview" id="ex-use">
+        <div class="useRow" id="useRow">
+          <div class="uc on" data-i="0"><div class="ue">🧍</div><div class="un">支撑</div></div>
+          <div class="uc" data-i="1"><div class="ue">🛡️</div><div class="un">保护</div></div>
+          <div class="uc" data-i="2"><div class="ue">🤸</div><div class="un">运动</div></div>
+        </div>
+        <div class="useCap" id="useCap"><b>支撑</b>：脊柱和腿骨像房子的柱子，把身体撑起来，让我们能站直、能走路。</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 把小人身上 <b>5</b> 处骨头都点一遍，就能去闯关！（<span id="cnt">0</span>/5）</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 骨头的本领<small>把它拖到 支撑 / 保护 / 运动</small></div>
+    <div class="gsub on" id="g-sort">
+      <div class="bins">
+        <div class="bin" data-k="hold"><div class="binIco">🧍</div><div class="binName">支撑身体</div><div class="binHint"></div><div class="binDrop"></div></div>
+        <div class="bin" data-k="guard"><div class="binIco">🛡️</div><div class="binName">保护内脏</div><div class="binHint"></div><div class="binDrop"></div></div>
+        <div class="bin" data-k="move"><div class="binIco">🤸</div><div class="binName">帮助运动</div><div class="binHint"></div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray">
+        <div class="item" data-k="hold"><div class="itIco">🦴</div><div class="itName">脊柱撑身体</div></div>
+        <div class="item" data-k="hold"><div class="itIco">🦵</div><div class="itName">腿骨站立</div></div>
+        <div class="item" data-k="guard"><div class="itIco">💀</div><div class="itName">头骨护大脑</div></div>
+        <div class="item" data-k="guard"><div class="itIco">🫁</div><div class="itName">肋骨护心肺</div></div>
+        <div class="item" data-k="move"><div class="itIco">💪</div><div class="itName">手肘弯胳膊</div></div>
+        <div class="item" data-k="move"><div class="itIco">🦿</div><div class="itName">膝盖弯腿</div></div>
+      </div>
+      <div class="roundNext" id="sortNext"><div class="ok">全部答对！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>了不起！</h2><div class="medalName">🎖 骨骼小卫士</div>
+      <p>你搞清楚了：<br>• 骨头能<b>支撑</b>身体（脊柱、腿骨）、<b>保护</b>内脏（头骨护脑、肋骨护心肺）、帮助<b>运动</b>（靠关节）；<br>• 骨头之间能弯，靠的是<b>关节</b>；<br>• 多<b>运动、晒太阳、喝牛奶</b>，骨头会长得更结实。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再来一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-skel').classList.toggle('on',v==='A'); document.getElementById('ex-use').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='block'; }
+
+/* 画骨架 */
+const cvS=document.getElementById('cvS'), sc=cvS.getContext('2d');
+(function drawSkel(){ sc.clearRect(0,0,260,420); sc.strokeStyle='#e9ddc4'; sc.fillStyle='#f3ead3'; sc.lineWidth=3; const cx=130;
+  // 头
+  sc.beginPath(); sc.arc(cx,44,26,0,7); sc.fill(); sc.stroke();
+  sc.beginPath(); sc.ellipse(cx,80,10,8,0,0,7); sc.fill(); sc.stroke(); // 下巴/颈
+  // 脊柱
+  sc.lineWidth=8; sc.beginPath(); sc.moveTo(cx,90); sc.lineTo(cx,250); sc.stroke();
+  // 肋骨
+  sc.lineWidth=4; for(let i=0;i<5;i++){ const y=110+i*18; sc.beginPath(); sc.ellipse(cx,y,38-i*2,10,0,Math.PI*0.05,Math.PI*0.95); sc.stroke(); sc.beginPath(); sc.ellipse(cx,y,38-i*2,10,0,Math.PI*1.05,Math.PI*1.95); sc.stroke(); }
+  // 肩+手臂
+  sc.lineWidth=7; sc.beginPath(); sc.moveTo(cx-40,102); sc.lineTo(cx+40,102); sc.stroke();
+  sc.beginPath(); sc.moveTo(cx-40,102); sc.lineTo(cx-58,175); sc.lineTo(cx-52,235); sc.stroke();
+  sc.beginPath(); sc.moveTo(cx+40,102); sc.lineTo(cx+58,175); sc.lineTo(cx+52,235); sc.stroke();
+  // 骨盆
+  sc.lineWidth=6; sc.beginPath(); sc.ellipse(cx,262,34,18,0,0,Math.PI); sc.stroke();
+  // 腿
+  sc.lineWidth=8; sc.beginPath(); sc.moveTo(cx-20,272); sc.lineTo(cx-26,340); sc.lineTo(cx-22,400); sc.stroke();
+  sc.beginPath(); sc.moveTo(cx+20,272); sc.lineTo(cx+26,340); sc.lineTo(cx+22,400); sc.stroke();
+  // 关节点
+  sc.fillStyle='#e6d6b2'; [[cx-58,175],[cx+58,175],[cx-26,340],[cx+26,340]].forEach(([x,y])=>{sc.beginPath();sc.arc(x,y,6,0,7);sc.fill();});
+})();
+
+const BONES=[
+ {f:'💀',n:'头骨',t:'<b>头骨</b>（头盖骨）像一顶硬帽子，牢牢<b>保护里面的大脑</b>。'},
+ {f:'🫁',n:'肋骨',t:'胸口一根根<b>肋骨</b>围成“笼子”，<b>保护心脏和肺</b>。'},
+ {f:'🦴',n:'脊柱',t:'背上的<b>脊柱</b>由很多小骨头串成，像柱子一样<b>撑起上半身</b>，让我们能站直。'},
+ {f:'💪',n:'手臂骨和关节',t:'胳膊里的骨头靠<b>关节</b>连接，所以能弯、能伸、能拿东西。'},
+ {f:'🦵',n:'腿骨',t:'<b>腿骨</b>是身体里又长又结实的骨头，<b>支撑体重</b>，让我们能站、能走、能跑。'},
+];
+const seen=[false,false,false,false,false];
+document.querySelectorAll('#boneArea .mk').forEach(m=>m.addEventListener('click',()=>{ document.querySelectorAll('#boneArea .mk').forEach(x=>x.classList.remove('on')); m.classList.add('on'); const i=+m.dataset.i; document.getElementById('bFace').textContent=BONES[i].f; document.getElementById('bName').textContent=BONES[i].n; document.getElementById('bBubble').innerHTML=BONES[i].t; seen[i]=true; const n=seen.filter(Boolean).length; document.getElementById('cnt').textContent=n; if(n===5) unlockGame(); }));
+
+const USE=['<b>支撑</b>：脊柱和腿骨像房子的柱子，把身体撑起来，让我们能站直、能走路。',
+ '<b>保护</b>：头骨保护大脑，肋骨围成笼子保护心脏和肺，很重要的器官都藏在骨头里面。',
+ '<b>运动</b>：骨头之间有<b>关节</b>，肌肉一拉，胳膊、腿就能弯能动，我们才能跑跳。'];
+document.querySelectorAll('#useRow .uc').forEach(c=>c.addEventListener('click',()=>{ document.querySelectorAll('#useRow .uc').forEach(x=>x.classList.remove('on')); c.classList.add('on'); document.getElementById('useCap').innerHTML=USE[+c.dataset.i]; }));
+
+/* 闯关1 拖拽（3筐） */
+const tray=document.getElementById('tray'); let active=null,ox=0,oy=0,placed=0; const TOTAL=6;
+const binAt=(x,y)=>[...document.querySelectorAll('#g-sort .bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+document.querySelectorAll('#g-sort .item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return; active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top; el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el); el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px'; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b&&!b.classList.contains('filled'))b.classList.add('over'); }
+addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+  const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+  if(bin&&bin.dataset.k===el.dataset.k){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); placed++; if([...bin.querySelectorAll('.binDrop .item')].length) bin.classList.add('filled'); if(placed===TOTAL) document.getElementById('sortNext').style.display='block'; }
+  else { rst(); tray.appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+
+/* 闯关2 判断 */
+const QUIZ=[{ico:'🦴',q:'如果人的身体里没有骨头，会怎样？',opts:[['软软的，立不起来',1],['变得更强壮',0],['跑得更快',0]],fb:'骨头支撑身体，没有骨头就站不起来。'},
+ {ico:'💀',q:'头骨（脑袋的骨头）主要保护身体的哪个部分？',opts:[['大脑',1],['胃',0],['脚',0]],fb:'头骨像硬帽子，保护里面的大脑。'},
+ {ico:'💪',q:'我们能弯胳膊、弯膝盖，靠的是骨头之间的？',opts:[['关节',1],['头发',0],['皮肤',0]],fb:'关节是骨头能弯曲活动的地方。'},
+ {ico:'🥛',q:'想让骨头长得更结实，应该多做什么？',opts:[['多运动、晒太阳、喝牛奶',1],['多吃糖果',0],['整天玩手机',0]],fb:'运动、阳光和牛奶都对骨头好。'}];
+let qi=0; function startQuiz(){ document.getElementById('g-sort').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>把骨头的知识用起来</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1400);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='想想骨头的三个本领～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('bones','🦴','骨骼小卫士'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#d0a768','#ffd36b','#3aa7ff','#41c98a','#ff9f43','#b58bff']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

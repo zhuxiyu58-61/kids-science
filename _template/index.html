@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<!--
+==================================================================
+  知识乐园 · 单课模板  （复制本文件夹 → 改 CONFIG → 写探索canvas）
+------------------------------------------------------------------
+  4 环节：开场 intro → 探索 explore(双标签) → 闯关 game(双关) → 徽章 finish
+  你只需要改两处：
+   1) 下面 <style> 顶部的 :root 三个主题色变量（--accent / --bg1 / --bg2）
+   2) <script> 顶部的 CONFIG 对象（文案/冷知识/判断题/闯关1/徽章…全在这）
+  唯一要手写代码的：探索两个标签里的“主互动”。
+   - 在 renderExploreA()/renderExploreB() 里画你的 canvas / 做互动
+   - 玩到该解锁闯关时，调用 unlockGame()
+  深链调试：#explore #game #finish #tabB #quiz
+==================================================================
+-->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>课程标题 · 知识乐园</title>
+<style>
+  :root{
+    /* ↓↓↓ 每课改这三个就换主题色 ↓↓↓ */
+    --accent:#3aa7ff; --bg1:#e9f8ff; --bg2:#bfe9ff;
+    /* ↑↑↑ */
+    --ink:#2b4a63; --ink2:#5a7a92; --card:#fff; --shadow:0 10px 30px rgba(40,90,140,.16);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;}
+  .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;}
+  .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;}
+  .dot.on{background:var(--accent); transform:scale(1.2);}
+
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;}
+  .scene.active{display:flex;}
+
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .mascot{font-size:110px; animation:bob 2s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+  .introCard{background:var(--card); border-radius:26px; padding:24px 30px; box-shadow:var(--shadow); max-width:560px; font-size:clamp(17px,2.5vw,22px); font-weight:800; line-height:1.7;}
+  .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:22px; padding:16px 40px; font-size:21px; font-weight:900; color:#fff; background:var(--accent); box-shadow:var(--shadow); cursor:pointer; letter-spacing:2px; margin-top:20px; transition:transform .1s;}
+  .bigbtn:active{transform:scale(.95);}
+
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:16px; padding:9px 20px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);}
+  .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;}
+  .subview{flex:1; min-height:0; display:none; align-items:center; justify-content:center; text-align:center;}
+  .subview.on{display:flex;}
+  .exFoot{margin-top:8px;}
+  .nextHint{background:#fff7e0; border-radius:14px; padding:10px 14px; font-weight:800; color:#c98a2b; font-size:14px; text-align:center;}
+  .nextBtn{border:none; border-radius:18px; padding:14px; font-size:19px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#ffd36b,#ff9f43); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; display:none;}
+  .nextBtn:active{transform:scale(.97);}
+
+  /* 闯关通用 */
+  #s-game{align-items:center;}
+  .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;}
+  .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;}
+  .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;}
+  .roundNext .ok{font-size:19px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  /* 拖拽分类 */
+  .bins{display:flex; gap:12px; width:100%; max-width:700px; justify-content:center;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #b7d3e6; border-radius:20px; padding:12px 8px; text-align:center; min-height:140px; transition:.2s;}
+  .bin.over{border-color:var(--accent); background:#eaf6ff;}
+  .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:32px;} .bin .binName{font-weight:900; font-size:18px; margin-top:4px;}
+  .bin .binHint{font-size:12px; color:var(--ink2); font-weight:700;}
+  .bin .binDrop{margin-top:8px; min-height:60px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:14px; margin-top:20px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:18px; box-shadow:var(--shadow); padding:12px 16px; text-align:center; cursor:grab; touch-action:none; transition:transform .12s;}
+  .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg); box-shadow:0 18px 36px rgba(40,90,140,.3);}
+  .item.placed{cursor:default; box-shadow:none; padding:5px 7px;}
+  .item .itIco{font-size:40px;} .item.placed .itIco{font-size:28px;}
+  .item .itName{font-weight:800; font-size:14px;} .item.placed .itName{font-size:11px;}
+  /* 排顺序 */
+  .orderRow{display:flex; gap:12px; flex-wrap:wrap; justify-content:center; max-width:720px;}
+  .ocard{background:#fff; border-radius:18px; box-shadow:var(--shadow); padding:14px; text-align:center; width:120px; border:3px solid #e3efda; cursor:pointer; transition:.15s; position:relative;}
+  .ocard:active{transform:scale(.96);}
+  .ocard.done{border-color:#41c98a; background:#eefbe6; cursor:default;}
+  .ocard .oico{font-size:44px;} .ocard .oname{font-weight:800; font-size:15px; margin-top:4px;}
+  .ocard .onum{position:absolute; top:-10px; left:-10px; width:30px; height:30px; border-radius:50%; background:#41c98a; color:#fff; font-weight:900; display:none; align-items:center; justify-content:center; font-size:16px;}
+  .ocard.done .onum{display:flex;}
+  .orderHint{margin-top:14px; font-weight:800; color:var(--ink2);}
+  /* 判断题 */
+  .qcard{background:var(--card); border-radius:24px; box-shadow:var(--shadow); padding:22px 26px; max-width:560px; width:100%; text-align:center;}
+  .qcard .qico{font-size:52px;} .qcard .qtext{font-size:20px; font-weight:900; margin:8px 0 16px;}
+  .qopts{display:flex; flex-direction:column; gap:10px;}
+  .qopt{border:3px solid #e3eef7; background:#f6fbff; border-radius:16px; padding:14px; font-size:17px; font-weight:800; color:var(--ink); cursor:pointer; transition:.15s;}
+  .qopt:active{transform:scale(.97);}
+  .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:16px; font-weight:800; min-height:22px;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+
+  #s-finish{align-items:center; justify-content:center; text-align:center;}
+  .finishCard{background:var(--card); border-radius:28px; padding:26px 34px; box-shadow:var(--shadow); max-width:520px;}
+  .medal{font-size:110px; animation:pop .5s ease;}
+  @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:28px;}
+  .medalName{display:inline-block; background:linear-gradient(160deg,#ffd36b,#ff9f43); color:#fff; font-weight:900; font-size:19px; padding:8px 22px; border-radius:20px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:700; line-height:1.8; margin:0 0 18px; font-size:15px;}
+  .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;}
+  .finishBtns button{border:none; border-radius:18px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;}
+  .fb1{background:var(--accent); color:#fff;} .fb2{background:#eef3f8; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+
+  /* 探索里可复用的小组件（生活实例/冷知识条），需要时贴到你的 panel 里 */
+  .life{background:#eef7ff; border-radius:14px; padding:9px 13px; font-size:14px; font-weight:800; color:#3f7abe;}
+  .fact{background:#fff7e0; border-radius:14px; padding:9px 13px; font-size:13.5px; font-weight:700; color:#b07d1e; display:flex; align-items:center; gap:8px;}
+  .fact span{flex:1; line-height:1.5;}
+  .fact button{border:none; background:#ffe0a3; color:#8a5d10; font-weight:800; border-radius:12px; padding:6px 10px; font-size:12px; cursor:pointer; white-space:nowrap;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title" id="pageTitle">课程标题<small id="pageSub">副标题</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <!-- 1 开场 -->
+  <section class="scene active" id="s-intro">
+    <div class="mascot" id="mascot">🙂</div>
+    <div class="introCard" id="introCard">开场白…</div>
+    <button class="bigbtn" id="introBtn" onclick="go('explore')">开始 ▶</button>
+  </section>
+
+  <!-- 2 探索（双标签） -->
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">标签一</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">标签二</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-A"><!-- renderExploreA() 填这里 --></div>
+      <div class="subview" id="ex-B"><!-- renderExploreB() 填这里 --></div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 玩一玩，完成后就能去闯关！</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <!-- 3 闯关（第1关由CONFIG决定 sort/order，第2关判断题） -->
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle"></div>
+    <div class="gsub on" id="g-round1"></div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qico" id="qico"></div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <!-- 4 徽章 -->
+  <section class="scene" id="s-finish">
+    <div class="finishCard">
+      <div class="medal" id="medal">🏅</div>
+      <h2>太棒啦！</h2>
+      <div class="medalName" id="medalName">🎖 徽章名</div>
+      <p id="finishSummary">小结…</p>
+      <div class="finishBtns">
+        <button class="fb2" onclick="location.reload()">再玩一次</button>
+        <button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button>
+      </div>
+    </div>
+  </section>
+
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+/* =======================================================================
+   ①  CONFIG —— 每课填这里（不用动下面的引擎代码）
+   ======================================================================= */
+const CONFIG = {
+  title:'课程标题', subtitle:'科学 · 副标题',
+  mascot:'🙂', introHTML:'嗨！我是…<br>今天我们来玩点好玩的！', introBtn:'开始 ▶',
+  tabA:'🔬 标签一', tabB:'🌍 标签二',
+  hint:'🔎 玩一玩，完成后就能去闯关！',
+  // 第1关：'sort'(拖拽分类) 或 'order'(排顺序)
+  round1: {
+    type:'sort',
+    title:'🎮 第 1 关 · 分一分', sub:'把下面的东西，拖到对的筐里',
+    bins:[ {key:'a',ico:'🅰️',name:'A类',hint:''}, {key:'b',ico:'🅱️',name:'B类',hint:''} ],
+    items:[ {key:'a',ico:'🍎',name:'苹果'}, {key:'b',ico:'🚗',name:'汽车'} ],
+    // 若 type:'order'，改用： title/sub + items:[{ico,name}]（按正确顺序写）
+  },
+  // 第2关：判断题
+  quiz: {
+    title:'🎮 第 2 关 · 想一想', sub:'选一个正确的答案',
+    list:[ {ico:'❓', q:'问题？', opts:[['对的',1],['错的',0],['也错',0]], fb:'讲解一句'} ],
+  },
+  badge:{ icon:'🏅', name:'🎖 徽章名', summaryHTML:'今天你学会了：<br>…' },
+};
+
+/* =======================================================================
+   ②  探索主互动 —— 每课手写（画canvas / 做互动），玩够了调用 unlockGame()
+   ======================================================================= */
+function renderExploreA(){ /* 例：往 #ex-A 里塞你的 canvas + 控制面板 */
+  document.getElementById('ex-A').innerHTML =
+    '<button class="bigbtn" onclick="unlockGame()">（示例）我玩好啦，去闯关</button>';
+}
+function renderExploreB(){ /* 例：往 #ex-B 里塞第二块知识 */
+  document.getElementById('ex-B').innerHTML = '<div style="font-weight:800">这里放第二块知识（动画/卡片…）</div>';
+}
+
+/* =======================================================================
+   ③  引擎（一般不用改）
+   ======================================================================= */
+const SCENES=['intro','explore','game','finish'];
+function go(name){
+  document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s-'+name).classList.add('active');
+  const idx=SCENES.indexOf(name);
+  SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx));
+  if(name==='finish') celebrate();
+}
+function switchEx(v){
+  document.getElementById('ex-A').classList.toggle('on', v==='A');
+  document.getElementById('ex-B').classList.toggle('on', v==='B');
+  document.getElementById('tabA').classList.toggle('on', v==='A');
+  document.getElementById('tabB').classList.toggle('on', v==='B');
+}
+function unlockGame(){ document.getElementById('nextHint').style.display='none'; document.getElementById('nextBtn').style.display='block'; }
+
+/* 冷知识轮播：给它一个 <span id=..> 和数组，返回 next 函数 */
+function makeFacts(spanId, facts){ let i=0; const el=document.getElementById(spanId); el.textContent=facts[0];
+  return ()=>{ i=(i+1)%facts.length; el.textContent=facts[i]; }; }
+
+/* 应用 CONFIG 文案 */
+function applyConfig(){
+  document.title=CONFIG.title+' · 知识乐园';
+  pageTitle.childNodes[0].nodeValue=CONFIG.title; pageSub.textContent=CONFIG.subtitle;
+  mascot.textContent=CONFIG.mascot; introCard.innerHTML=CONFIG.introHTML; introBtn.textContent=CONFIG.introBtn;
+  tabA.textContent=CONFIG.tabA; tabB.textContent=CONFIG.tabB; nextHint.innerHTML=CONFIG.hint;
+  medal.textContent=CONFIG.badge.icon; medalName.textContent=CONFIG.badge.name; finishSummary.innerHTML=CONFIG.badge.summaryHTML;
+}
+
+/* 第1关：拖拽分类 */
+function buildSort(){
+  const c=CONFIG.round1; gameTitle.innerHTML=c.title+'<small>'+c.sub+'</small>';
+  const box=document.getElementById('g-round1');
+  box.innerHTML='<div class="bins">'+c.bins.map(b=>`<div class="bin" data-k="${b.key}"><div class="binIco">${b.ico}</div><div class="binName">${b.name}</div><div class="binHint">${b.hint||''}</div><div class="binDrop"></div></div>`).join('')
+    +'</div><div class="tray" id="tray">'+shuffle([...c.items]).map(it=>`<div class="item" data-k="${it.key}"><div class="itIco">${it.ico}</div><div class="itName">${it.name}</div></div>`).join('')
+    +'</div><div class="roundNext" id="r1next"><div class="ok">全对啦！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>';
+  let active=null,ox=0,oy=0,placed=0; const total=c.items.length;
+  const binAt=(x,y)=>[...box.querySelectorAll('.bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+  box.querySelectorAll('.item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return;
+    active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top;
+    el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el);
+    el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+  function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px';
+    box.querySelectorAll('.bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b&&!b.classList.contains('filled'))b.classList.add('over'); }
+  addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+  addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null;
+    box.querySelectorAll('.bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+    const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+    if(bin&&bin.dataset.k===el.dataset.k&&!bin.classList.contains('filled')){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); bin.classList.add('filled'); placed++;
+      if(placed===total) document.getElementById('r1next').style.display='block'; }
+    else { rst(); document.getElementById('tray').appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+}
+/* 第1关：排顺序 */
+function buildOrder(){
+  const c=CONFIG.round1; gameTitle.innerHTML=c.title+'<small>'+c.sub+'</small>';
+  const box=document.getElementById('g-round1');
+  box.innerHTML='<div class="orderRow" id="orderRow"></div><div class="orderHint" id="orderHint">从最开始的点起～</div>'
+    +'<div class="roundNext" id="r1next"><div class="ok">排对啦！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>';
+  let expect=0;
+  shuffle(c.items.map((o,idx)=>({...o,idx}))).forEach(o=>{ const d=document.createElement('div'); d.className='ocard'; d.dataset.idx=o.idx;
+    d.innerHTML=`<div class="onum"></div><div class="oico">${o.ico}</div><div class="oname">${o.name}</div>`;
+    d.onclick=()=>{ if(d.classList.contains('done'))return;
+      if(+d.dataset.idx===expect){ d.classList.add('done'); d.querySelector('.onum').textContent=++expect;
+        orderHint.textContent = expect===c.items.length ? '全部排好啦！' : '接着点第 '+(expect+1)+' 个～';
+        if(expect===c.items.length) document.getElementById('r1next').style.display='block'; }
+      else { d.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); orderHint.textContent='🤔 还不到时候，先想想最开始是什么？'; } };
+    document.getElementById('orderRow').appendChild(d); });
+}
+/* 第2关：判断题 */
+let qi=0;
+function startQuiz(){ document.getElementById('g-round1').classList.remove('on'); document.getElementById('g-quiz').classList.add('on');
+  gameTitle.innerHTML=CONFIG.quiz.title+'<small>'+CONFIG.quiz.sub+'</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=CONFIG.quiz.list[qi];
+  qprog.textContent=`第 ${qi+1} / ${CONFIG.quiz.list.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q;
+  qopts.innerHTML=''; qfb.textContent='';
+  it.opts.forEach(([label,ok])=>{ const b=document.createElement('div'); b.className='qopt'; b.textContent=label; b.onclick=()=>ans(b,ok,it.fb); qopts.appendChild(b); }); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none');
+    qfb.style.color='#2ba36a'; qfb.textContent='✅ 答对啦！'+fb;
+    setTimeout(()=>{ qi++; if(qi<CONFIG.quiz.list.length) renderQ(); else go('finish'); },1300);
+  } else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='🤔 再想想～'; } }
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+function celebrate(){ const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight;
+  const cols=['#ff6a3d','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0'];
+  const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++;
+    bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();});
+    if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+
+/* ===== 启动 ===== */
+applyConfig();
+(CONFIG.round1.type==='order'?buildOrder:buildSort)();
+renderExploreA(); renderExploreB();
+if(location.hash){const h=location.hash.slice(1);
+  if(h==='tabB'){go('explore');switchEx('B');}
+  else if(h==='quiz'){go('game');startQuiz();}
+  else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

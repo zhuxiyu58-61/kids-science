@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>关卡地图怎么设计 · 知识乐园</title>
+<style>
+  :root{ --accent:#e0783f; --bg1:#fff2e8; --bg2:#f3ceb0; --ink:#573a24; --ink2:#8f6a4c; --card:#fff; --shadow:0 10px 30px rgba(160,90,40,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:96px;}
+  .introCard{background:var(--card); border-radius:24px; padding:24px 30px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(16px,2.3vw,20px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#ff9a5b,#d0692c); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:20px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  #ex-build{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  #cvT{width:100%; max-width:600px; height:auto; display:block; background:#eaf6ff; border-radius:18px; box-shadow:var(--shadow);}
+  .tBtns{display:flex; gap:8px; flex-wrap:wrap; justify-content:center;} .tBtns button{border:none; border-radius:14px; padding:11px 14px; font-weight:900; font-size:14px; color:#fff; cursor:pointer; box-shadow:var(--shadow);} .ba{background:#8a8f9c;} .bb{background:#41c98a;} .bc{background:#f0b400;} .bd{background:#e0783f;} .be{background:#bcaea0;}
+  .tCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(14px,2vw,17px); font-weight:800; max-width:600px; text-align:center; min-height:44px; display:flex; align-items:center; justify-content:center;} .tCap b{color:var(--accent);}
+  #ex-tip{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  .tipRow{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; width:100%; max-width:680px;}
+  @media (max-width:600px){ .tipRow{grid-template-columns:repeat(2,1fr);} }
+  .tc{background:var(--card); border-radius:16px; padding:14px 6px; text-align:center; box-shadow:var(--shadow); cursor:pointer; border:3px solid transparent;} .tc:active{transform:scale(.95);} .tc.on{border-color:var(--accent); background:#fff3e9;}
+  .tc .ti{font-size:36px;} .tc .tn{font-weight:900; font-size:12px; margin-top:4px;}
+  .tipCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(15px,2.2vw,18px); font-weight:800; max-width:680px; width:100%; text-align:center; min-height:48px; display:flex; align-items:center; justify-content:center;} .tipCap b{color:var(--accent);}
+  .nextHint{background:#fff2e2; border-radius:14px; padding:10px 14px; font-weight:800; color:#c47433; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#ff9a5b,#d0692c); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:14px; width:100%; max-width:560px; justify-content:center;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #e6c29a; border-radius:20px; padding:12px 8px; text-align:center; min-height:150px; transition:.2s;} .bin.over{border-color:var(--accent); background:#fff3e9;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:34px;} .bin .binName{font-weight:900; font-size:17px; margin-top:4px;} .bin .binHint{font-size:12px; color:var(--ink2); font-weight:700;}
+  .bin .binDrop{margin-top:8px; min-height:70px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:12px; margin-top:20px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:16px; box-shadow:var(--shadow); padding:10px 14px; text-align:center; cursor:grab; touch-action:none;} .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg);} .item.placed{cursor:default; box-shadow:none; padding:5px 7px;}
+  .item .itIco{font-size:30px;} .item.placed .itIco{font-size:22px;} .item .itName{font-weight:800; font-size:12px;} .item.placed .itName{font-size:10px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #eed6bd; background:#fdf6ef; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#ff9a5b,#d0692c); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#f4ece2; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">关卡地图怎么设计<small>做游戏 · 关卡设计</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🗺️</div>
+    <div class="introCard"><b>蛋仔闯关的赛道、三角洲的作战地图，都是有人一格一格“设计”出来的。</b><br>怎样才算好玩、又不会太难？<br>来当一次<b>关卡设计师</b>，自己搭一条赛道试试！</div>
+    <button class="bigbtn" onclick="go('explore')">开始设计 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🛠️ 搭条赛道</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">💡 好关卡的秘诀</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-build">
+        <canvas id="cvT" width="600" height="240"></canvas>
+        <div class="tBtns">
+          <button class="ba" onclick="add('obs')">🚧 加障碍</button>
+          <button class="bb" onclick="add('spring')">🟢 加弹板</button>
+          <button class="bc" onclick="add('coin')">🪙 加金币</button>
+          <button class="be" onclick="clearT()">🗑️ 清空</button>
+          <button class="bd" onclick="play()">▶ 试玩</button>
+        </div>
+        <div class="tCap" id="tCap">先往赛道上<b>摆一些东西</b>（障碍、弹板、金币），再点“<b>试玩</b>”让蛋仔跑一遍看看。</div>
+      </div>
+      <div class="subview" id="ex-tip">
+        <div class="tipRow" id="tipRow">
+          <div class="tc on" data-i="0"><div class="ti">🎯</div><div class="tn">有主题</div></div>
+          <div class="tc" data-i="1"><div class="ti">📈</div><div class="tn">先易后难</div></div>
+          <div class="tc" data-i="2"><div class="ti">🪙</div><div class="tn">有奖励</div></div>
+          <div class="tc" data-i="3"><div class="ti">🔁</div><div class="tn">多测试</div></div>
+        </div>
+        <div class="tipCap" id="tipCap"><b>有主题</b>：一关最好有个样子，比如“糖果乐园”“太空基地”，玩起来更有感觉。</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 往赛道上摆 <b>3</b> 样东西，再试玩一次，就能去闯关！（<span id="cnt">0</span>/3）</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 障碍还是奖励<small>拖到“障碍”或“奖励”一边</small></div>
+    <div class="gsub on" id="g-sort">
+      <div class="bins">
+        <div class="bin" data-k="obs"><div class="binIco">🚧</div><div class="binName">障碍</div><div class="binHint">挡路、变难</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="rew"><div class="binIco">🎁</div><div class="binName">奖励</div><div class="binHint">给好处、鼓励</div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray">
+        <div class="item" data-k="obs"><div class="itIco">🧱</div><div class="itName">墙</div></div>
+        <div class="item" data-k="obs"><div class="itIco">🕳️</div><div class="itName">陷阱坑</div></div>
+        <div class="item" data-k="obs"><div class="itIco">🔥</div><div class="itName">火焰</div></div>
+        <div class="item" data-k="rew"><div class="itIco">🪙</div><div class="itName">金币</div></div>
+        <div class="item" data-k="rew"><div class="itIco">⭐</div><div class="itName">星星</div></div>
+        <div class="item" data-k="rew"><div class="itIco">❤️</div><div class="itName">血包</div></div>
+      </div>
+      <div class="roundNext" id="sortNext"><div class="ok">全部答对！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>设计完成！</h2><div class="medalName">🎖 关卡设计师</div>
+      <p>你搞清楚了：<br>• 游戏关卡是设计师<b>精心设计</b>出来的，不是乱摆的；<br>• 好关卡：有<b>主题</b>、难度<b>先易后难</b>、有<b>奖励</b>鼓励玩家；<br>• 做完一定要<b>反复试玩</b>，才知道好不好玩、难不难。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再来一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-build').classList.toggle('on',v==='A'); document.getElementById('ex-tip').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='block'; }
+
+/* 搭赛道 */
+const cvT=document.getElementById('cvT'), tc=cvT.getContext('2d'); const TW=cvT.width, TH=cvT.height, gy=TH-56;
+let pieces=[], added=0, playing=false, ex=0, hop=0, tested=false;
+const EMO={obs:'🚧',spring:'🟢',coin:'🪙'};
+function add(type){ if(pieces.length>=6){document.getElementById('tCap').innerHTML='赛道摆满啦～ 点“<b>试玩</b>”跑一遍，或“清空”重来。';return;} pieces.push(type); added++; document.getElementById('cnt').textContent=Math.min(added,3); document.getElementById('tCap').innerHTML='摆上了一个 '+EMO[type]+'。可以继续摆，或点“<b>试玩</b>”。'; }
+function clearT(){ pieces=[]; playing=false; ex=0; document.getElementById('tCap').innerHTML='赛道清空啦，重新设计一条吧！'; }
+function play(){ if(pieces.length===0){document.getElementById('tCap').innerHTML='先摆点东西，再试玩呀～';return;} playing=true; ex=0; tested=true; document.getElementById('tCap').innerHTML='🎮 试玩中……看看蛋仔跑得顺不顺！'; if(added>=3) unlockGame(); }
+function drawTrack(){ tc.clearRect(0,0,TW,TH);
+  const skyG=tc.createLinearGradient(0,0,0,TH); skyG.addColorStop(0,'#cdeeff'); skyG.addColorStop(1,'#eaf7ff'); tc.fillStyle=skyG; tc.fillRect(0,0,TW,TH);
+  tc.fillStyle='#8fd07a'; tc.fillRect(0,gy,TW,TH-gy);
+  // 起点终点
+  tc.font='26px system-ui'; tc.textAlign='center'; tc.textBaseline='alphabetic';
+  tc.fillText('🚩', 30, gy-4); tc.fillText('🏁', TW-26, gy-4);
+  // 摆件
+  const n=pieces.length; pieces.forEach((p,i)=>{ const x=70+(TW-120)*(n<=1?0.5:i/(n-1||1)); tc.font='30px system-ui'; tc.fillText(EMO[p], x, gy-6); });
+  // 蛋仔
+  let egx=30; if(playing){ ex+=3.2; egx=30+ex; hop=Math.abs(Math.sin(ex*0.06))*22; if(egx>TW-30){ egx=TW-30; playing=false; document.getElementById('tCap').innerHTML='🏁 蛋仔到达终点！你设计的这条赛道能跑通～ 好的设计师就是这样一遍遍<b>试玩</b>的。'; } }
+  const eggy=gy-18-(playing?hop:0);
+  const g=tc.createLinearGradient(egx-16,eggy-20,egx+16,eggy+20); g.addColorStop(0,'#ffd15b'); g.addColorStop(1,'#ff9f2e');
+  tc.fillStyle=g; tc.beginPath(); tc.ellipse(egx,eggy,16,20,0,0,7); tc.fill();
+  tc.fillStyle='#3a2333'; tc.beginPath(); tc.arc(egx-5,eggy-3,2.5,0,7); tc.arc(egx+5,eggy-3,2.5,0,7); tc.fill();
+  requestAnimationFrame(drawTrack); }
+drawTrack();
+
+/* 秘诀 */
+const TIP=['<b>有主题</b>：一关最好有个样子，比如“糖果乐园”“太空基地”，玩起来更有代入感。',
+ '<b>先易后难</b>：开头简单让玩家上手，后面慢慢变难，才既不无聊也不气人。',
+ '<b>有奖励</b>：金币、星星这些奖励，能鼓励玩家往前闯、想再玩一次。',
+ '<b>多测试</b>：做完要自己反复<b>试玩</b>，找出太难或不好玩的地方，再改。'];
+document.querySelectorAll('#tipRow .tc').forEach(c=>c.addEventListener('click',()=>{ document.querySelectorAll('#tipRow .tc').forEach(x=>x.classList.remove('on')); c.classList.add('on'); document.getElementById('tipCap').innerHTML=TIP[+c.dataset.i]; }));
+
+/* 闯关1 拖拽 */
+const tray=document.getElementById('tray'); let active=null,ox=0,oy=0,placed=0; const TOTAL=6;
+const binAt=(x,y)=>[...document.querySelectorAll('#g-sort .bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+document.querySelectorAll('#g-sort .item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return; active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top; el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el); el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px'; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b&&!b.classList.contains('filled'))b.classList.add('over'); }
+addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null; document.querySelectorAll('#g-sort .bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+  const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+  if(bin&&bin.dataset.k===el.dataset.k){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); bin.classList.add('filled'); placed++; if(placed===TOTAL) document.getElementById('sortNext').style.display='block'; }
+  else { rst(); tray.appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+
+/* 闯关2 判断 */
+const QUIZ=[{ico:'🗺️',q:'游戏的关卡地图，是怎么来的？',opts:[['设计师精心设计出来的',1],['随机乱摆的',0],['玩家自己长出来的',0]],fb:'关卡是关卡设计师一格格设计出来的。'},
+ {ico:'📈',q:'好的闯关关卡，难度一般应该怎样？',opts:[['先简单，后面慢慢变难',1],['一上来就超级难',0],['完全没有难度',0]],fb:'先易后难，玩家才玩得下去又有挑战。'},
+ {ico:'🪙',q:'关卡里的金币、星星，主要是用来？',opts:[['奖励、鼓励玩家',1],['挡住去路',0],['吓唬玩家',0]],fb:'奖励能鼓励玩家往前闯。'},
+ {ico:'🔁',q:'关卡设计师做完一关，最重要的一步是？',opts:[['反复试玩，测试好不好玩',1],['马上上线不管了',0],['直接删掉重做',0]],fb:'一定要多次试玩，才能发现问题再改好。'}];
+let qi=0; function startQuiz(){ document.getElementById('g-sort').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>把关卡设计的道理用起来</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1400);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='想想搭赛道的经验～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('game-level','🗺️','关卡设计师'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#ff9a5b','#ffd36b','#3aa7ff','#41c98a','#ff9f43','#b58bff']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

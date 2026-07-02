@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>四大发明 · 知识乐园</title>
+<style>
+  :root{ --accent:#c8862f; --bg1:#fff6e6; --bg2:#f0d190; --ink:#5a3f14; --ink2:#8a6a3a; --card:#fff; --shadow:0 10px 30px rgba(180,120,30,.18); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:96px;}
+  .introCard{background:var(--card); border-radius:24px; padding:22px 28px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(15px,2.2vw,19px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .idiom{margin-top:12px; background:#fdf0da; border-radius:14px; padding:10px 14px; font-size:14px; color:#9a6a20; font-weight:800;} .idiom b{color:#c07d1e;}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#e0a94e,#b8792a); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:18px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  #ex-lab{flex-direction:column; align-items:center; justify-content:center; gap:10px;}
+  #cvA{width:100%; max-width:600px; height:auto; display:block; border-radius:18px; box-shadow:var(--shadow); background:#241a0c;}
+  .invBtns{display:flex; gap:8px; flex-wrap:wrap; justify-content:center;}
+  .invBtn{border:none; border-radius:14px; padding:10px 14px; font-weight:900; font-size:14px; color:#fff; cursor:pointer; box-shadow:var(--shadow); background:#c8862f; opacity:.55;}
+  .invBtn.on{opacity:1; transform:scale(1.06);}
+  .aCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(14px,2vw,17px); font-weight:800; max-width:600px; text-align:center; min-height:44px; display:flex; align-items:center; justify-content:center;} .aCap b{color:var(--accent);}
+  #ex-know{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  .tipRow{display:grid; grid-template-columns:repeat(5,1fr); gap:10px; width:100%; max-width:700px;}
+  @media (max-width:600px){ .tipRow{grid-template-columns:repeat(3,1fr);} }
+  .tc{background:var(--card); border-radius:16px; padding:14px 4px; text-align:center; box-shadow:var(--shadow); cursor:pointer; border:3px solid transparent;} .tc:active{transform:scale(.95);} .tc.on{border-color:var(--accent); background:#fdf0da;}
+  .tc .ti{font-size:32px;} .tc .tn{font-weight:900; font-size:11.5px; margin-top:4px;}
+  .tc.subj{background:#eef4ff;} .tc.subj.on{border-color:#3f7ae0; background:#e3edff;}
+  .tipCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(15px,2.2vw,18px); font-weight:800; max-width:700px; width:100%; text-align:center; min-height:48px; display:flex; align-items:center; justify-content:center;} .tipCap b{color:var(--accent);} .tipCap .en{color:#3f7ae0;}
+  .nextHint{background:#fdf0da; border-radius:14px; padding:10px 14px; font-weight:800; color:#a67320; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#e0a94e,#b8792a); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:10px; width:100%; max-width:720px; justify-content:center; flex-wrap:wrap;}
+  .bin{flex:1; min-width:130px; background:#ffffffcc; border:4px dashed #e6c98a; border-radius:20px; padding:10px 6px; text-align:center; min-height:150px; transition:.2s;}
+  .bin.over{border-color:var(--accent); background:#fdf0da;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:30px;} .bin .binName{font-weight:900; font-size:14px; margin-top:4px;}
+  .bin .binDrop{margin-top:8px; min-height:60px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:14px; margin-top:18px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:18px; box-shadow:var(--shadow); padding:12px 14px; text-align:center; cursor:grab; touch-action:none;}
+  .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg); box-shadow:0 18px 36px rgba(180,120,30,.3);}
+  .item.placed{cursor:default; box-shadow:none; padding:5px 7px;}
+  .item .itIco{font-size:30px;} .item.placed .itIco{font-size:22px;}
+  .item .itName{font-weight:800; font-size:12.5px;} .item.placed .itName{font-size:10px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qtag{display:inline-block; font-size:12px; font-weight:900; padding:3px 10px; border-radius:10px; margin-bottom:6px;} .qtag.math{background:#e6f0ff;color:#2f7fe0;} .qtag.en{background:#e3edff;color:#3f7ae0;} .qtag.sci{background:#eaf6ee;color:#2ba36a;} .qtag.cn{background:#fdf0da;color:#c07d1e;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #f0dcb3; background:#fffaf0; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#e0a94e,#b8792a); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#f4ecdd; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">四大发明<small>环球探险 · 古人的智慧</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🏮</div>
+    <div class="introCard">很久很久以前，聪明的中国古人发明了四样特别厉害的东西——<b>造纸术、印刷术、火药、指南针</b>，后来传到全世界，深深地改变了人类的生活！它们被称为「<b>四大发明</b>」。
+      <div class="idiom">📖 语文小课堂 · 老话说「<b>学富五车</b>」形容一个人读书多、学问大。可古时候书很贵很难得，直到有了造纸术和印刷术，普通人才慢慢读得起书。</div>
+    </div>
+    <button class="bigbtn" onclick="go('explore')">去发明实验室 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🧪 发明实验室</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">🌍 改变了生活</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-lab">
+        <canvas id="cvA" width="600" height="240"></canvas>
+        <div class="invBtns" id="invBtns"></div>
+        <div class="aCap" id="aCap">点一点下面的按钮，看看每种发明是怎么「动」起来的！</div>
+      </div>
+      <div class="subview" id="ex-know">
+        <div class="tipRow" id="tipRow">
+          <div class="tc on" data-i="0"><div class="ti">📜</div><div class="tn">造纸术</div></div>
+          <div class="tc" data-i="1"><div class="ti">🖨️</div><div class="tn">印刷术</div></div>
+          <div class="tc" data-i="2"><div class="ti">🎆</div><div class="tn">火药</div></div>
+          <div class="tc" data-i="3"><div class="ti">🧭</div><div class="tn">指南针</div></div>
+          <div class="tc subj" data-i="4"><div class="ti">🔤</div><div class="tn">英语角</div></div>
+        </div>
+        <div class="tipCap" id="tipCap"><b>造纸术</b>：东汉的蔡伦改进了造纸术，让纸张变得便宜好用，书本终于能让更多人读到。</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 把 4 种发明都点一遍看看动画，就能去闯关！（<span id="cnt">0</span>/4）</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 发明配对<small>把用途拖到对应的发明筐里</small></div>
+    <div class="gsub on" id="g-round1">
+      <div class="bins">
+        <div class="bin" data-k="paper"><div class="binIco">📜</div><div class="binName">造纸术</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="print"><div class="binIco">🖨️</div><div class="binName">印刷术</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="powder"><div class="binIco">🎆</div><div class="binName">火药</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="compass"><div class="binIco">🧭</div><div class="binName">指南针</div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray"></div>
+      <div class="roundNext" id="r1next"><div class="ok">全对啦！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qtag" id="qtag"></div><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>穿越回来啦！</h2><div class="medalName">🎖 发明小达人</div>
+      <p>你认识了四大发明：<br>• <b>造纸术</b>：蔡伦改进，让纸变便宜；<br>• <b>印刷术</b>：毕昇发明活字印刷，印书更快；<br>• <b>火药</b>：最早用来炼丹，后来做成了烟花爆竹🎆；<br>• <b>指南针</b>：帮航海家在大海上找方向，不会迷路；<br>• 🔤 英语：纸 <b>paper</b>、指南针 <b>compass</b>、印刷 <b>print</b>。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再来一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-lab').classList.toggle('on',v==='A'); document.getElementById('ex-know').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='block'; }
+
+/* ===== 发明实验室 ===== */
+const cvA=document.getElementById('cvA'), ac=cvA.getContext('2d'); const AW=cvA.width, AH=cvA.height;
+const INVS=[
+  {key:'paper',ico:'📜',name:'造纸术',cap:'把植物纤维打成浆，铺平晾干，就成了一张纸！'},
+  {key:'print',ico:'🖨️',name:'印刷术',cap:'把字刻成一个个小方块（活字），排好版就能反复印刷。'},
+  {key:'powder',ico:'🎆',name:'火药',cap:'古人炼丹时意外发现了它，后来做成了烟花爆竹！'},
+  {key:'compass',ico:'🧭',name:'指南针',cap:'磁针会自己转，最后总是指向南北方向。'},
+];
+let curI=0, localT=0, visited=new Set(), particles=[], glyphCount=0;
+const invBtnsEl=document.getElementById('invBtns');
+INVS.forEach((inv,i)=>{ const b=document.createElement('button'); b.className='invBtn'+(i===0?' on':''); b.textContent=inv.ico+' '+inv.name;
+  b.onclick=()=>selectInv(i); invBtnsEl.appendChild(b); });
+function selectInv(i){ curI=i; localT=0; glyphCount=0; particles=[];
+  [...invBtnsEl.children].forEach((b,j)=>b.classList.toggle('on',j===i));
+  visited.add(i); document.getElementById('cnt').textContent=visited.size;
+  document.getElementById('aCap').innerHTML='<b>'+INVS[i].name+'</b>：'+INVS[i].cap;
+  if(visited.size>=4) unlockGame();
+}
+selectInv(0);
+let fibers=Array.from({length:60},()=>({sx:Math.random()*560+20, sy:Math.random()*220+10}));
+function drawA(){ ac.clearRect(0,0,AW,AH); ac.fillStyle='#241a0c'; ac.fillRect(0,0,AW,AH);
+  localT++;
+  const cx=AW/2, cy=AH/2;
+  if(curI===0){ // 造纸术：纤维聚成一张纸
+    const p=Math.min(1, localT/70);
+    ac.save(); ac.globalAlpha=.9;
+    fibers.forEach((f,i)=>{ const col=i%10, row=(i/10|0); const tx=170+col*26, ty=40+row*30;
+      const x=f.sx+(tx-f.sx)*p, y=f.sy+(ty-f.sy)*p;
+      ac.fillStyle='#e8d29a'; ac.beginPath(); ac.arc(x,y,3,0,7); ac.fill(); });
+    ac.restore();
+    if(p>0.9){ ac.strokeStyle='rgba(255,255,255,.5)'; ac.lineWidth=2; ac.strokeRect(160,32,270,150); ac.fillStyle='rgba(255,255,255,.06)'; ac.fillRect(160,32,270,150); }
+  } else if(curI===1){ // 印刷术：压印
+    const cyclePos = localT%60; const pressY = cyclePos<30 ? 40+cyclePos*2 : 40+(60-cyclePos)*2;
+    if(localT>0 && localT%60===30 && glyphCount<8) glyphCount++;
+    ac.fillStyle='#d9c090'; ac.fillRect(200,150,220,70);
+    const GL=['福','印','纸','术','国','明','智','慧'];
+    for(let i=0;i<glyphCount;i++){ ac.fillStyle='#5a3f14'; ac.font='bold 20px system-ui'; ac.textAlign='center'; ac.fillText(GL[i%GL.length], 218+i*26, 190); }
+    ac.fillStyle='#8a6a3a'; ac.fillRect(200+ (glyphCount%8)*26 -6, pressY, 40,60);
+    ac.fillStyle='#c8862f'; ac.font='22px system-ui'; ac.textAlign='center'; ac.fillText('🖨️', 200+(glyphCount%8)*26+14, pressY+30);
+  } else if(curI===2){ // 火药：爆炸粒子
+    if(localT%45===0){ for(let k=0;k<24;k++){ const a=Math.random()*7; particles.push({x:cx,y:cy,vx:Math.cos(a)*(2+Math.random()*3),vy:Math.sin(a)*(2+Math.random()*3),life:34,col:['#ffb84d','#ff6a3d','#ffd36b','#ff4d6a'][Math.random()*4|0]}); } }
+    particles.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.vy+=0.03; p.life--; ac.globalAlpha=Math.max(0,p.life/34); ac.fillStyle=p.col; ac.beginPath(); ac.arc(p.x,p.y,4,0,7); ac.fill(); ac.globalAlpha=1; });
+    particles=particles.filter(p=>p.life>0);
+    ac.font='30px system-ui'; ac.textAlign='center'; ac.fillText('🧨', cx, cy+6);
+  } else { // 指南针：阻尼摆动指向北
+    const angle = Math.PI/2*Math.cos(localT*0.05)*Math.exp(-localT*0.01);
+    ac.save(); ac.translate(cx,cy);
+    ac.strokeStyle='rgba(255,255,255,.35)'; ac.lineWidth=2; ac.beginPath(); ac.arc(0,0,80,0,7); ac.stroke();
+    ac.rotate(angle);
+    ac.beginPath(); ac.moveTo(0,-70); ac.lineTo(-10,0); ac.lineTo(10,0); ac.closePath(); ac.fillStyle='#ff4d4d'; ac.fill();
+    ac.beginPath(); ac.moveTo(0,70); ac.lineTo(-10,0); ac.lineTo(10,0); ac.closePath(); ac.fillStyle='#e6e6e6'; ac.fill();
+    ac.restore();
+    ac.fillStyle='#e6e6e6'; ac.font='bold 15px system-ui'; ac.textAlign='center'; ac.fillText('北', cx, cy-92);
+    if(localT>140 && Math.abs(angle)<0.03) document.getElementById('aCap').innerHTML='🧭 指针稳稳指向<b>北方</b>啦，古人靠它在大海上找方向！';
+  }
+  requestAnimationFrame(drawA);
+}
+drawA();
+
+/* ===== 改变了生活（含英语角）===== */
+const TIP=['<b>造纸术</b>：东汉的蔡伦改进了造纸术，让纸张变得便宜好用，书本终于能让更多人读到。',
+ '<b>印刷术</b>：宋代的毕昇发明了活字印刷术，把字刻成一个个小方块，可以重复排版印刷，比手抄书快多了！',
+ '<b>火药</b>：古人最早为了炼丹意外发现了火药，后来做成了烟花爆竹——过年放的烟花，就是火药的杰作🎆。',
+ '<b>指南针</b>：能准确指出南北方向，帮助古代航海家在大海上找到方向，不会迷路。',
+ '🔤 <span class="en">英语角</span>：纸 <b class="en">paper</b>、印刷 <b class="en">print</b>、指南针 <b class="en">compass</b>。'];
+document.querySelectorAll('#tipRow .tc').forEach(c=>c.addEventListener('click',()=>{ document.querySelectorAll('#tipRow .tc').forEach(x=>x.classList.remove('on')); c.classList.add('on'); document.getElementById('tipCap').innerHTML=TIP[+c.dataset.i]; }));
+
+/* ===== 闯关1 拖拽配对 ===== */
+const ITEMS=[
+ {key:'paper',ico:'📖',name:'写字读书'},
+ {key:'print',ico:'📚',name:'印书出版'},
+ {key:'powder',ico:'🎆',name:'过年放烟花'},
+ {key:'compass',ico:'⛵',name:'航海辨方向'},
+];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+(function buildSort(){
+  const tray=document.getElementById('tray');
+  shuffle([...ITEMS]).forEach(it=>{ const d=document.createElement('div'); d.className='item'; d.dataset.k=it.key;
+    d.innerHTML=`<div class="itIco">${it.ico}</div><div class="itName">${it.name}</div>`; tray.appendChild(d); });
+  let active=null,ox=0,oy=0,placed=0; const total=ITEMS.length; const box=document.getElementById('g-round1');
+  const binAt=(x,y)=>[...box.querySelectorAll('.bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+  box.querySelectorAll('.item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return;
+    active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top;
+    el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el);
+    el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+  function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px';
+    box.querySelectorAll('.bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b)b.classList.add('over'); }
+  addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+  addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null;
+    box.querySelectorAll('.bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+    const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+    if(bin&&bin.dataset.k===el.dataset.k){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); bin.classList.add('filled'); placed++;
+      if(placed===total) document.getElementById('r1next').style.display='block'; }
+    else { rst(); document.getElementById('tray').appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+})();
+
+/* ===== 闯关2 判断（含语文·数学·英语）===== */
+const QUIZ=[
+ {tag:'sci',tl:'科学',ico:'🏮',q:'四大发明是哪个国家的古人发明的？',opts:[['中国',1],['英国',0],['美国',0]],fb:'造纸术、印刷术、火药、指南针，都是中国古代的发明。'},
+ {tag:'math',tl:'数学',ico:'🔢',q:'四大发明一共有几样？如果每样配 1 张说明卡，一共需要几张卡片？',opts:[['4 样，需要 4 张卡片',1],['4 样，需要 8 张卡片',0],['3 样，需要 3 张卡片',0]],fb:'造纸术、印刷术、火药、指南针，一共 4 样，配 4 张卡片。'},
+ {tag:'cn',tl:'语文',ico:'📖',q:'成语「学富五车」形容一个人怎么样？',opts:[['读书多、学问渊博',1],['力气很大',0],['开了五辆车',0]],fb:'「学富五车」形容读书多、学问深，跟纸和印刷术让书变多有关系。'},
+ {tag:'en',tl:'英语',ico:'🔤',q:'“指南针”用英语怎么说？',opts:[['compass',1],['paper',0],['print',0]],fb:'compass 指南针 / paper 纸 / print 印刷。'},
+];
+let qi=0; function startQuiz(){ document.getElementById('g-round1').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>科学 + 数学 + 语文 + 英语</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; const tag=document.getElementById('qtag'); tag.className='qtag '+it.tag; tag.textContent=it.tl; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('invention','🏮','发明小达人'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#c8862f','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

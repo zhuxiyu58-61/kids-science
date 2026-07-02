@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>游戏音效怎么做 · 知识乐园</title>
+<style>
+  :root{ --accent:#8a5cf6; --bg1:#f2eeff; --bg2:#d9c9fb; --ink:#3a2a66; --ink2:#6a5a95; --card:#fff; --shadow:0 10px 30px rgba(100,60,180,.18); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:96px;}
+  .introCard{background:var(--card); border-radius:24px; padding:22px 28px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(15px,2.2vw,19px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#a983fb,#7a3fe0); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:18px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  #ex-play{flex-direction:column; align-items:center; justify-content:center; gap:10px;}
+  #cvA{width:100%; max-width:600px; height:auto; display:block; border-radius:18px; box-shadow:var(--shadow); background:#241a40;}
+  .sfxBtns{display:flex; gap:8px; flex-wrap:wrap; justify-content:center;}
+  .sfxBtn{border:none; border-radius:14px; padding:11px 16px; font-weight:900; font-size:14px; color:#fff; cursor:pointer; box-shadow:var(--shadow); background:#8a5cf6;}
+  .sfxBtn.done{background:#41c98a;}
+  .aCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(14px,2vw,17px); font-weight:800; max-width:600px; text-align:center; min-height:44px; display:flex; align-items:center; justify-content:center;} .aCap b{color:var(--accent);}
+  #ex-know{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  .tipRow{display:grid; grid-template-columns:repeat(5,1fr); gap:10px; width:100%; max-width:700px;}
+  @media (max-width:600px){ .tipRow{grid-template-columns:repeat(3,1fr);} }
+  .tc{background:var(--card); border-radius:16px; padding:14px 4px; text-align:center; box-shadow:var(--shadow); cursor:pointer; border:3px solid transparent;} .tc:active{transform:scale(.95);} .tc.on{border-color:var(--accent); background:#f2eeff;}
+  .tc .ti{font-size:32px;} .tc .tn{font-weight:900; font-size:11.5px; margin-top:4px;}
+  .tc.subj{background:#eef4ff;} .tc.subj.on{border-color:#3f7ae0; background:#e3edff;}
+  .tipCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(15px,2.2vw,18px); font-weight:800; max-width:700px; width:100%; text-align:center; min-height:48px; display:flex; align-items:center; justify-content:center;} .tipCap b{color:var(--accent);} .tipCap .en{color:#3f7ae0;}
+  .nextHint{background:#f2eeff; border-radius:14px; padding:10px 14px; font-weight:800; color:#6a3fc4; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#a983fb,#7a3fe0); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:12px; width:100%; max-width:700px; justify-content:center;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #cdb8f7; border-radius:20px; padding:12px 8px; text-align:center; min-height:150px; transition:.2s;}
+  .bin.over{border-color:var(--accent); background:#f2eeff;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:32px;} .bin .binName{font-weight:900; font-size:15px; margin-top:4px;} .bin .binHint{font-size:12px; color:var(--ink2); font-weight:700;}
+  .bin .binDrop{margin-top:8px; min-height:60px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:14px; margin-top:20px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:18px; box-shadow:var(--shadow); padding:12px 14px; text-align:center; cursor:grab; touch-action:none;}
+  .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg); box-shadow:0 18px 36px rgba(100,60,180,.3);}
+  .item.placed{cursor:default; box-shadow:none; padding:5px 7px;}
+  .item .itIco{font-size:30px;} .item.placed .itIco{font-size:22px;}
+  .item .itName{font-weight:800; font-size:12.5px;} .item.placed .itName{font-size:10px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qtag{display:inline-block; font-size:12px; font-weight:900; padding:3px 10px; border-radius:10px; margin-bottom:6px;} .qtag.math{background:#e6f0ff;color:#2f7fe0;} .qtag.en{background:#e3edff;color:#3f7ae0;} .qtag.sci{background:#eaf6ee;color:#2ba36a;} .qtag.cn{background:#fff1d6;color:#c98a2b;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #ddc9f9; background:#f8f4ff; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#a983fb,#7a3fe0); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#efe9fc; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">游戏音效怎么做<small>做游戏 · 声音特效</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🎧</div>
+    <div class="introCard">蛋仔跳起来「咻」一声，捡到金币「叮」一声，撞到墙「哐」一声——这些声音不是巧合，是做游戏的人专门<b>设计</b>出来的<b>音效</b>！今天你来当<b>游戏音效师</b>，亲手做几个音效试试！</div>
+    <button class="bigbtn" onclick="go('explore')">去音效工作台 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🎚️ 音效工作台</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">🎵 音效 VS 音乐</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-play">
+        <canvas id="cvA" width="600" height="220"></canvas>
+        <div class="sfxBtns" id="sfxBtns"></div>
+        <div class="aCap" id="aCap">点一点下面的按钮，让蛋仔动起来，听听不同的音效！</div>
+      </div>
+      <div class="subview" id="ex-know">
+        <div class="tipRow" id="tipRow">
+          <div class="tc on" data-i="0"><div class="ti">🔊</div><div class="tn">音效SFX</div></div>
+          <div class="tc" data-i="1"><div class="ti">🎼</div><div class="tn">背景音乐</div></div>
+          <div class="tc" data-i="2"><div class="ti">📈</div><div class="tn">音调传情绪</div></div>
+          <div class="tc" data-i="3"><div class="ti">🔈</div><div class="tn">音量与远近</div></div>
+          <div class="tc subj" data-i="4"><div class="ti">🔤</div><div class="tn">英语角</div></div>
+        </div>
+        <div class="tipCap" id="tipCap"><b>音效（SFX）</b>：一次性的短声音，对应一个动作（跳、捡、撞），提示玩家「发生了什么事」。</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 把 4 种音效都试一遍，就能去闯关！（<span id="cnt">0</span>/4）</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 音效 VS 背景音乐<small>把下面的声音，拖到对的筐里</small></div>
+    <div class="gsub on" id="g-round1">
+      <div class="bins">
+        <div class="bin" data-k="sfx"><div class="binIco">🔊</div><div class="binName">音效</div><div class="binHint">一次性</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="bgm"><div class="binIco">🎼</div><div class="binName">背景音乐</div><div class="binHint">循环播放</div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray"></div>
+      <div class="roundNext" id="r1next"><div class="ok">全对啦！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qtag" id="qtag"></div><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>音效做得真棒！</h2><div class="medalName">🎖 音效设计师</div>
+      <p>你今天学到了：<br>• <b>音效（SFX）</b>是配合动作的一次性短声音；<b>背景音乐（BGM）</b>是循环播放、烘托气氛的长音乐；<br>• 音调<b>向上扬</b>听起来开心，音调<b>往下沉</b>听起来失落；<br>• 离得越近声音越<b>大</b>，离得越远声音越<b>小</b>；<br>• 🔤 英语：音效 <b>sound effect</b>、音乐 <b>music</b>、音量 <b>volume</b>。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再来一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-play').classList.toggle('on',v==='A'); document.getElementById('ex-know').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='block'; }
+
+/* ===== Web Audio 合成音效（懒加载） ===== */
+let AC; function ac_(){ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended')AC.resume(); return AC; }
+function tone(f,dur,type,delay){ try{ const A=ac_(); const o=A.createOscillator(), g=A.createGain(); o.type=type||'sine'; o.frequency.value=f; o.connect(g); g.connect(A.destination);
+  const t=A.currentTime+(delay||0); g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.22,t+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+(dur||0.5));
+  o.start(t); o.stop(t+(dur||0.5)+0.02); }catch(e){} }
+function sweep(f1,f2,dur,type){ try{ const A=ac_(); const o=A.createOscillator(), g=A.createGain(); o.type=type||'sine'; o.connect(g); g.connect(A.destination);
+  const t=A.currentTime; o.frequency.setValueAtTime(f1,t); o.frequency.exponentialRampToValueAtTime(f2,t+dur);
+  g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.22,t+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.start(t); o.stop(t+dur+0.02); }catch(e){} }
+const SFX={
+  jump:()=>sweep(280,720,0.18,'sine'),
+  coin:()=>{tone(988,0.12,'sine',0); tone(1319,0.16,'sine',0.1);},
+  hit:()=>tone(120,0.18,'square',0),
+  win:()=>{tone(523,0.14,'sine',0); tone(659,0.14,'sine',0.14); tone(784,0.14,'sine',0.28); tone(1047,0.22,'sine',0.42);},
+};
+
+/* ===== 音效工作台 canvas ===== */
+const cvA=document.getElementById('cvA'), ac=cvA.getContext('2d'); const AW=cvA.width, AH=cvA.height, gx=AW/2, gy=150;
+const SFXDEF=[
+  {key:'jump',ico:'🦘',name:'跳跃',cap:'跳跃音效：音调<b>快速向上扬</b>，听起来轻盈、往上冲！'},
+  {key:'coin',ico:'🪙',name:'金币',cap:'金币音效：两个清脆的高音连着响，听起来「叮！」很开心！'},
+  {key:'hit',ico:'💥',name:'撞墙',cap:'撞墙音效：短促低沉的一声「哐」，听起来有分量、被撞到了！'},
+  {key:'win',ico:'🏆',name:'胜利',cap:'胜利音效：一串音符<b>依次升高</b>，像小喇叭一样，听起来超有成就感！'},
+];
+let visited=new Set(), anim=null;
+const btnsEl=document.getElementById('sfxBtns');
+SFXDEF.forEach(s=>{ const b=document.createElement('button'); b.className='sfxBtn'; b.textContent=s.ico+' '+s.name;
+  b.onclick=()=>play(s); btnsEl.appendChild(b); });
+function play(s){ SFX[s.key](); visited.add(s.key); document.getElementById('cnt').textContent=visited.size;
+  document.getElementById('aCap').innerHTML=s.cap;
+  [...btnsEl.children].forEach((b,i)=>{ if(SFXDEF[i].key===s.key) b.classList.add('done'); });
+  anim={key:s.key,t:0};
+  if(visited.size>=4) unlockGame();
+}
+function drawA(){ ac.clearRect(0,0,AW,AH); ac.fillStyle='#241a40'; ac.fillRect(0,0,AW,AH);
+  ac.strokeStyle='rgba(255,255,255,.08)'; ac.lineWidth=1; for(let x=0;x<AW;x+=40){ac.beginPath();ac.moveTo(x,0);ac.lineTo(x,AH);ac.stroke();}
+  ac.strokeStyle='rgba(180,140,255,.4)'; ac.lineWidth=2; ac.beginPath(); ac.moveTo(0,190); ac.lineTo(AW,190); ac.stroke();
+  let ex=gx, ey=gy, scale=1, extra='';
+  if(anim){ anim.t++; const p=anim.t;
+    if(anim.key==='jump'){ const h=Math.sin(Math.min(p/16,1)*Math.PI)*60; ey=gy-h; if(p>34)anim=null; }
+    else if(anim.key==='coin'){ scale=1+Math.sin(Math.min(p/10,1)*Math.PI)*0.25; extra='coin'; if(p>40)anim=null; }
+    else if(anim.key==='hit'){ ex=gx+Math.sin(p*2)*Math.max(0,10-p); if(p>26)anim=null; }
+    else if(anim.key==='win'){ extra='win'; if(p>70)anim=null; }
+  }
+  if(extra==='coin'){ ac.save(); ac.globalAlpha=Math.max(0,1-(anim?anim.t/40:1)); ac.font='26px system-ui'; ac.textAlign='center';
+    ac.fillText('🪙', gx, gy-40-(anim?anim.t*1.5:0)); ac.restore(); }
+  if(extra==='win'){ for(let k=0;k<3;k++){ const a=(anim?anim.t:0)*0.15+k*2.1; ac.font='20px system-ui'; ac.textAlign='center'; ac.globalAlpha=0.8; ac.fillText('✨', gx+Math.cos(a)*60, gy-30+Math.sin(a)*20); ac.globalAlpha=1; } }
+  ac.save(); ac.translate(ex,ey); ac.scale(scale,scale); ac.font='54px system-ui'; ac.textAlign='center'; ac.textBaseline='middle'; ac.fillText('🥚',0,0); ac.restore();
+  ac.fillStyle='rgba(180,140,255,.6)'; ac.font='bold 13px system-ui'; ac.textAlign='center'; ac.fillText('点下方按钮，让蛋仔动起来 →', gx, AH-14);
+  requestAnimationFrame(drawA);
+}
+drawA();
+
+/* ===== 音效 VS 音乐（含英语角）===== */
+const TIP=['<b>音效（SFX）</b>：一次性的短声音，对应一个动作（跳、捡、撞），提示玩家「发生了什么事」。',
+ '<b>背景音乐（BGM）</b>：一直循环播放的长音乐，用来烘托气氛（紧张、欢快、神秘），而不是回应某个动作。',
+ '<b>音调传递情绪</b>：音调<b>向上扬</b>，听起来开心、成功；音调<b>往下沉</b>，听起来失败、沉重——做胜利音效就该往上走！',
+ '<b>音量与远近</b>：离得越近，声音越<b>大</b>；离得越远，声音越<b>小</b>，这样才有「空间感」（就像「好听的声音」那节课里，声音其实是振动哦）。',
+ '🔤 <span class="en">英语角</span>：音效 <b class="en">sound effect</b>、音乐 <b class="en">music</b>、音量 <b class="en">volume</b>。'];
+document.querySelectorAll('#tipRow .tc').forEach(c=>c.addEventListener('click',()=>{ document.querySelectorAll('#tipRow .tc').forEach(x=>x.classList.remove('on')); c.classList.add('on'); document.getElementById('tipCap').innerHTML=TIP[+c.dataset.i]; }));
+
+/* ===== 闯关1 拖拽分类 ===== */
+const ITEMS=[
+ {key:'sfx',ico:'🦘',name:'跳跃「咻」一声'},
+ {key:'sfx',ico:'🪙',name:'捡金币「叮」一声'},
+ {key:'sfx',ico:'🏆',name:'胜利时的庆祝声'},
+ {key:'bgm',ico:'🎶',name:'关卡里循环的欢快旋律'},
+ {key:'bgm',ico:'🌙',name:'开始界面神秘的音乐'},
+ {key:'bgm',ico:'🔁',name:'战斗时紧张的循环配乐'},
+];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+(function buildSort(){
+  const tray=document.getElementById('tray');
+  shuffle([...ITEMS]).forEach(it=>{ const d=document.createElement('div'); d.className='item'; d.dataset.k=it.key;
+    d.innerHTML=`<div class="itIco">${it.ico}</div><div class="itName">${it.name}</div>`; tray.appendChild(d); });
+  let active=null,ox=0,oy=0,placed=0; const total=ITEMS.length; const box=document.getElementById('g-round1');
+  const binAt=(x,y)=>[...box.querySelectorAll('.bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+  box.querySelectorAll('.item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return;
+    active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top;
+    el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el);
+    el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+  function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px';
+    box.querySelectorAll('.bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b&&!b.classList.contains('filled'))b.classList.add('over'); }
+  addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+  addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null;
+    box.querySelectorAll('.bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+    const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+    if(bin&&bin.dataset.k===el.dataset.k){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); placed++;
+      if(placed===total) document.getElementById('r1next').style.display='block'; }
+    else { rst(); document.getElementById('tray').appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+})();
+
+/* ===== 闯关2 判断（含数学）===== */
+const QUIZ=[
+ {tag:'sci',tl:'科学',ico:'📈',q:'设计「胜利」音效时，音调应该怎样，才更像开心？',opts:[['音调向上扬起',1],['音调一直很低沉',0],['完全没有声音',0]],fb:'音调向上扬，听起来才有「成功、开心」的感觉。'},
+ {tag:'math',tl:'数学',ico:'🔢',q:'一局游戏里蛋仔跳了 3 次、捡了 5 个金币，一共触发了几次音效？',opts:[['8 次',1],['15 次',0],['2 次',0]],fb:'3 + 5 = 8，一共触发了 8 次音效。'},
+ {tag:'sci',tl:'科学',ico:'🎼',q:'背景音乐和音效最大的不同是？',opts:[['背景音乐循环播放烘托气氛，音效是配合动作的短声音',1],['背景音乐比音效难听',0],['它们其实完全一样',0]],fb:'背景音乐管「气氛」，音效管「这一下发生了什么」。'},
+ {tag:'en',tl:'英语',ico:'🔤',q:'“音效”用英语怎么说？',opts:[['sound effect',1],['picture',0],['color',0]],fb:'sound effect 音效 / music 音乐。'},
+];
+let qi=0; function startQuiz(){ document.getElementById('g-round1').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>科学 + 数学 + 英语</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; const tag=document.getElementById('qtag'); tag.className='qtag '+it.tag; tag.textContent=it.tl; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('game-audio','🎧','音效设计师'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#8a5cf6','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

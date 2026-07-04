@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>数图形 · 知识乐园</title>
+<style>
+  :root{ --accent:#2f9e6a; --bg1:#eafaf1; --bg2:#bfe8cf; --ink:#1f5c3e; --ink2:#4f8a6a; --card:#fff; --shadow:0 10px 30px rgba(30,140,90,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:88px;}
+  .introCard{background:var(--card); border-radius:24px; padding:22px 28px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(15px,2.2vw,19px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#5cd097,#1f8a52); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:18px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none; flex-direction:column; align-items:center; justify-content:center; gap:10px;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  .progDots{display:flex; gap:8px;} .pd{width:10px; height:10px; border-radius:50%; background:#cdeedb;} .pd.done{background:var(--accent);}
+  .revealRow{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; max-width:520px;}
+  .revealBtn{border:3px solid #cdeedb; background:#f2fbf6; border-radius:14px; padding:8px 14px; font-weight:900; font-size:13.5px; cursor:pointer;} .revealBtn:active{transform:scale(.95);}
+  .roundCap{background:var(--card); border-radius:16px; padding:10px 16px; box-shadow:var(--shadow); font-size:15px; font-weight:800; max-width:520px; text-align:center; min-height:40px; display:flex; align-items:center; justify-content:center;} .roundCap b{color:var(--accent);}
+  .nextHint{background:#e3f7ec; border-radius:14px; padding:10px 14px; font-weight:800; color:#1f8a52; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#5cd097,#1f8a52); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center; gap:14px;} .gsub.on{display:flex;}
+  .optRow{display:flex; gap:14px;}
+  .optBtn{border:3px solid #cdeedb; background:#f2fbf6; border-radius:18px; padding:14px 26px; font-size:26px; font-weight:900; cursor:pointer; box-shadow:var(--shadow);} .optBtn:active{transform:scale(.94);}
+  .optBtn.right{border-color:#41c98a; background:#e4fbef;} .optBtn.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .roundNext{display:none; margin-top:6px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qtag{display:inline-block; font-size:12px; font-weight:900; padding:3px 10px; border-radius:10px; margin-bottom:6px;} .qtag.logic{background:#e3f7ec;color:#1f8a52;} .qtag.en{background:#e3edff;color:#3f7ae0;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #cdeedb; background:#f4fbf7; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#5cd097,#1f8a52); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#e5f5ec; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">数图形<small>数学思维 · 数一数，别漏掉</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🔺🔍</div>
+    <div class="introCard">看图数一数——数三角形的时候，除了<b>最小的那些</b>，两个拼在一起的<b>大三角形</b>也要算进去哦！今天来做一次数图形高手。</div>
+    <button class="bigbtn" onclick="go('explore')">开始数一数 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🔺 数三角形</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">⬜ 数正方形</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-A"></div>
+      <div class="subview" id="ex-B"></div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 两边各数完 2 张图，就能去闯关！（<span id="cntA">0</span>/2 + <span id="cntB">0</span>/2）</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 自己数一数<small>这次没有提示按钮啦，仔细看图</small></div>
+    <div class="gsub on" id="g-round1"></div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qtag" id="qtag"></div><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>图形都被你数清楚啦！</h2><div class="medalName">🎖 数图形高手</div>
+      <p>你今天学到了：<br>• 数图形要<b>系统地数</b>，先数最小的，再数拼起来的大图形；<br>• 一个正方形被分成 2×2 共 4 小格时，一共能数出 <b>5</b> 个正方形（4 小 + 1 大）；<br>• 一个三角形被一条线分成两半时，一共有 <b>3</b> 个三角形；<br>• 🔤 英语："数一数"用英语怎么说：<b>count</b>。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再数一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-A').classList.toggle('on',v==='A'); document.getElementById('ex-B').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+let doneA=0, doneB=0;
+function unlockGame(){ if(doneA>=2 && doneB>=2){ nextHint.style.display='none'; nextBtn.style.display='block'; } }
+
+/* ===== 通用：造一个"数图形"面板（带提示按钮逐个揭示） ===== */
+function renderCountRound(mount, cfg){
+  mount.innerHTML=`<div class="progDots" id="pd-${cfg.key}"></div>
+    <svg viewBox="${cfg.viewBox}" width="100%" style="max-width:280px" id="svg-${cfg.key}">
+      ${cfg.base.map(p=>`<polygon points="${p}" fill="none" stroke="#3a3a3a" stroke-width="2.5"/>`).join('')}
+      ${cfg.reveals.map(r=>`<polygon points="${r.poly}" fill="${r.color}" opacity="0" stroke="${r.color}" stroke-width="3" id="ov-${cfg.key}-${r.id}"/>`).join('')}
+    </svg>
+    <div class="revealRow" id="rr-${cfg.key}"></div>
+    <div class="roundCap" id="cap-${cfg.key}">点一下按钮，看看藏着的图形吧！</div>`;
+  mount.querySelector(`#pd-${cfg.key}`).innerHTML = cfg.dots.map((d,i)=>`<div class="pd ${i<cfg.dotIdx?'done':''}"></div>`).join('');
+  const row=mount.querySelector(`#rr-${cfg.key}`); let found=0;
+  cfg.reveals.forEach(r=>{ const b=document.createElement('button'); b.className='revealBtn'; b.textContent=r.label;
+    b.onclick=()=>{ if(b.dataset.done)return; b.dataset.done='1'; b.style.background=r.color; b.style.color='#fff'; b.style.borderColor=r.color;
+      document.getElementById(`ov-${cfg.key}-${r.id}`).setAttribute('opacity','0.35'); found++;
+      mount.querySelector(`#cap-${cfg.key}`).innerHTML = found<cfg.reveals.length? `已经找到 ${found} 个啦，还有吗？` : `🎉 一共有 <b>${cfg.total}</b> 个！`;
+      if(found===cfg.reveals.length) setTimeout(cfg.onDone,1200);
+    };
+    row.appendChild(b); });
+}
+const TRI1={viewBox:'0 0 300 240', base:['150,20 30,220 150,220','150,20 150,220 270,220'], total:3,
+  reveals:[{id:'a',label:'小三角形①',poly:'150,20 30,220 150,220',color:'#3f8fd6'},{id:'b',label:'小三角形②',poly:'150,20 150,220 270,220',color:'#e0327a'},{id:'c',label:'大三角形',poly:'150,20 30,220 270,220',color:'#41c98a'}]};
+const TRI2={viewBox:'0 0 300 240', base:['150,20 90,120 210,120','90,120 30,220 150,220','210,120 150,220 270,220','90,120 150,220 210,120'], total:5,
+  reveals:[{id:'a',label:'顶部小三角',poly:'150,20 90,120 210,120',color:'#3f8fd6'},{id:'b',label:'左边小三角',poly:'90,120 30,220 150,220',color:'#e0327a'},{id:'c',label:'右边小三角',poly:'210,120 150,220 270,220',color:'#f0993a'},{id:'d',label:'中间倒三角',poly:'90,120 150,220 210,120',color:'#b58bff'},{id:'e',label:'最大的三角形',poly:'150,20 30,220 270,220',color:'#41c98a'}]};
+const SQ1={viewBox:'0 0 220 220', base:['10,10 110,10 110,110 10,110','110,10 210,10 210,110 110,110','10,110 110,110 110,210 10,210','110,110 210,110 210,210 110,210'], total:5,
+  reveals:[{id:'a',label:'左上格',poly:'10,10 110,10 110,110 10,110',color:'#3f8fd6'},{id:'b',label:'右上格',poly:'110,10 210,10 210,110 110,110',color:'#e0327a'},{id:'c',label:'左下格',poly:'10,110 110,110 110,210 10,210',color:'#f0993a'},{id:'d',label:'右下格',poly:'110,110 210,110 210,210 110,210',color:'#b58bff'},{id:'e',label:'最大的正方形',poly:'10,10 210,10 210,210 10,210',color:'#41c98a'}]};
+const SQ2={viewBox:'0 0 260 100', base:['10,10 90,10 90,90 10,90','90,10 170,10 170,90 90,90','170,10 250,10 250,90 170,90'], total:3,
+  reveals:[{id:'a',label:'第①格',poly:'10,10 90,10 90,90 10,90',color:'#3f8fd6'},{id:'b',label:'第②格',poly:'90,10 170,10 170,90 90,90',color:'#e0327a'},{id:'c',label:'第③格',poly:'170,10 250,10 250,90 170,90',color:'#f0993a'}]};
+const ROUNDS_A=[TRI1,TRI2], ROUNDS_B=[SQ1,SQ2];
+let idxA=0, idxB=0;
+function showA(){ const box=document.getElementById('ex-A');
+  if(idxA>=ROUNDS_A.length){ box.innerHTML='<div class="roundCap">🎉 两张图都数完啦！</div>'; return; }
+  renderCountRound(box, {...ROUNDS_A[idxA], key:'A', dots:ROUNDS_A, dotIdx:idxA, onDone:()=>{ doneA++; document.getElementById('cntA').textContent=doneA; unlockGame(); idxA++; showA(); }});
+}
+function showB(){ const box=document.getElementById('ex-B');
+  if(idxB>=ROUNDS_B.length){ box.innerHTML='<div class="roundCap">🎉 两张图都数完啦！</div>'; return; }
+  renderCountRound(box, {...ROUNDS_B[idxB], key:'B', dots:ROUNDS_B, dotIdx:idxB, onDone:()=>{ doneB++; document.getElementById('cntB').textContent=doneB; unlockGame(); idxB++; showB(); }});
+}
+showA(); showB();
+
+/* ===== 闯关1：自己数（没有提示按钮） ===== */
+const GAME_ROUNDS=[
+  {viewBox:'0 0 220 220', base:SQ1.base, q:'图里一共有多少个正方形（含大的）？', opts:[4,5,6], ans:1},
+  {viewBox:'0 0 300 240', base:TRI1.base, q:'图里一共有多少个三角形？', opts:[2,3,4], ans:1},
+];
+let gIdx=0;
+function renderGame(){ const box=document.getElementById('g-round1');
+  if(gIdx>=GAME_ROUNDS.length){ box.innerHTML='<div class="ok">全对啦！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button>'; return; }
+  const r=GAME_ROUNDS[gIdx];
+  box.innerHTML=`<svg viewBox="${r.viewBox}" width="100%" style="max-width:240px">${r.base.map(p=>`<polygon points="${p}" fill="none" stroke="#3a3a3a" stroke-width="2.5"/>`).join('')}</svg>
+    <div class="roundCap">${r.q}</div><div class="optRow" id="gOptRow"></div>`;
+  const row=document.getElementById('gOptRow');
+  r.opts.forEach((o,i)=>{ const b=document.createElement('div'); b.className='optBtn'; b.textContent=o;
+    b.onclick=()=>{ if(b.dataset.locked)return;
+      if(i===r.ans){ b.classList.add('right'); b.dataset.locked='1'; setTimeout(()=>{ gIdx++; renderGame(); },1000); }
+      else { b.classList.add('wrong'); setTimeout(()=>b.classList.remove('wrong'),400); } };
+    row.appendChild(b); });
+}
+renderGame();
+
+/* ===== 闯关2 判断 ===== */
+const QUIZ=[
+ {tag:'logic',tl:'逻辑',ico:'⬜',q:'一个正方形被两条线分成2×2共4个小格，一共可以数出多少个正方形（含大的）？',opts:[['5个',1],['4个',0],['6个',0]],fb:'4个小格 + 1个最大的 = 5个。'},
+ {tag:'logic',tl:'逻辑',ico:'🔺',q:'一个大三角形被从顶点到底边中点的一条线分成两半，一共有多少个三角形？',opts:[['3个',1],['2个',0],['4个',0]],fb:'2个小三角形 + 1个最大的 = 3个。'},
+ {tag:'logic',tl:'逻辑',ico:'🔍',q:'数图形时，除了最小的那些，还要数上哪种？',opts:[['几个小图形拼起来的大图形',1],['只数最小的就够了',0],['随便数几个都行',0]],fb:'别漏掉拼起来的大图形，才能数得又快又准。'},
+ {tag:'en',tl:'英语',ico:'🔤',q:'英语角："数一数"用英语怎么说？',opts:[['count',1],['color',0],['shape',0]],fb:'count 数数，shape 形状。'},
+];
+let qi=0; function startQuiz(){ document.getElementById('g-round1').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>逻辑 + 英语</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; const tag=document.getElementById('qtag'); tag.className='qtag '+it.tag; tag.textContent=it.tl; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('countshapes','🔺','数图形高手'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#2f9e6a','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

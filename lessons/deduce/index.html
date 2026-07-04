@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>逻辑小侦探 · 知识乐园</title>
+<style>
+  :root{ --accent:#a85a2f; --bg1:#fff3e8; --bg2:#f0cba0; --ink:#5c3a1a; --ink2:#8a6a45; --card:#fff; --shadow:0 10px 30px rgba(150,90,40,.18); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:92px;}
+  .introCard{background:var(--card); border-radius:24px; padding:22px 28px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(15px,2.2vw,19px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#d68a5c,#96461f); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:18px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none; flex-direction:column; align-items:center; justify-content:center; gap:14px;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  .trioRow{display:flex; gap:18px;}
+  .trioCard{background:var(--card); border-radius:18px; padding:14px; box-shadow:var(--shadow); text-align:center; width:110px;}
+  .trioCard .ta{font-size:40px;} .trioCard .tf{font-size:34px; margin-top:8px; min-height:40px;}
+  .clueCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(14px,2.1vw,17px); font-weight:800; max-width:600px; text-align:center; min-height:56px; display:flex; align-items:center; justify-content:center; line-height:1.55;} .clueCap b{color:var(--accent);}
+  .clueBtn{border:none; border-radius:16px; padding:12px 26px; font-size:16px; font-weight:900; color:#fff; background:var(--accent); box-shadow:var(--shadow); cursor:pointer;}
+  .puzzle2{display:flex; gap:24px;}
+  .p2card{background:var(--card); border-radius:18px; padding:14px; box-shadow:var(--shadow); text-align:center;}
+  .p2card .pa{font-size:40px;} .p2card .pn{font-weight:900; margin:6px 0;}
+  .p2opts{display:flex; gap:8px; justify-content:center;}
+  .p2opt{border:3px solid #f0d9c2; background:#fdf5ec; border-radius:12px; padding:8px 12px; font-size:26px; cursor:pointer;} .p2opt.right{border-color:#41c98a; background:#e4fbef;} .p2opt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .clueList{background:var(--card); border-radius:14px; padding:10px 16px; box-shadow:var(--shadow); font-size:14px; font-weight:700; max-width:560px; line-height:1.8;} .clueList b{color:var(--accent);}
+  .nextHint{background:#fbe9d8; border-radius:14px; padding:10px 14px; font-weight:800; color:#96461f; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#d68a5c,#96461f); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 8px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:12px; width:100%; max-width:640px; justify-content:center;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #eec9a3; border-radius:20px; padding:12px 6px; text-align:center; min-height:150px; transition:.2s;}
+  .bin.over{border-color:var(--accent); background:#fbe9d8;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:30px;} .bin .binName{font-weight:900; font-size:14px; margin-top:4px;} .bin .binHint{font-size:11px; color:var(--ink2); font-weight:700;}
+  .bin .binDrop{margin-top:8px; min-height:60px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:14px; margin-top:16px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:18px; box-shadow:var(--shadow); padding:12px 14px; text-align:center; cursor:grab; touch-action:none;}
+  .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg); box-shadow:0 18px 36px rgba(150,90,40,.3);}
+  .item.placed{cursor:default; box-shadow:none; padding:5px 7px;}
+  .item .itIco{font-size:34px;} .item.placed .itIco{font-size:24px;}
+  .item .itName{font-weight:800; font-size:13px;} .item.placed .itName{font-size:10.5px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qtag{display:inline-block; font-size:12px; font-weight:900; padding:3px 10px; border-radius:10px; margin-bottom:6px;} .qtag.logic{background:#fbe9d8;color:#96461f;} .qtag.en{background:#e3edff;color:#3f7ae0;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #f0d9c2; background:#fdf6ee; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#d68a5c,#96461f); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#f5e9dc; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">逻辑小侦探<small>数学思维 · 用线索找答案</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🕵️</div>
+    <div class="introCard">三只小动物，每人养了一只不同的宠物，你能靠几条<b>线索</b>猜出谁养了什么吗？今天当一次逻辑小侦探，用<b>排除法</b>一步步找到真相！</div>
+    <button class="bigbtn" onclick="go('explore')">开始破案 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🔍 线索是什么</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">🧠 自己来推理</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-A"></div>
+      <div class="subview" id="ex-B"></div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 看完全部线索，再自己解开一道推理题，就能去闯关！</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 破案时间<small>把宠物拖给对的小动物</small></div>
+    <div class="gsub on" id="g-round1">
+      <div class="clueList">① 乌龟最爱吃<b>生菜</b>｜② 小鸟只吃<b>虫子</b>，别的都不吃｜③ 剩下的就是仓鼠的啦</div>
+      <div class="bins">
+        <div class="bin" data-k="bird"><div class="binIco">🐦</div><div class="binName">小鸟</div><div class="binHint"></div><div class="binDrop"></div></div>
+        <div class="bin" data-k="turtle"><div class="binIco">🐢</div><div class="binName">乌龟</div><div class="binHint"></div><div class="binDrop"></div></div>
+        <div class="bin" data-k="hamster"><div class="binIco">🐹</div><div class="binName">仓鼠</div><div class="binHint"></div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray"></div>
+      <div class="roundNext" id="r1next"><div class="ok">破案成功！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qtag" id="qtag"></div><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>案子破啦！</h2><div class="medalName">🎖 逻辑小侦探</div>
+      <p>你今天学到了：<br>• 一条线索能<b>排除</b>掉一些不可能的答案；<br>• 线索用完了，剩下的那个就是<b>唯一的答案</b>；<br>• 这种一步步排除、找到真相的方法，叫<b>排除法</b>；<br>• 🔤 英语：侦探 <b>detective</b>。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再破一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-A').classList.toggle('on',v==='A'); document.getElementById('ex-B').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+let tabADone=false, tabBDone=false;
+function unlockGame(){ if(tabADone && tabBDone){ nextHint.style.display='none'; nextBtn.style.display='block'; } }
+
+/* ===== Tab A 线索是什么：逐条揭示 🐶🐱🐰 x 🦴🐟🥕 ===== */
+const boxA=document.getElementById('ex-A');
+boxA.innerHTML=`<div class="trioRow" id="trioRow">
+    <div class="trioCard"><div class="ta">🐶</div><div class="tf" id="tf0">❔</div></div>
+    <div class="trioCard"><div class="ta">🐱</div><div class="tf" id="tf1">❔</div></div>
+    <div class="trioCard"><div class="ta">🐰</div><div class="tf" id="tf2">❔</div></div>
+  </div>
+  <div class="clueCap" id="clueCapA">点「下一条线索」，看看侦探是怎么推理的！</div>
+  <button class="clueBtn" id="clueBtnA">下一条线索 ▶</button>`;
+const CLUES_A=[
+  {msg:'🐰 <b>线索①</b>：小兔最爱吃胡萝卜！——直接确定：小兔 = 胡萝卜 🥕', apply:()=>{document.getElementById('tf2').textContent='🥕';}},
+  {msg:'🐶 <b>线索②</b>：小狗从来不吃鱼——排除"小狗=鱼"这个组合，小狗只能是骨头 🦴', apply:()=>{document.getElementById('tf0').textContent='🦴';}},
+  {msg:'🐱 <b>线索③</b>：胡萝卜、骨头都分完了，剩下的鱼，就是小猫的啦 🐟', apply:()=>{document.getElementById('tf1').textContent='🐟';}},
+  {msg:'🎉 案子破啦！这种一条一条排除不可能、剩下唯一答案的方法，就叫<b>排除法</b>。', apply:()=>{ tabADone=true; unlockGame(); }},
+];
+let clueIdxA=0;
+document.getElementById('clueBtnA').onclick=()=>{ if(clueIdxA>=CLUES_A.length)return; const c=CLUES_A[clueIdxA]; c.apply(); document.getElementById('clueCapA').innerHTML=c.msg; clueIdxA++;
+  if(clueIdxA>=CLUES_A.length) document.getElementById('clueBtnA').style.display='none'; };
+
+/* ===== Tab B 自己来推理：🐭🐷 x 🧀🌽 ===== */
+const boxB=document.getElementById('ex-B');
+boxB.innerHTML=`<div class="clueList">① 小猪不喜欢奶酪｜② 剩下的就是老鼠的</div>
+  <div class="puzzle2">
+    <div class="p2card"><div class="pa">🐭</div><div class="pn">老鼠养了？</div><div class="p2opts" id="pOptsMouse"></div></div>
+    <div class="p2card"><div class="pa">🐷</div><div class="pn">小猪养了？</div><div class="p2opts" id="pOptsPig"></div></div>
+  </div>
+  <div class="clueCap" id="clueCapB">先想一想，再点你觉得对的答案～</div>`;
+let mouseOk=false, pigOk=false;
+function checkB(){ if(mouseOk&&pigOk){ document.getElementById('clueCapB').innerHTML='✅ 推理成功！小猪不要奶酪，所以小猪=玉米，老鼠=奶酪。'; tabBDone=true; unlockGame(); } }
+[['pOptsMouse','🧀','mouse'],['pOptsPig','🌽','pig']].forEach(([id,right,who])=>{
+  const row=document.getElementById(id); const opts= who==='mouse'? ['🧀','🌽'] : ['🌽','🧀'];
+  opts.forEach(o=>{ const b=document.createElement('div'); b.className='p2opt'; b.textContent=o;
+    b.onclick=()=>{ if(b.dataset.locked)return;
+      if(o===right){ b.classList.add('right'); b.dataset.locked='1'; if(who==='mouse')mouseOk=true; else pigOk=true; checkB(); }
+      else { b.classList.add('wrong'); setTimeout(()=>b.classList.remove('wrong'),400); document.getElementById('clueCapB').textContent='🤔 再想想线索①：小猪不喜欢奶酪～'; } };
+    row.appendChild(b); });
+});
+
+/* ===== 闯关1 拖拽匹配（3个筐） ===== */
+const ITEMS=[ {key:'bird',ico:'🐛',name:'虫子'}, {key:'turtle',ico:'🥬',name:'生菜'}, {key:'hamster',ico:'🌰',name:'坚果'} ];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+(function buildSort(){
+  const tray=document.getElementById('tray');
+  shuffle([...ITEMS]).forEach(it=>{ const d=document.createElement('div'); d.className='item'; d.dataset.k=it.key;
+    d.innerHTML=`<div class="itIco">${it.ico}</div><div class="itName">${it.name}</div>`; tray.appendChild(d); });
+  let active=null,ox=0,oy=0,placed=0; const total=ITEMS.length; const box=document.getElementById('g-round1');
+  const binAt=(x,y)=>[...box.querySelectorAll('.bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+  box.querySelectorAll('.item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return;
+    active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top;
+    el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el);
+    el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+  function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px';
+    box.querySelectorAll('.bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b)b.classList.add('over'); }
+  addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+  addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null;
+    box.querySelectorAll('.bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+    const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+    if(bin&&bin.dataset.k===el.dataset.k){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); placed++;
+      if(placed===total) document.getElementById('r1next').style.display='block'; }
+    else { rst(); document.getElementById('tray').appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+})();
+
+/* ===== 闯关2 判断 ===== */
+const QUIZ=[
+ {tag:'logic',tl:'逻辑',ico:'🐢',q:'线索说"乌龟最爱吃生菜"，那乌龟的食物是？',opts:[['生菜',1],['虫子',0],['坚果',0]],fb:'线索直接告诉了答案。'},
+ {tag:'logic',tl:'逻辑',ico:'🐦',q:'如果"小鸟只吃虫子"，那小鸟绝对不会吃？',opts:[['坚果和生菜',1],['虫子',0],['都不对',0]],fb:'"只吃虫子"排除了其他所有食物。'},
+ {tag:'logic',tl:'逻辑',ico:'🔍',q:'一条一条排除不可能的答案，剩下的就是答案，这个方法叫？',opts:[['排除法',1],['瞎猜法',0],['记忆法',0]],fb:'排除法：排除掉不可能的，剩下的就是真相。'},
+ {tag:'en',tl:'英语',ico:'🔤',q:'英语角："侦探"用英语怎么说？',opts:[['detective',1],['doctor',0],['dentist',0]],fb:'detective 侦探，专门找线索破案的人。'},
+];
+let qi=0; function startQuiz(){ document.getElementById('g-round1').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>逻辑 + 英语</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; const tag=document.getElementById('qtag'); tag.className='qtag '+it.tag; tag.textContent=it.tl; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('deduce','🕵️','逻辑小侦探'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#a85a2f','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

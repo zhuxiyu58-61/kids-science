@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>走迷宫和一笔画 · 知识乐园</title>
+<style>
+  :root{ --accent:#d6547a; --bg1:#fff0f4; --bg2:#f5c3d3; --ink:#6b2a3e; --ink2:#9a6070; --card:#fff; --shadow:0 10px 30px rgba(180,50,90,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:88px;}
+  .introCard{background:var(--card); border-radius:24px; padding:22px 28px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(15px,2.2vw,19px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#e88aa5,#b8305a); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:18px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none; flex-direction:column; align-items:center; justify-content:center; gap:12px;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  .progDots{display:flex; gap:8px;} .pd{width:10px; height:10px; border-radius:50%; background:#f5cdd9;} .pd.done{background:var(--accent);}
+  .mazeGrid{display:grid; gap:3px;}
+  .mcell{width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-size:20px; border-radius:6px;}
+  .mcell.wall{background:#7a4a58;} .mcell.path{background:#fff0e0; cursor:pointer;} .mcell.visited{background:#ffd7e8;}
+  .roundCap{background:var(--card); border-radius:16px; padding:10px 16px; box-shadow:var(--shadow); font-size:14.5px; font-weight:800; max-width:520px; text-align:center; min-height:40px; display:flex; align-items:center; justify-content:center;} .roundCap b{color:var(--accent);}
+  .strokeBtn{border:none; border-radius:16px; padding:11px 22px; font-size:15px; font-weight:900; color:#fff; background:var(--accent); box-shadow:var(--shadow); cursor:pointer;}
+  .optRow{display:flex; gap:14px;}
+  .optBtn{border:3px solid #f5cdd9; background:#fef3f6; border-radius:18px; padding:14px 24px; font-size:20px; font-weight:900; cursor:pointer; box-shadow:var(--shadow);} .optBtn:active{transform:scale(.94);}
+  .optBtn.right{border-color:#41c98a; background:#e4fbef;} .optBtn.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qWord{font-size:clamp(15px,2.2vw,19px); font-weight:800; max-width:560px; text-align:center; line-height:1.6;}
+  .nextHint{background:#fbe3ea; border-radius:14px; padding:10px 14px; font-weight:800; color:#b8305a; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#e88aa5,#b8305a); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center; gap:14px;} .gsub.on{display:flex;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qtag{display:inline-block; font-size:12px; font-weight:900; padding:3px 10px; border-radius:10px; margin-bottom:6px;} .qtag.logic{background:#fbe3ea;color:#b8305a;} .qtag.en{background:#e3edff;color:#3f7ae0;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #f5cdd9; background:#fef6f8; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#e88aa5,#b8305a); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#f7e5ea; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">走迷宫和一笔画<small>数学思维 · 路线怎么走</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🐭🧀</div>
+    <div class="introCard">小老鼠要走迷宫找奶酪，怎么才能找到<b>最快</b>的那条路？有些图形还能<b>一笔画完</b>，中间不抬笔、不重复！今天来当一次路线小侦探。</div>
+    <button class="bigbtn" onclick="go('explore')">开始出发 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🐭 走迷宫</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">✏️ 一笔画</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-A"></div>
+      <div class="subview" id="ex-B"></div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 走完 2 个迷宫，再看完 2 个一笔画，就能去闯关！（<span id="cntA">0</span>/2 + <span id="cntB">0</span>/2）</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 路线小挑战<small>动动脑，别用手走啦</small></div>
+    <div class="gsub on" id="g-round1"></div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qtag" id="qtag"></div><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>路线都被你找到啦！</h2><div class="medalName">🎖 迷宫探险家</div>
+      <p>你今天学到了：<br>• 走迷宫要挑<b>最短</b>的那条路，不绕远路；<br>• 走了 6 步，其实经过了 <b>7</b> 个格子（含起点终点），数格子容易多数或少数一个；<br>• 有些图形能<b>一笔画完</b>，中间不断笔、不重复；<br>• 🔤 英语：迷宫 <b>maze</b>。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再走一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-A').classList.toggle('on',v==='A'); document.getElementById('ex-B').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+let doneA=0, doneB=0;
+function unlockGame(){ if(doneA>=2 && doneB>=2){ nextHint.style.display='none'; nextBtn.style.display='block'; } }
+
+/* ===== Tab A 走迷宫 ===== */
+function renderMaze(mount, cfg){
+  let cur={...cfg.start}, steps=0, visited=new Set([cfg.start.r+','+cfg.start.c]), finished=false;
+  function draw(){
+    const rows=cfg.grid.length, cols=cfg.grid[0].length; let html=`<div class="mazeGrid" style="grid-template-columns:repeat(${cols},36px)">`;
+    for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){ const isWall=cfg.grid[r][c]===0; const isCur=cur.r===r&&cur.c===c; const isGoal=cfg.goal.r===r&&cfg.goal.c===c; const isVis=visited.has(r+','+c);
+      const content = isCur? '🐭' : (isGoal? '🧀' : '');
+      html+=`<div class="mcell ${isWall?'wall':'path'} ${isVis&&!isWall?'visited':''}" data-r="${r}" data-c="${c}">${content}</div>`; }
+    html+='</div>';
+    mount.querySelector('.mazeStage').innerHTML=html;
+    if(finished) return;
+    mount.querySelectorAll('.mcell.path').forEach(el=>{ el.onclick=()=>{ if(finished)return; const r=+el.dataset.r,c=+el.dataset.c;
+      if(Math.abs(r-cur.r)+Math.abs(c-cur.c)===1){ cur={r,c}; steps++; visited.add(r+','+c); draw();
+        if(r===cfg.goal.r&&c===cfg.goal.c){ finished=true; mount.querySelector('.mazeCap').innerHTML=`🎉 走到啦！这次一共走了 <b>${steps}</b> 步。`; cfg.onDone(); }
+        else mount.querySelector('.mazeCap').textContent='点🐭旁边的格子，继续往前走～'; } }; });
+  }
+  mount.innerHTML=`<div class="mazeStage"></div><div class="mazeCap roundCap">点🐭旁边的格子，带它一步步走到🧀身边！</div>`;
+  draw();
+}
+const MAZES=[
+  {grid:[[1,1,0,0,0],[0,1,0,1,1],[0,1,1,1,0],[0,0,0,1,0],[0,0,0,1,1]], start:{r:0,c:0}, goal:{r:4,c:4}},
+  {grid:[[1,1,1,0],[0,0,1,0],[0,1,1,1],[0,1,0,1]], start:{r:0,c:0}, goal:{r:3,c:3}},
+];
+let idxA=0;
+function showA(){ const box=document.getElementById('ex-A');
+  if(idxA>=MAZES.length){ box.innerHTML='<div class="roundCap">🎉 两个迷宫都走完啦！</div>'; return; }
+  box.innerHTML=`<div class="progDots">${MAZES.map((_,i)=>`<div class="pd ${i<idxA?'done':''}"></div>`).join('')}</div>`;
+  const stage=document.createElement('div'); box.appendChild(stage);
+  renderMaze(stage, {...MAZES[idxA], onDone:()=>{ doneA++; document.getElementById('cntA').textContent=doneA; unlockGame(); setTimeout(()=>{ idxA++; showA(); },1400); }});
+}
+showA();
+
+/* ===== Tab B 一笔画 ===== */
+const STROKES=[
+  {d:'M100,10 L153,175 L15,74 L185,74 L47,175 Z', box:'0 0 200 190', label:'五角星'},
+  {d:'M10,110 L10,10 L190,10 L190,110 L10,110 L100,60 L190,110', box:'0 0 200 130', label:'信封'},
+];
+let idxB=0;
+function showB(){ const box=document.getElementById('ex-B');
+  if(idxB>=STROKES.length){ box.innerHTML='<div class="roundCap">🎉 两个图形都看完啦！</div>'; return; }
+  const s=STROKES[idxB];
+  box.innerHTML=`<div class="progDots">${STROKES.map((_,i)=>`<div class="pd ${i<idxB?'done':''}"></div>`).join('')}</div>
+    <svg viewBox="${s.box}" width="200" height="190"><path id="strokePath" d="${s.d}" fill="none" stroke="#b8305a" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/></svg>
+    <button class="strokeBtn" id="strokeBtn">▶ 看它一笔画完 · ${s.label}</button>
+    <div class="roundCap" id="capB">点按钮，看这个图形怎么不抬笔、不重复地画完！</div>`;
+  const path=document.getElementById('strokePath'); const len=path.getTotalLength();
+  path.style.strokeDasharray=len; path.style.strokeDashoffset=len;
+  document.getElementById('strokeBtn').onclick=()=>{
+    path.style.transition='none'; path.style.strokeDashoffset=len; void path.getBoundingClientRect();
+    path.style.transition=`stroke-dashoffset ${1.6+idxB*0.4}s linear`; path.style.strokeDashoffset='0';
+    setTimeout(()=>{ document.getElementById('capB').innerHTML=`✅ 看！整个「${s.label}」都是<b>一笔画完</b>的，中间没有抬笔、没有重复描线！`;
+      doneB++; document.getElementById('cntB').textContent=doneB; unlockGame(); setTimeout(()=>{ idxB++; showB(); },1300); }, (1.6+idxB*0.4)*1000+100);
+  };
+}
+showB();
+
+/* ===== 闯关1：自己动脑想（新题） ===== */
+const GAME_STEPS=[
+  {kind:'maze', q:'如果小老鼠从起点到终点最短要走 6 步，那么它一共经过了几个格子（含起点和终点）？', opts:['6个','7个','8个'], ai:1},
+  {kind:'stroke', q:'一个三角形（3条边）能不能一笔画完，中间不抬笔、不重复？', opts:['可以','不可以','根本画不出三角形'], ai:0},
+];
+let gIdx=0;
+function renderGame(){ const box=document.getElementById('g-round1');
+  if(gIdx>=GAME_STEPS.length){ box.innerHTML='<div class="ok" style="font-size:18px;font-weight:900;color:#2ba36a;">全对啦！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button>'; return; }
+  const r=GAME_STEPS[gIdx];
+  box.innerHTML=`<div class="qWord">${r.q}</div><div class="optRow" id="gOptRow"></div><div class="roundCap" id="gCap"></div>`;
+  const row=document.getElementById('gOptRow');
+  r.opts.forEach((o,i)=>{ const b=document.createElement('div'); b.className='optBtn'; b.textContent=o;
+    b.onclick=()=>{ if(b.dataset.locked)return;
+      if(i===r.ai){ b.classList.add('right'); b.dataset.locked='1'; setTimeout(()=>{ gIdx++; renderGame(); },1000); }
+      else { b.classList.add('wrong'); setTimeout(()=>b.classList.remove('wrong'),400); document.getElementById('gCap').textContent='🤔 再想想～'; } };
+    row.appendChild(b); });
+}
+renderGame();
+
+/* ===== 闯关2 判断 ===== */
+const QUIZ=[
+ {tag:'logic',tl:'逻辑',ico:'🐭',q:'在迷宫里，从起点到终点，怎样才能走得最快？',opts:[['走最短的那条路',1],['随便乱走',0],['原地不动',0]],fb:'挑最短的路线，不绕远路，就能最快到达。'},
+ {tag:'logic',tl:'逻辑',ico:'🔢',q:'如果从起点到终点要走 6 步，一共经过了几个格子（含起点终点）？',opts:[['7个',1],['6个',0],['5个',0]],fb:'走6步会经过7个格子——数格子容易忘了多算1个。'},
+ {tag:'logic',tl:'逻辑',ico:'✏️',q:'像画星星一样，从头到尾连着画完，中间不断笔、不重复的画法，我们可以说这个图形是？',opts:[['能一笔画成的',1],['只能用两笔画',0],['根本画不出来',0]],fb:'不抬笔、不重复走同一条线，就是"一笔画"。'},
+ {tag:'en',tl:'英语',ico:'🔤',q:'英语角："迷宫"用英语怎么说？',opts:[['maze',1],['house',0],['garden',0]],fb:'maze 迷宫。'},
+];
+let qi=0; function startQuiz(){ document.getElementById('g-round1').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>逻辑 + 英语</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; const tag=document.getElementById('qtag'); tag.className='qtag '+it.tag; tag.textContent=it.tl; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('maze','🗺️','迷宫探险家'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#d6547a','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

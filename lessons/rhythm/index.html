@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>节奏和拍子 · 知识乐园</title>
+<style>
+  :root{ --accent:#e0327a; --bg1:#fff0f6; --bg2:#ffc7de; --ink:#6b1f42; --ink2:#a34d78; --card:#fff; --shadow:0 10px 30px rgba(200,30,110,.18); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:92px; animation:bob 1.2s ease-in-out infinite;} @keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-10px) rotate(4deg)}}
+  .introCard{background:var(--card); border-radius:24px; padding:22px 28px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(15px,2.2vw,19px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#f06aa0,#c81f66); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:18px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  /* Tab A 强拍弱拍 */
+  #ex-beat{flex-direction:column; align-items:center; justify-content:center; gap:16px;}
+  .beatRow{display:flex; gap:16px;}
+  .beatDot{width:44px; height:44px; border-radius:50%; background:#ffffffcc; box-shadow:var(--shadow); display:flex; align-items:center; justify-content:center; font-weight:900; color:var(--ink2); transition:transform .1s, background .1s;}
+  .beatDot.strong{width:60px; height:60px; font-size:20px;}
+  .beatDot.active{background:var(--accent); color:#fff; transform:scale(1.18);}
+  .drumWrap{display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .drum{font-size:70px; cursor:pointer; transition:transform .08s; filter:drop-shadow(0 6px 10px rgba(200,30,110,.3));}
+  .drum:active{transform:scale(.9);}
+  .drum.hit{animation:hitpop .3s ease;} @keyframes hitpop{0%{transform:scale(1.3)}100%{transform:scale(1)}}
+  .beatBtns{display:flex; gap:10px;} .beatBtns button{border:none; border-radius:14px; padding:11px 20px; font-weight:900; font-size:15px; cursor:pointer; background:var(--accent); color:#fff; box-shadow:var(--shadow);}
+  .beatCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(14px,2.1vw,17px); font-weight:800; max-width:580px; text-align:center; min-height:48px; display:flex; align-items:center; justify-content:center; line-height:1.5;} .beatCap b{color:var(--accent);}
+  /* Tab B 快慢 */
+  #ex-tempo{flex-direction:column; align-items:center; justify-content:center; gap:14px;}
+  .tempoStage{width:100%; max-width:520px; height:120px; background:var(--card); border-radius:20px; box-shadow:var(--shadow); position:relative; overflow:hidden;}
+  .tempoChar{position:absolute; bottom:10px; font-size:52px; left:20px;}
+  .tempoBtns{display:flex; gap:12px;}
+  .tBtn{border:3px solid transparent; background:#ffffffcc; border-radius:16px; padding:10px 20px; font-weight:900; font-size:15px; cursor:pointer; box-shadow:var(--shadow); color:var(--ink2);} .tBtn.on{border-color:var(--accent); background:#fff; color:var(--accent);}
+  .nextHint{background:#ffe4ef; border-radius:14px; padding:10px 14px; font-weight:800; color:#c81f66; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#f06aa0,#c81f66); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:14px; width:100%; max-width:600px; justify-content:center;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #f0a8c6; border-radius:20px; padding:12px 8px; text-align:center; min-height:150px; transition:.2s;}
+  .bin.over{border-color:var(--accent); background:#ffe4ef;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:32px;} .bin .binName{font-weight:900; font-size:17px; margin-top:4px;} .bin .binHint{font-size:12px; color:var(--ink2); font-weight:700;}
+  .bin .binDrop{margin-top:8px; min-height:60px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:14px; margin-top:20px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:18px; box-shadow:var(--shadow); padding:12px 14px; text-align:center; cursor:grab; touch-action:none;}
+  .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg); box-shadow:0 18px 36px rgba(200,30,110,.3);}
+  .item.placed{cursor:default; box-shadow:none; padding:5px 7px;}
+  .item .itIco{font-size:34px;} .item.placed .itIco{font-size:24px;}
+  .item .itName{font-weight:800; font-size:13px;} .item.placed .itName{font-size:10.5px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qtag{display:inline-block; font-size:12px; font-weight:900; padding:3px 10px; border-radius:10px; margin-bottom:6px;} .qtag.music{background:#ffe4ef;color:#c81f66;} .qtag.math{background:#e6f0ff;color:#2f7fe0;} .qtag.en{background:#e3edff;color:#3f7ae0;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #f7cfe0; background:#fff5f9; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#f06aa0,#c81f66); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#f8e7ef; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">节奏和拍子<small>音乐 · 强拍弱拍与快慢</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🥁</div>
+    <div class="introCard">拍拍手、跺跺脚，声音里也藏着<b>节奏</b>！有的拍子重、有的轻，有的快、有的慢。今天来当一次小小指挥家，找到藏在声音里的秘密。</div>
+    <button class="bigbtn" onclick="go('explore')">开始打拍子 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🥁 强拍和弱拍</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">🐇🐢 快节奏和慢节奏</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-beat">
+        <div class="beatRow" id="beatRow"></div>
+        <div class="drumWrap">
+          <div class="drum" id="drum" onclick="hitDrum()">🥁</div>
+          <div class="beatBtns"><button id="playBtn" onclick="toggleBeat()">▶ 开始</button></div>
+        </div>
+        <div class="beatCap" id="beatCap">先点<b>开始</b>，听一听「咚-哒-哒-哒」；<b>咚</b>是又重又响的<b>强拍</b>，等大鼓亮起来的时候，点一下上面的🥁跟上它！</div>
+      </div>
+      <div class="subview" id="ex-tempo">
+        <div class="tempoStage"><div class="tempoChar" id="tempoChar">🐢</div></div>
+        <div class="tempoBtns">
+          <button class="tBtn on" id="tSlow" onclick="setTempo('slow')">🐢 慢节奏</button>
+          <button class="tBtn" id="tFast" onclick="setTempo('fast')">🐇 快节奏</button>
+        </div>
+        <div class="beatCap" id="tempoCap">乌龟一步一步慢慢走，节奏很<b>慢</b>；兔子蹦蹦跳跳，节奏很<b>快</b>。点两个按钮都听听看！</div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 跟上强拍 3 次（<span id="hitCnt">0</span>/3），并试试快慢两种节奏（<span id="tempoCnt">0</span>/2），就能去闯关！</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 快节奏还是慢节奏<small>把下面的动物/东西，拖到对的筐里</small></div>
+    <div class="gsub on" id="g-round1">
+      <div class="bins">
+        <div class="bin" data-k="fast"><div class="binIco">🐇</div><div class="binName">快节奏</div><div class="binHint"></div><div class="binDrop"></div></div>
+        <div class="bin" data-k="slow"><div class="binIco">🐢</div><div class="binName">慢节奏</div><div class="binHint"></div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray"></div>
+      <div class="roundNext" id="r1next"><div class="ok">全对啦！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qtag" id="qtag"></div><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>拍子打得真准！</h2><div class="medalName">🎖 节奏小达人</div>
+      <p>你今天学到了：<br>• 一段节奏里，又重又响的叫<b>强拍</b>，又轻又短的叫<b>弱拍</b>；<br>• 节奏有快有慢，兔子蹦跳<b>快</b>，乌龟走路<b>慢</b>；<br>• 🔢 数学：「强-弱-弱-弱」重复 2 次，一共有 <b>2</b> 个强拍；<br>• 🔤 英语：节奏 <b>rhythm</b>、拍子 <b>beat</b>。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再打一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-beat').classList.toggle('on',v==='A'); document.getElementById('ex-tempo').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+let hitCnt=0, tempoSeen=new Set();
+function unlockGame(){ if(hitCnt>=3 && tempoSeen.size>=2){ nextHint.style.display='none'; nextBtn.style.display='block'; } }
+
+/* 音频 */
+let AC; function tone(f,dur,vol){ try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended')AC.resume(); const o=AC.createOscillator(), g=AC.createGain(); o.type='sine'; o.frequency.value=f; o.connect(g); g.connect(AC.destination); const t=AC.currentTime; g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(vol||0.25,t+0.01); g.gain.exponentialRampToValueAtTime(0.0001,t+(dur||0.25)); o.start(t); o.stop(t+(dur||0.25)+0.02);}catch(e){} }
+
+/* ===== Tab A 强拍弱拍 ===== */
+const beatRow=document.getElementById('beatRow');
+for(let i=0;i<4;i++){ const d=document.createElement('div'); d.className='beatDot'+(i===0?' strong':''); d.textContent=i+1; d.id='bd'+i; beatRow.appendChild(d); }
+let beatOn=false, beatIdx=0, beatTimer=null, drumHitThisBeat=false;
+function toggleBeat(){ beatOn=!beatOn; document.getElementById('playBtn').textContent = beatOn?'⏸ 暂停':'▶ 开始';
+  if(beatOn){ beatIdx=0; tickBeat(); beatTimer=setInterval(tickBeat,520); } else clearInterval(beatTimer); }
+function tickBeat(){ document.querySelectorAll('.beatDot').forEach(d=>d.classList.remove('active'));
+  const d=document.getElementById('bd'+beatIdx); d.classList.add('active'); drumHitThisBeat=false;
+  if(beatIdx===0){ tone(160,0.35,0.32); document.getElementById('beatCap').innerHTML='<b>咚！</b>这是<b>强拍</b>——又重又响。快点一下🥁跟上它！'; }
+  else { tone(420,0.14,0.14); document.getElementById('beatCap').innerHTML='<b>哒</b>——这是<b>弱拍</b>，又轻又短。'; }
+  beatIdx=(beatIdx+1)%4;
+}
+function hitDrum(){ const drum=document.getElementById('drum'); drum.classList.remove('hit'); void drum.offsetWidth; drum.classList.add('hit');
+  const activeIsStrong = document.getElementById('bd0').classList.contains('active');
+  if(beatOn && activeIsStrong && !drumHitThisBeat){ drumHitThisBeat=true; hitCnt=Math.min(hitCnt+1,3); document.getElementById('hitCnt').textContent=hitCnt;
+    document.getElementById('beatCap').innerHTML='🎉 跟上啦！这一下正好是<b>强拍</b>！'; unlockGame(); }
+  tone(200,0.2,0.2);
+}
+
+/* ===== Tab B 快慢 ===== */
+let tempoTimer=null, tempoUp=false;
+function setTempo(t){ document.getElementById('tSlow').classList.toggle('on',t==='slow'); document.getElementById('tFast').classList.toggle('on',t==='fast');
+  tempoSeen.add(t); document.getElementById('tempoCnt').textContent=tempoSeen.size; unlockGame();
+  clearInterval(tempoTimer); const ch=document.getElementById('tempoChar');
+  if(t==='slow'){ ch.textContent='🐢'; document.getElementById('tempoCap').innerHTML='乌龟一步一步慢慢走，敲的鼓点也<b>又慢又稀疏</b>——这就是<b>慢节奏</b>。'; tempoTimer=setInterval(()=>{bounceChar(ch); tone(180,0.3,0.2);},900); }
+  else { ch.textContent='🐇'; document.getElementById('tempoCap').innerHTML='兔子蹦蹦跳跳跑得快，敲的鼓点也<b>又快又密集</b>——这就是<b>快节奏</b>。'; tempoTimer=setInterval(()=>{bounceChar(ch); tone(420,0.12,0.2);},260); }
+}
+function bounceChar(ch){ ch.animate([{transform:'translateY(0) translateX(0)'},{transform:'translateY(-30px) translateX(20px)'},{transform:'translateY(0) translateX(40px)'}],{duration:260}); }
+setTempo('slow');
+
+/* ===== 闯关1 拖拽分类 ===== */
+const ITEMS=[
+ {key:'fast',ico:'🐇',name:'兔子蹦跳'},{key:'fast',ico:'🏎️',name:'赛车飞驰'},{key:'fast',ico:'⚡',name:'心跳加速'},
+ {key:'slow',ico:'🐢',name:'乌龟散步'},{key:'slow',ico:'🐌',name:'蜗牛爬行'},{key:'slow',ico:'😴',name:'睡觉的呼吸'},
+];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+(function buildSort(){
+  const tray=document.getElementById('tray');
+  shuffle([...ITEMS]).forEach(it=>{ const d=document.createElement('div'); d.className='item'; d.dataset.k=it.key;
+    d.innerHTML=`<div class="itIco">${it.ico}</div><div class="itName">${it.name}</div>`; tray.appendChild(d); });
+  let active=null,ox=0,oy=0,placed=0; const total=ITEMS.length; const box=document.getElementById('g-round1');
+  const binAt=(x,y)=>[...box.querySelectorAll('.bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+  box.querySelectorAll('.item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return;
+    active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top;
+    el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el);
+    el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+  function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px';
+    box.querySelectorAll('.bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b)b.classList.add('over'); }
+  addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+  addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null;
+    box.querySelectorAll('.bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+    const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+    if(bin&&bin.dataset.k===el.dataset.k){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); placed++;
+      if(placed===total) document.getElementById('r1next').style.display='block'; }
+    else { rst(); document.getElementById('tray').appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+})();
+
+/* ===== 闯关2 判断 ===== */
+const QUIZ=[
+ {tag:'music',tl:'音乐',ico:'🥁',q:'一段节奏里，又重又响的那一拍，我们叫它？',opts:[['强拍',1],['弱拍',0],['休止符',0]],fb:'又重又响、最先感觉到的那一拍，就是强拍。'},
+ {tag:'music',tl:'音乐',ico:'🐇',q:'兔子蹦跳的节奏和乌龟走路的节奏，哪个更快？',opts:[['兔子蹦跳更快',1],['乌龟走路更快',0],['一样快',0]],fb:'兔子蹦跳又急又密，是快节奏；乌龟走路又慢又稀，是慢节奏。'},
+ {tag:'math',tl:'数学',ico:'🔢',q:'一段节奏是「强-弱-弱-弱」，重复 2 次，一共有几个强拍？',opts:[['2 个',1],['4 个',0],['8 个',0]],fb:'每重复一次只有 1 个强拍，重复 2 次就是 2 个强拍。'},
+ {tag:'en',tl:'英语',ico:'🔤',q:'英语角："节奏"用英语怎么说？',opts:[['rhythm',1],['color',0],['number',0]],fb:'rhythm 节奏，beat 是拍子。'},
+];
+let qi=0; function startQuiz(){ document.getElementById('g-round1').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>音乐 + 数学 + 英语</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; const tag=document.getElementById('qtag'); tag.className='qtag '+it.tag; tag.textContent=it.tl; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ clearInterval(beatTimer); clearInterval(tempoTimer); saveBadge('rhythm','🥁','节奏小达人'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#e0327a','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

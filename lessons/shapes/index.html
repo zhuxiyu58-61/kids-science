@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>形状和线条的心情 · 知识乐园</title>
+<style>
+  :root{ --accent:#3fae6e; --bg1:#eefaf1; --bg2:#bfe8cc; --ink:#1f5c3a; --ink2:#4f8a68; --card:#fff; --shadow:0 10px 30px rgba(30,140,80,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:92px;}
+  .introCard{background:var(--card); border-radius:24px; padding:22px 28px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(15px,2.2vw,19px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#6fd696,#2f9457); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:18px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  /* Tab A 形状会说话 */
+  #ex-talk{flex-direction:column; align-items:center; justify-content:center; gap:14px;}
+  .shapeRow{display:flex; gap:10px; flex-wrap:wrap; justify-content:center;}
+  .shCard{background:var(--card); border-radius:16px; padding:14px 16px; text-align:center; box-shadow:var(--shadow); cursor:pointer; border:3px solid transparent; width:96px;} .shCard:active{transform:scale(.95);} .shCard.on{border-color:var(--accent); background:#eafaf0;}
+  .shCard .si{font-size:34px;} .shCard .sn{font-weight:900; font-size:12.5px; margin-top:4px;}
+  .faceBox{display:flex; align-items:center; gap:18px;}
+  .faceIco{font-size:64px; transition:transform .2s;}
+  .talkCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(14px,2.1vw,17px); font-weight:800; max-width:520px; text-align:center; line-height:1.55; min-height:70px; display:flex; align-items:center; justify-content:center;} .talkCap b{color:var(--accent);}
+  /* Tab B 画一幅心情画 */
+  #ex-draw{flex-direction:column; align-items:center; justify-content:center; gap:10px;}
+  .stampRow{display:flex; gap:8px;}
+  .stampBtn{border:3px solid transparent; background:#ffffffcc; border-radius:14px; padding:8px 12px; cursor:pointer; box-shadow:var(--shadow); font-size:22px;} .stampBtn.on{border-color:var(--accent); background:#fff;}
+  #canvasDraw{width:100%; max-width:560px; height:auto; border-radius:18px; box-shadow:var(--shadow); background:#fff; touch-action:none;}
+  .moodBar{width:100%; max-width:560px; height:16px; border-radius:8px; background:#e4f2e8; overflow:hidden; display:flex;}
+  .moodBar .mSoft{background:linear-gradient(90deg,#a0e0c0,#3fae6e);} .moodBar .mSharp{background:linear-gradient(90deg,#f0b03a,#e0632f);}
+  .drawCap{background:var(--card); border-radius:16px; padding:10px 16px; box-shadow:var(--shadow); font-size:14.5px; font-weight:800; max-width:560px; width:100%; text-align:center; min-height:40px; display:flex; align-items:center; justify-content:center;} .drawCap b{color:var(--accent);}
+  .drawBtns{display:flex; gap:10px;} .drawBtns button{border:none; border-radius:12px; padding:8px 14px; font-weight:800; font-size:13px; cursor:pointer; background:#eafaf0; color:var(--accent);}
+  .nextHint{background:#eafaf0; border-radius:14px; padding:10px 14px; font-weight:800; color:#2f9457; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#6fd696,#2f9457); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:14px; width:100%; max-width:600px; justify-content:center;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #a8d9bb; border-radius:20px; padding:12px 8px; text-align:center; min-height:150px; transition:.2s;}
+  .bin.over{border-color:var(--accent); background:#eafaf0;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:32px;} .bin .binName{font-weight:900; font-size:17px; margin-top:4px;} .bin .binHint{font-size:12px; color:var(--ink2); font-weight:700;}
+  .bin .binDrop{margin-top:8px; min-height:60px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:14px; margin-top:20px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:18px; box-shadow:var(--shadow); padding:12px 14px; text-align:center; cursor:grab; touch-action:none;}
+  .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg); box-shadow:0 18px 36px rgba(30,140,80,.3);}
+  .item.placed{cursor:default; box-shadow:none; padding:5px 7px;}
+  .item .itIco{font-size:34px;} .item.placed .itIco{font-size:24px;}
+  .item .itName{font-weight:800; font-size:13px;} .item.placed .itName{font-size:10.5px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qtag{display:inline-block; font-size:12px; font-weight:900; padding:3px 10px; border-radius:10px; margin-bottom:6px;} .qtag.art{background:#eafaf0;color:#2f9457;} .qtag.en{background:#e3edff;color:#3f7ae0;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #cdeed9; background:#f2fcf6; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#6fd696,#2f9457); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#e7f5ec; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">形状和线条的心情<small>艺术 · 线条和形状会说话</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🔺⭕</div>
+    <div class="introCard">圆圆的东西让人觉得<b>可爱安心</b>，尖尖的东西让人觉得<b>警惕有劲</b>。线条也一样：直直的很<b>整齐</b>，弯弯的很<b>温柔</b>。今天用形状和线条，画出不同的心情！</div>
+    <button class="bigbtn" onclick="go('explore')">开始探索 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">💬 形状会说话</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">🖌️ 画一幅心情画</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-talk">
+        <div class="shapeRow" id="shapeRow"></div>
+        <div class="faceBox"><div class="faceIco" id="faceIco">😊</div></div>
+        <div class="talkCap" id="talkCap"></div>
+      </div>
+      <div class="subview" id="ex-draw">
+        <div class="stampRow" id="stampRow"></div>
+        <canvas id="canvasDraw" width="560" height="200"></canvas>
+        <div class="moodBar"><div class="mSoft" id="mSoft" style="width:50%"></div><div class="mSharp" id="mSharp" style="width:50%"></div></div>
+        <div class="drawCap" id="drawCap">选一个形状印章，点画布空白处盖上去，画一幅属于你的心情画！</div>
+        <div class="drawBtns"><button onclick="clearDraw()">🔄 清空重画</button></div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 点一遍全部 5 种形状（<span id="seenCnt">0</span>/5），再盖 5 个印章（<span id="stampCnt">0</span>/5），就能去闯关！</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 圆润还是尖锐<small>把下面的东西，拖到对的筐里</small></div>
+    <div class="gsub on" id="g-round1">
+      <div class="bins">
+        <div class="bin" data-k="soft"><div class="binIco">🌤️</div><div class="binName">圆润温柔</div><div class="binHint"></div><div class="binDrop"></div></div>
+        <div class="bin" data-k="sharp"><div class="binIco">⚡</div><div class="binName">尖锐警惕</div><div class="binHint"></div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray"></div>
+      <div class="roundNext" id="r1next"><div class="ok">全对啦！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qtag" id="qtag"></div><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>看穿形状的心情啦！</h2><div class="medalName">🎖 形状小侦探</div>
+      <p>你今天学到了：<br>• <b>圆形</b>和<b>波浪线</b>让人觉得温柔可爱；<br>• <b>三角形</b>让人觉得稳固有力，<b>锯齿线</b>让人觉得紧张警惕；<br>• 画画时选对形状和线条，就能画出想要的心情；<br>• 🔤 英语：三角形 <b>triangle</b>、圆形 <b>circle</b>。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再玩一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-talk').classList.toggle('on',v==='A'); document.getElementById('ex-draw').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+let seenShapes=new Set(), stampCount=0;
+function unlockGame(){ if(seenShapes.size>=5 && stampCount>=5){ nextHint.style.display='none'; nextBtn.style.display='block'; } }
+
+/* ===== Tab A 形状会说话 ===== */
+const SHAPES=[
+ {i:0,ico:'⭕',name:'圆形',face:'😊',cap:'<b>圆形</b>：没有棱角，摸起来光溜溜的，像抱抱一样让人觉得<b>温柔安心</b>。例子：云朵、皮球、拥抱。'},
+ {i:1,ico:'🔺',name:'三角形',face:'💪',cap:'<b>三角形</b>：尖尖的顶、稳稳的底，站得特别牢，让人觉得<b>稳固有力</b>。例子：屋顶、金字塔、大山。'},
+ {i:2,ico:'⬜',name:'正方形',face:'😌',cap:'<b>正方形</b>：四条边一样长，方方正正很规矩，让人觉得<b>整齐可靠</b>。例子：积木、窗户、书本。'},
+ {i:3,ico:'〰️',name:'波浪线',face:'🥰',cap:'<b>波浪线</b>：一会儿高一会儿低，弯弯曲曲地流动，让人觉得<b>柔软温柔</b>。例子：河流、蛇、飘动的头发。'},
+ {i:4,ico:'⚡',name:'锯齿线',face:'😲',cap:'<b>锯齿线</b>：一下尖一下尖，忽然转折，让人觉得<b>紧张警惕</b>。例子：闪电、鲨鱼牙、碎玻璃。'},
+];
+const shapeRow=document.getElementById('shapeRow');
+SHAPES.forEach(s=>{ const d=document.createElement('div'); d.className='shCard'+(s.i===0?' on':''); d.dataset.i=s.i;
+  d.innerHTML=`<div class="si">${s.ico}</div><div class="sn">${s.name}</div>`;
+  d.onclick=()=>{ document.querySelectorAll('.shCard').forEach(x=>x.classList.remove('on')); d.classList.add('on');
+    document.getElementById('faceIco').textContent=s.face; document.getElementById('talkCap').innerHTML=s.cap;
+    seenShapes.add(s.i); document.getElementById('seenCnt').textContent=seenShapes.size; unlockGame(); };
+  shapeRow.appendChild(d); });
+document.getElementById('faceIco').textContent='😊'; document.getElementById('talkCap').innerHTML=SHAPES[0].cap; seenShapes.add(0); document.getElementById('seenCnt').textContent=1;
+
+/* ===== Tab B 画一幅心情画 ===== */
+const STAMPS=[{k:'circle',ico:'⭕',soft:true},{k:'wave',ico:'〰️',soft:true},{k:'triangle',ico:'🔺',soft:false},{k:'zigzag',ico:'⚡',soft:false}];
+let curStamp='circle'; const stampRow=document.getElementById('stampRow');
+STAMPS.forEach(s=>{ const b=document.createElement('button'); b.className='stampBtn'+(s.k==='circle'?' on':''); b.textContent=s.ico; b.dataset.k=s.k;
+  b.onclick=()=>{ document.querySelectorAll('.stampBtn').forEach(x=>x.classList.remove('on')); b.classList.add('on'); curStamp=s.k; };
+  stampRow.appendChild(b); });
+const dc=document.getElementById('canvasDraw'), dg=dc.getContext('2d'), DW=dc.width, DH=dc.height;
+let softN=0, sharpN=0;
+function stampAt(x,y,k){ dg.lineWidth=3; dg.strokeStyle='#2f9457'; dg.fillStyle='rgba(63,174,110,.25)';
+  if(k==='circle'){ dg.beginPath(); dg.arc(x,y,18,0,7); dg.fill(); dg.stroke(); softN++; }
+  else if(k==='wave'){ dg.beginPath(); dg.moveTo(x-24,y); for(let i=-24;i<=24;i+=4) dg.lineTo(x+i,y+Math.sin(i*0.5)*10); dg.stroke(); softN++; }
+  else if(k==='triangle'){ dg.strokeStyle='#c9862f'; dg.fillStyle='rgba(201,134,47,.2)'; dg.beginPath(); dg.moveTo(x,y-20); dg.lineTo(x+20,y+16); dg.lineTo(x-20,y+16); dg.closePath(); dg.fill(); dg.stroke(); sharpN++; }
+  else { dg.strokeStyle='#e0632f'; dg.beginPath(); dg.moveTo(x-20,y+16); let px=x-20,py=y+16; for(let i=0;i<4;i++){ const nx=px+10, ny=py + (i%2?16:-16); dg.lineTo(nx,ny); px=nx; py=ny; } dg.stroke(); sharpN++; }
+  stampCount++; document.getElementById('stampCnt').textContent=Math.min(stampCount,5);
+  const total=softN+sharpN, softPct=total?Math.round(softN/total*100):50;
+  document.getElementById('mSoft').style.width=softPct+'%'; document.getElementById('mSharp').style.width=(100-softPct)+'%';
+  document.getElementById('drawCap').innerHTML = softPct>=65?'这幅画感觉<b>温柔柔和</b> 🥰（圆润形状比较多）':softPct<=35?'这幅画感觉<b>紧张有力</b> ⚡（尖锐形状比较多）':'这幅画<b>温柔和有力</b>各占一半，很有意思！';
+  unlockGame();
+}
+dc.addEventListener('pointerdown', e=>{ const r=dc.getBoundingClientRect(); const x=(e.clientX-r.left)*(DW/r.width), y=(e.clientY-r.top)*(DH/r.height); stampAt(x,y,curStamp); });
+function clearDraw(){ dg.clearRect(0,0,DW,DH); softN=0; sharpN=0; document.getElementById('mSoft').style.width='50%'; document.getElementById('mSharp').style.width='50%'; document.getElementById('drawCap').innerHTML='清空啦，重新画一幅新的心情画吧！'; }
+dg.fillStyle='#fbfffc'; dg.fillRect(0,0,DW,DH);
+
+/* ===== 闯关1 拖拽分类 ===== */
+const ITEMS=[
+ {key:'soft',ico:'🐢',name:'乌龟壳'},{key:'soft',ico:'🎈',name:'气球'},{key:'soft',ico:'☁️',name:'云朵'},
+ {key:'sharp',ico:'🦈',name:'鲨鱼牙'},{key:'sharp',ico:'🌵',name:'仙人掌'},{key:'sharp',ico:'🔪',name:'小刀'},
+];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+(function buildSort(){
+  const tray=document.getElementById('tray');
+  shuffle([...ITEMS]).forEach(it=>{ const d=document.createElement('div'); d.className='item'; d.dataset.k=it.key;
+    d.innerHTML=`<div class="itIco">${it.ico}</div><div class="itName">${it.name}</div>`; tray.appendChild(d); });
+  let active=null,ox=0,oy=0,placed=0; const total=ITEMS.length; const box=document.getElementById('g-round1');
+  const binAt=(x,y)=>[...box.querySelectorAll('.bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+  box.querySelectorAll('.item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return;
+    active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top;
+    el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el);
+    el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+  function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px';
+    box.querySelectorAll('.bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b)b.classList.add('over'); }
+  addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+  addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null;
+    box.querySelectorAll('.bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+    const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+    if(bin&&bin.dataset.k===el.dataset.k){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); placed++;
+      if(placed===total) document.getElementById('r1next').style.display='block'; }
+    else { rst(); document.getElementById('tray').appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+})();
+
+/* ===== 闯关2 判断 ===== */
+const QUIZ=[
+ {tag:'art',tl:'艺术',ico:'🐰',q:'要画一只温柔可爱的小兔子，用什么样的线条比较合适？',opts:[['圆润的曲线',1],['尖尖的锯齿线',0],['又直又硬的直线',0]],fb:'圆润的曲线能画出温柔可爱的感觉。'},
+ {tag:'art',tl:'艺术',ico:'🏠',q:'尖尖的三角形屋顶，给人什么感觉？',opts:[['稳固有力',1],['软绵绵的',0],['轻飘飘的',0]],fb:'三角形站得稳，让人觉得稳固有力。'},
+ {tag:'art',tl:'艺术',ico:'〰️',q:'波浪线弯弯曲曲，最像什么在动？',opts:[['河水流动或蛇爬行',1],['一动不动的石头',0],['冷冰冰的冰块',0]],fb:'波浪线柔软流动，像水波或蛇的身体。'},
+ {tag:'en',tl:'英语',ico:'🔤',q:'英语角："三角形"用英语怎么说？',opts:[['triangle',1],['circle',0],['square',0]],fb:'triangle 三角形，circle 圆形，square 正方形。'},
+];
+let qi=0; function startQuiz(){ document.getElementById('g-round1').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>艺术 + 英语</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; const tag=document.getElementById('qtag'); tag.className='qtag '+it.tag; tag.textContent=it.tl; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('shapes','🔷','形状小侦探'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#3fae6e','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

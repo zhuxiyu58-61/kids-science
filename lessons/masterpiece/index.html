@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>名画里的故事 · 知识乐园</title>
+<style>
+  :root{ --accent:#b8425c; --bg1:#fdf1f0; --bg2:#f0c9ce; --ink:#5c2a38; --ink2:#8a5865; --card:#fff; --shadow:0 10px 30px rgba(150,50,80,.18); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:92px;}
+  .introCard{background:var(--card); border-radius:24px; padding:22px 28px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(15px,2.2vw,19px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#d97891,#a8324e); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:18px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  /* Tab A 画廊 */
+  #ex-gallery{flex-direction:column; align-items:center; justify-content:center; gap:10px;}
+  .pickRow{display:flex; gap:10px;}
+  .pickBtn{border:3px solid transparent; background:#ffffffcc; border-radius:16px; padding:8px 14px; text-align:center; cursor:pointer; box-shadow:var(--shadow);} .pickBtn.on{border-color:var(--accent); background:#fff;}
+  .pickBtn .pi{font-size:28px;} .pickBtn .pn{font-size:11.5px; font-weight:900; margin-top:2px;}
+  #gallery{width:100%; max-width:560px; height:auto; border-radius:18px; box-shadow:var(--shadow); background:#fff;}
+  .galCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(14px,2.1vw,17px); font-weight:700; max-width:600px; text-align:center; min-height:60px; display:flex; align-items:center; justify-content:center; line-height:1.55;} .galCap b{color:var(--accent);}
+  /* Tab B 小知识 */
+  #ex-know{flex-direction:column; align-items:center; justify-content:center; gap:12px;}
+  .tipRow{display:grid; grid-template-columns:repeat(5,1fr); gap:10px; width:100%; max-width:700px;}
+  @media (max-width:600px){ .tipRow{grid-template-columns:repeat(3,1fr);} }
+  .tc{background:var(--card); border-radius:16px; padding:14px 4px; text-align:center; box-shadow:var(--shadow); cursor:pointer; border:3px solid transparent;} .tc:active{transform:scale(.95);} .tc.on{border-color:var(--accent); background:#fdecef;}
+  .tc .ti{font-size:30px;} .tc .tn{font-weight:900; font-size:11.5px; margin-top:4px;}
+  .tc.subj{background:#eef4ff;} .tc.subj.on{border-color:#3f7ae0; background:#e3edff;}
+  .tipCap{background:var(--card); border-radius:16px; padding:12px 18px; box-shadow:var(--shadow); font-size:clamp(15px,2.2vw,18px); font-weight:800; max-width:700px; width:100%; text-align:center; min-height:52px; display:flex; align-items:center; justify-content:center;} .tipCap b{color:var(--accent);} .tipCap .en{color:#3f7ae0;}
+  .nextHint{background:#fdecef; border-radius:14px; padding:10px 14px; font-weight:800; color:#a8324e; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#d97891,#a8324e); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:14px; width:100%; max-width:600px; justify-content:center;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #e2b3bd; border-radius:20px; padding:12px 8px; text-align:center; min-height:150px; transition:.2s;}
+  .bin.over{border-color:var(--accent); background:#fdecef;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:32px;} .bin .binName{font-weight:900; font-size:17px; margin-top:4px;} .bin .binHint{font-size:12px; color:var(--ink2); font-weight:700;}
+  .bin .binDrop{margin-top:8px; min-height:60px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:14px; margin-top:20px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:18px; box-shadow:var(--shadow); padding:12px 14px; text-align:center; cursor:grab; touch-action:none;}
+  .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg); box-shadow:0 18px 36px rgba(150,50,80,.3);}
+  .item.placed{cursor:default; box-shadow:none; padding:5px 7px;}
+  .item .itIco{font-size:34px;} .item.placed .itIco{font-size:24px;}
+  .item .itName{font-weight:800; font-size:13px;} .item.placed .itName{font-size:10.5px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qtag{display:inline-block; font-size:12px; font-weight:900; padding:3px 10px; border-radius:10px; margin-bottom:6px;} .qtag.art{background:#fdecef;color:#a8324e;} .qtag.en{background:#e3edff;color:#3f7ae0;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #f0d4d9; background:#fef7f8; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#d97891,#a8324e); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#f5e7ea; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">名画里的故事<small>艺术欣赏 · 画家想说什么</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🖼️</div>
+    <div class="introCard">画家画画，不只是画得像——他们想讲一个<b>故事</b>，或者告诉你一种<b>心情</b>。今天当一次小小艺术侦探，看看三幅世界名画里，都藏着什么秘密！</div>
+    <button class="bigbtn" onclick="go('explore')">开始参观 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🖼️ 走进画里</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">💡 画家的小秘密</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-gallery">
+        <div class="pickRow" id="pickRow">
+          <div class="pickBtn on" data-i="0"><div class="pi">🌌</div><div class="pn">星夜</div></div>
+          <div class="pickBtn" data-i="1"><div class="pi">🪷</div><div class="pn">睡莲</div></div>
+          <div class="pickBtn" data-i="2"><div class="pi">⛰️</div><div class="pn">水墨山水</div></div>
+        </div>
+        <canvas id="gallery" width="560" height="230"></canvas>
+        <div class="galCap" id="galCap"></div>
+      </div>
+      <div class="subview" id="ex-know">
+        <div class="tipRow" id="tipRow">
+          <div class="tc on" data-i="0"><div class="ti">🇳🇱</div><div class="tn">梵高</div></div>
+          <div class="tc" data-i="1"><div class="ti">🌀</div><div class="tn">星夜的故事</div></div>
+          <div class="tc" data-i="2"><div class="ti">⬜</div><div class="tn">留白</div></div>
+          <div class="tc" data-i="3"><div class="ti">🪷</div><div class="tn">画了181次</div></div>
+          <div class="tc subj" data-i="4"><div class="ti">🔤</div><div class="tn">英语角</div></div>
+        </div>
+        <div class="tipCap" id="tipCap"></div>
+      </div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 把三幅画都看一遍（<span id="cnt">1</span>/3），画家的小秘密卡片也翻一遍（<span id="tipCnt">1</span>/5），就能去闯关！</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 猜猜这是什么心情<small>把下面的东西，拖到对的感觉里</small></div>
+    <div class="gsub on" id="g-round1">
+      <div class="bins">
+        <div class="bin" data-k="loud"><div class="binIco">🌪️</div><div class="binName">热闹不安</div><div class="binHint">像打旋的粗线条</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="calm"><div class="binIco">🕊️</div><div class="binName">安静柔和</div><div class="binHint">像轻轻的小色点</div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray"></div>
+      <div class="roundNext" id="r1next"><div class="ok">全对啦！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qtag" id="qtag"></div><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>侦探任务完成！</h2><div class="medalName">🎖 小小艺术侦探</div>
+      <p>你今天发现了：<br>• <b>梵高《星夜》</b>用打旋的粗线条，画出热闹不安的夜空；<br>• 中国水墨画的大片<b>留白</b>，留给你想象的空间；<br>• <b>莫奈《睡莲》</b>用一点一点的色点，画出朦胧柔和的池塘；<br>• 🔤 英语：画家 <b>artist</b>、博物馆 <b>museum</b>。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再逛一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-gallery').classList.toggle('on',v==='A'); document.getElementById('ex-know').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+function unlockGame(){ if(viewed.size>=3 && tipSeen.size>=5){ nextHint.style.display='none'; nextBtn.style.display='block'; } }
+
+/* ===== Tab A 画廊：三幅名画的简化动态重现 ===== */
+const gc=document.getElementById('gallery'), gg=gc.getContext('2d'), GW=gc.width, GH=gc.height;
+const GAL_CAP=[
+  '<b>梵高《星夜》</b>：天空里全是<b>打旋的粗线条</b>，一圈一圈转个不停，让人觉得夜晚<b>热闹又不安</b>，好像天空自己也在呼吸。',
+  '<b>莫奈《睡莲》</b>：整幅画都是<b>一点一点</b>的小色块，没有清楚的边线，看起来<b>朦胧又柔和</b>，像是池塘反光晃啊晃。',
+  '<b>中国水墨山水画</b>：只用黑白灰的墨色，山顶留了大片<b>空白</b>（叫「留白」），这些「什么都没画」的地方，正是留给你自己去想象云雾和远方的。'
+];
+let cur=0, viewed=new Set([0]);
+function drawStarry(t){ gg.clearRect(0,0,GW,GH);
+  const grd=gg.createLinearGradient(0,0,0,GH); grd.addColorStop(0,'#0e2350'); grd.addColorStop(1,'#1c3f6e'); gg.fillStyle=grd; gg.fillRect(0,0,GW,GH);
+  // moon glow
+  gg.save(); gg.shadowColor='#ffe9a8'; gg.shadowBlur=30; gg.fillStyle='#fff3c9'; gg.beginPath(); gg.arc(GW*0.78,44,20,0,7); gg.fill(); gg.restore();
+  // swirls
+  for(let s=0;s<4;s++){ const cx=90+s*120+Math.sin(t*0.3+s)*8, cy=70+((s%2)*30); gg.strokeStyle=`rgba(255,230,150,${0.5+0.15*Math.sin(t+s)})`; gg.lineWidth=4;
+    gg.beginPath(); for(let a=0;a<Math.PI*4.2;a+=0.2){ const r=6+a*3.4; const x=cx+Math.cos(a+t*0.8+s)*r, y=cy+Math.sin(a+t*0.8+s)*r*0.7; a===0?gg.moveTo(x,y):gg.lineTo(x,y);} gg.stroke(); }
+  // village silhouette
+  gg.fillStyle='#0a1730'; gg.beginPath(); gg.moveTo(0,GH); gg.lineTo(0,GH-40);
+  for(let x=0;x<=GW;x+=30){ gg.lineTo(x, GH-40- (x%90===0?26:10)); } gg.lineTo(GW,GH); gg.closePath(); gg.fill();
+  // cypress tree
+  gg.beginPath(); gg.moveTo(GW*0.14,GH); for(let y=GH;y>GH-120;y-=6){ const w=14*(1-(GH-y)/120)+Math.sin(y*0.3+t*2)*2; gg.lineTo(GW*0.14+w,y); }
+  gg.lineTo(GW*0.14,GH-124); for(let y=GH-120;y<=GH;y+=6){ const w=14*(1-(GH-y)/120)+Math.sin(y*0.3+t*2+3)*2; gg.lineTo(GW*0.14-w,y);} gg.closePath(); gg.fill();
+}
+function drawLily(t){ const grd=gg.createLinearGradient(0,0,0,GH); grd.addColorStop(0,'#3f7a6e'); grd.addColorStop(1,'#1f4a44'); gg.fillStyle=grd; gg.fillRect(0,0,GW,GH);
+  gg.save(); gg.globalAlpha=.5;
+  for(let i=0;i<8;i++){ const x=40+ (i*63)%(GW-60), y=50+((i*47)%(GH-70)); const bob=Math.sin(t*1.2+i)*3;
+    gg.fillStyle=i%2? '#2f6b57':'#4a8f78'; gg.beginPath(); gg.ellipse(x,y+bob,26,13,0.3,0,7); gg.fill(); }
+  gg.restore();
+  for(let i=0;i<6;i++){ const x=70+(i*82)%(GW-90), y=40+((i*61)%(GH-60)); const bob=Math.sin(t*1.4+i*1.7)*3;
+    gg.save(); gg.shadowColor='#ffd9ea'; gg.shadowBlur=14;
+    for(let p=0;p<6;p++){ const a=p/6*Math.PI*2; gg.fillStyle=p%2?'#ffc9de':'#fff2f7'; gg.beginPath(); gg.ellipse(x+Math.cos(a)*8,y+bob+Math.sin(a)*8,6,4,a,0,7); gg.fill(); }
+    gg.fillStyle='#f4c534'; gg.beginPath(); gg.arc(x,y+bob,4,0,7); gg.fill(); gg.restore(); }
+}
+function drawInk(t){ gg.fillStyle='#f3ede0'; gg.fillRect(0,0,GW,GH);
+  const layers=[{y:GH*0.55,c:'rgba(150,150,150,.35)',amp:14},{y:GH*0.68,c:'rgba(100,100,100,.5)',amp:20},{y:GH*0.82,c:'rgba(60,60,60,.75)',amp:26}];
+  layers.forEach((L,i)=>{ gg.beginPath(); gg.moveTo(0,GH);
+    for(let x=0;x<=GW;x+=8){ const y=L.y - Math.sin(x*0.02+i*1.3+t*0.15)*L.amp - Math.sin(x*0.007+i)*L.amp*1.6; gg.lineTo(x,y); }
+    gg.lineTo(GW,GH); gg.closePath(); gg.fillStyle=L.c; gg.fill(); });
+  // drifting mist band (the "留白" area softly breathing)
+  const mistX=(t*20)%(GW+200)-100; gg.save(); gg.globalAlpha=.35; const mg=gg.createLinearGradient(mistX,0,mistX+200,0); mg.addColorStop(0,'rgba(255,255,255,0)'); mg.addColorStop(.5,'rgba(255,255,255,.9)'); mg.addColorStop(1,'rgba(255,255,255,0)');
+  gg.fillStyle=mg; gg.fillRect(0,GH*0.35,GW,GH*0.35); gg.restore();
+  // seal stamp
+  gg.fillStyle='#b8324a'; gg.fillRect(GW-42,14,26,26); gg.fillStyle='#fff'; gg.font='11px serif'; gg.textAlign='center'; gg.fillText('画',GW-29,32);
+}
+const DRAW=[drawStarry,drawLily,drawInk];
+function galLoop(){ DRAW[cur](performance.now()/1000); requestAnimationFrame(galLoop); }
+galLoop();
+document.querySelectorAll('#pickRow .pickBtn').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#pickRow .pickBtn').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+  cur=+b.dataset.i; viewed.add(cur); document.getElementById('galCap').innerHTML=GAL_CAP[cur];
+  document.getElementById('cnt').textContent=viewed.size; unlockGame();
+}));
+document.getElementById('galCap').innerHTML=GAL_CAP[0];
+
+/* ===== Tab B 画家的小秘密 ===== */
+const TIP=['<b>梵高</b>是荷兰画家，一生画了2000多幅画，生前几乎没卖出去几幅，现在《星夜》却是世界上最有名的画之一。',
+ '<b>星夜的故事</b>：梵高画这幅画的时候，正住在法国一间疗养院里，望着窗外的夜空，把心里翻腾的感觉画成了打旋的星空。',
+ '<b>留白</b>：中国画家故意把纸的一部分空着不画，这不是没画完，而是把「云雾、远方、想象」都藏在了空白里。',
+ '<b>莫奈</b>晚年在自家花园的池塘边，对着同一片<b>睡莲</b>，不同时间、不同光线下，一共画了大约 <b>181</b> 幅！',
+ '🔤 <span class="en">英语角</span>：画家 <b class="en">artist</b>、博物馆 <b class="en">museum</b>、画 <b class="en">paint / painting</b>。'];
+let tipSeen=new Set([0]);
+document.querySelectorAll('#tipRow .tc').forEach(c=>c.addEventListener('click',()=>{ document.querySelectorAll('#tipRow .tc').forEach(x=>x.classList.remove('on')); c.classList.add('on'); document.getElementById('tipCap').innerHTML=TIP[+c.dataset.i];
+  tipSeen.add(+c.dataset.i); document.getElementById('tipCnt').textContent=tipSeen.size; unlockGame(); }));
+document.getElementById('tipCap').innerHTML=TIP[0];
+
+/* ===== 闯关1 拖拽分类 ===== */
+const ITEMS=[
+ {key:'loud',ico:'🌪️',name:'龙卷风'},{key:'loud',ico:'🎆',name:'烟花'},{key:'loud',ico:'🥁',name:'咚咚鼓声'},
+ {key:'calm',ico:'🪶',name:'飘落的羽毛'},{key:'calm',ico:'☁️',name:'白云'},{key:'calm',ico:'🌙',name:'安静的月夜'},
+];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+(function buildSort(){
+  const tray=document.getElementById('tray');
+  shuffle([...ITEMS]).forEach(it=>{ const d=document.createElement('div'); d.className='item'; d.dataset.k=it.key;
+    d.innerHTML=`<div class="itIco">${it.ico}</div><div class="itName">${it.name}</div>`; tray.appendChild(d); });
+  let active=null,ox=0,oy=0,placed=0; const total=ITEMS.length; const box=document.getElementById('g-round1');
+  const binAt=(x,y)=>[...box.querySelectorAll('.bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+  box.querySelectorAll('.item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return;
+    active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top;
+    el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el);
+    el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+  function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px';
+    box.querySelectorAll('.bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b)b.classList.add('over'); }
+  addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+  addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null;
+    box.querySelectorAll('.bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+    const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+    if(bin&&bin.dataset.k===el.dataset.k){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); placed++;
+      if(placed===total) document.getElementById('r1next').style.display='block'; }
+    else { rst(); document.getElementById('tray').appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+})();
+
+/* ===== 闯关2 判断 ===== */
+const QUIZ=[
+ {tag:'art',tl:'艺术',ico:'🌌',q:'梵高的《星夜》，天空为什么让人觉得热闹、有力量？',opts:[['用了很多打旋的粗线条',1],['因为画得很小',0],['因为只用了黑色',0]],fb:'一圈圈打旋的粗线条，让天空看起来在流动、呼吸。'},
+ {tag:'art',tl:'艺术',ico:'⛰️',q:'中国水墨山水画里，大片留白（不画东西的空白）是为了？',opts:[['让人感觉安静，留出想象的空间',1],['因为墨用完了',0],['画错了没擦掉',0]],fb:'留白是故意的，把云雾和远方留给你自己去想象。'},
+ {tag:'art',tl:'艺术',ico:'🪷',q:'莫奈画《睡莲》时，用了很多细小的色点而不是涂得很平整，这样看起来会？',opts:[['朦胧、柔和',1],['特别锐利',0],['像照片一样清楚',0]],fb:'一点一点的色块，让整幅画显得柔和、有点朦胧。'},
+ {tag:'en',tl:'英语',ico:'🔤',q:'英语角：会画画的人叫 artist，那"博物馆"用英语怎么说？',opts:[['museum',1],['restaurant',0],['hospital',0]],fb:'museum 博物馆，是收藏名画和文物的地方。'},
+];
+let qi=0; function startQuiz(){ document.getElementById('g-round1').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>艺术 + 英语</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; const tag=document.getElementById('qtag'); tag.className='qtag '+it.tag; tag.textContent=it.tl; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('masterpiece','🖼️','小小艺术侦探'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#b8425c','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>排队问题 · 知识乐园</title>
+<style>
+  :root{ --accent:#c9962f; --bg1:#fff8e8; --bg2:#f0dca0; --ink:#5c4a1a; --ink2:#8a7645; --card:#fff; --shadow:0 10px 30px rgba(150,120,30,.18); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:88px;}
+  .introCard{background:var(--card); border-radius:24px; padding:22px 28px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(15px,2.2vw,19px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#e0b95c,#a87a1f); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:18px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none; flex-direction:column; align-items:center; justify-content:center; gap:16px;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  .progDots{display:flex; gap:8px;} .pd{width:10px; height:10px; border-radius:50%; background:#f0e0b0;} .pd.done{background:var(--accent);}
+  .lineRow{display:flex; align-items:center; gap:4px; font-size:34px;}
+  .lineRow .me{font-size:40px;}
+  .qWord{font-size:clamp(15px,2.2vw,19px); font-weight:800; max-width:560px; text-align:center; line-height:1.6;}
+  .queueWrap{display:flex; flex-direction:column; align-items:center; gap:6px; width:100%; max-width:480px;}
+  .qLbl{font-weight:900; font-size:14px; color:var(--ink2);}
+  .queueLine{width:100%; height:6px; background:var(--accent); border-radius:4px; position:relative; margin:14px 0;}
+  .queueMark{position:absolute; top:-20px; left:42%; font-size:36px; transform:translateX(-50%);}
+  .optRow{display:flex; gap:14px;}
+  .optBtn{border:3px solid #f0e0b0; background:#fdf8ec; border-radius:18px; padding:14px 26px; font-size:22px; font-weight:900; cursor:pointer; box-shadow:var(--shadow);} .optBtn:active{transform:scale(.94);}
+  .optBtn.right{border-color:#41c98a; background:#e4fbef;} .optBtn.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .roundCap{font-weight:900; color:var(--ink2); font-size:14px; min-height:20px;}
+  .nextHint{background:#f7ecd0; border-radius:14px; padding:10px 14px; font-weight:800; color:#a87a1f; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#e0b95c,#a87a1f); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center; gap:14px;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:6px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qtag{display:inline-block; font-size:12px; font-weight:900; padding:3px 10px; border-radius:10px; margin-bottom:6px;} .qtag.logic{background:#f7ecd0;color:#a87a1f;} .qtag.en{background:#e3edff;color:#3f7ae0;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #f0e0b0; background:#fdf8ec; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#e0b95c,#a87a1f); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#f5ecd8; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">排队问题<small>数学思维 · 数一数第几个</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🧍🧍🧍</div>
+    <div class="introCard">排队的时候，怎么才能不数错人数呢？这里藏着一个<b>所有人都会犯</b>的小陷阱——别忘了把<b>自己</b>也数进去哦！今天来做排队小专家。</div>
+    <button class="bigbtn" onclick="go('explore')">开始数一数 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🐰 前面加后面</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">🔁 数了两次的陷阱</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-A"></div>
+      <div class="subview" id="ex-B"></div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 两边各答对 2 题，就能去闯关！（<span id="cntA">0</span>/2 + <span id="cntB">0</span>/2）</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 排队大挑战<small>算一算，一共有多少人</small></div>
+    <div class="gsub on" id="g-round1"></div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qtag" id="qtag"></div><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🏅</div><h2>排队都被你算清楚啦！</h2><div class="medalName">🎖 排队小专家</div>
+      <p>你今天学到了：<br>• 「前面有几人 + 后面有几人 + <b>自己 1 个</b>」才是排队总人数；<br>• 「从前数第几 + 从后数第几 − <b>1</b>」（因为自己被数了两次）；<br>• 算排队问题，最容易忘记的就是<b>自己</b>；<br>• 🔤 英语：排队 <b>line up</b>。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再算一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-A').classList.toggle('on',v==='A'); document.getElementById('ex-B').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+let doneA=0, doneB=0;
+function unlockGame(){ if(doneA>=2 && doneB>=2){ nextHint.style.display='none'; nextBtn.style.display='block'; } }
+
+/* ===== Tab A 前面加后面 ===== */
+const ROUNDS_A=[
+  {front:3,back:2,ans:6,opts:[5,6,7],ai:1,cap:'前面3人 + 自己1个 + 后面2人 = 6人！别忘了算上自己～'},
+  {front:4,back:0,ans:5,opts:[4,5,6],ai:1,cap:'后面虽然是0人，但前面4人 + 自己1个 = 5人！'},
+];
+let idxA=0;
+function renderA(){ const box=document.getElementById('ex-A');
+  if(idxA>=ROUNDS_A.length){ box.innerHTML='<div class="roundCap">🎉 两题都答对啦！</div>'; return; }
+  const r=ROUNDS_A[idxA];
+  box.innerHTML=`<div class="progDots">${ROUNDS_A.map((_,i)=>`<div class="pd ${i<idxA?'done':''}"></div>`).join('')}</div>
+    <div class="lineRow">${'🧍'.repeat(r.front)}<span class="me">🐰</span>${'🧍'.repeat(r.back)}</div>
+    <div class="qWord">🐰小兔排队，前面有 <b>${r.front}</b> 人，后面有 <b>${r.back}</b> 人，一共有几人排队？</div>
+    <div class="optRow" id="optRowA"></div>
+    <div class="roundCap" id="capA"></div>`;
+  const row=document.getElementById('optRowA');
+  r.opts.forEach((o,i)=>{ const b=document.createElement('div'); b.className='optBtn'; b.textContent=o+'人';
+    b.onclick=()=>{ if(b.dataset.locked)return;
+      if(i===r.ai){ b.classList.add('right'); b.dataset.locked='1'; document.getElementById('capA').innerHTML='✅ '+r.cap;
+        doneA++; document.getElementById('cntA').textContent=doneA; unlockGame(); setTimeout(()=>{ idxA++; renderA(); },1500); }
+      else { b.classList.add('wrong'); setTimeout(()=>b.classList.remove('wrong'),400); document.getElementById('capA').textContent='🤔 再想想，自己也要算进去哦～'; } };
+    row.appendChild(b); });
+}
+renderA();
+
+/* ===== Tab B 数了两次的陷阱 ===== */
+const ROUNDS_B=[
+  {f:5,b:3,ans:7,opts:[8,7,9],bi:1,cap:'5 + 3 − 1 = 7！因为自己在两边都被数了一次，要减掉多数的那一次。'},
+  {f:2,b:4,ans:5,opts:[6,5,7],bi:1,cap:'2 + 4 − 1 = 5！自己被重复数了一次，记得减 1。'},
+];
+let idxB=0;
+function renderB(){ const box=document.getElementById('ex-B');
+  if(idxB>=ROUNDS_B.length){ box.innerHTML='<div class="roundCap">🎉 两题都答对啦！</div>'; return; }
+  const r=ROUNDS_B[idxB];
+  box.innerHTML=`<div class="progDots">${ROUNDS_B.map((_,i)=>`<div class="pd ${i<idxB?'done':''}"></div>`).join('')}</div>
+    <div class="queueWrap"><div class="qLbl">从前数：第 ${r.f} 个 →</div>
+      <div class="queueLine"><div class="queueMark">🐥</div></div>
+      <div class="qLbl">← 从后数：第 ${r.b} 个</div></div>
+    <div class="qWord">从前往后数，小鸡排第 <b>${r.f}</b>；从后往前数，小鸡排第 <b>${r.b}</b>。一共有几人排队？</div>
+    <div class="optRow" id="optRowB"></div>
+    <div class="roundCap" id="capB"></div>`;
+  const row=document.getElementById('optRowB');
+  r.opts.forEach((o,i)=>{ const b=document.createElement('div'); b.className='optBtn'; b.textContent=o+'人';
+    b.onclick=()=>{ if(b.dataset.locked)return;
+      if(i===r.bi){ b.classList.add('right'); b.dataset.locked='1'; document.getElementById('capB').innerHTML='✅ '+r.cap;
+        doneB++; document.getElementById('cntB').textContent=doneB; unlockGame(); setTimeout(()=>{ idxB++; renderB(); },1500); }
+      else { b.classList.add('wrong'); setTimeout(()=>b.classList.remove('wrong'),400); document.getElementById('capB').textContent='🤔 小鸡被两边都数了一次，是不是该减掉一次呀？'; } };
+    row.appendChild(b); });
+}
+renderB();
+
+/* ===== 闯关1 自己算（新题） ===== */
+const GAME_Q=[
+  {kind:'A', front:4, back:3, opts:[7,8,9], ai:1, q:'小明排队，前面有 4 人，后面有 3 人，一共有几人排队？'},
+  {kind:'B', f:4, b:2, opts:[5,6,7], bi:0, q:'从前往后数，小丽排第 4；从后往前数，小丽排第 2。一共有几人排队？'},
+];
+let gIdx=0;
+function renderGame(){ const box=document.getElementById('g-round1');
+  if(gIdx>=GAME_Q.length){ box.innerHTML='<div class="ok">全对啦！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button>'; return; }
+  const r=GAME_Q[gIdx];
+  box.innerHTML=`<div class="qWord">${r.q}</div><div class="optRow" id="gOptRow"></div><div class="roundCap" id="gCap"></div>`;
+  const ansIdx = r.kind==='A'? r.ai : r.bi;
+  const row=document.getElementById('gOptRow');
+  r.opts.forEach((o,i)=>{ const b=document.createElement('div'); b.className='optBtn'; b.textContent=o+'人';
+    b.onclick=()=>{ if(b.dataset.locked)return;
+      if(i===ansIdx){ b.classList.add('right'); b.dataset.locked='1'; setTimeout(()=>{ gIdx++; renderGame(); },1000); }
+      else { b.classList.add('wrong'); setTimeout(()=>b.classList.remove('wrong'),400); document.getElementById('gCap').textContent='🤔 再算一次～'; } };
+    row.appendChild(b); });
+}
+renderGame();
+
+/* ===== 闯关2 判断 ===== */
+const QUIZ=[
+ {tag:'logic',tl:'逻辑',ico:'🧍',q:'小华排队，前面有5人，后面有1人，一共有几人排队？',opts:[['7个',1],['6个',0],['5个',0]],fb:'5 + 1 + 自己1个 = 7个。'},
+ {tag:'logic',tl:'逻辑',ico:'🔁',q:'从前往后数，小刚排第3；从后往前数，小刚排第5。一共有几人排队？',opts:[['7个',1],['8个',0],['9个',0]],fb:'3 + 5 − 1 = 7，减掉重复数的自己。'},
+ {tag:'logic',tl:'逻辑',ico:'🤔',q:'算"前面加后面"的人数时，为什么还要再加1？',opts:[['因为还要把自己算进去',1],['因为要加倍',0],['不需要加1',0]],fb:'前面、后面都不包括自己，所以要单独加上自己这1个。'},
+ {tag:'en',tl:'英语',ico:'🔤',q:'英语角："排队"用英语怎么说？',opts:[['line up',1],['sit down',0],['stand up',0]],fb:'line up 排队。'},
+];
+let qi=0; function startQuiz(){ document.getElementById('g-round1').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>逻辑 + 英语</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; const tag=document.getElementById('qtag'); tag.className='qtag '+it.tag; tag.textContent=it.tl; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('queue','🧍','排队小专家'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#c9962f','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

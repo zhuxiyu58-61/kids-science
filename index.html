@@ -185,7 +185,7 @@
 <body>
   <header>
     <h1>🗺️ 知识寻宝地图</h1>
-    <p>沿着金色路线，一路探险 · 收集宝藏徽章</p>
+    <p>从出发点选一条主题支线 · 一路探险收集宝藏徽章</p>
   </header>
 
   <div class="hud">
@@ -398,43 +398,59 @@ SEQ.push({type:'final', done:allDone});
 let currentId=null;
 for(const l of ALL){ if(!isDone(l.id)){ currentId=l.id; break; } }
 
-/* ===== 布局：蜿蜒排布 ===== */
+/* ===== 布局：一个起点 → 多条主题支线（树形地图）===== */
 const mapEl=document.getElementById('map');
 const svg=document.getElementById('trail');
 function layout(){
-  const W=mapEl.clientWidth;
-  const small=W<420;
-  const GAP=small?116:132;
-  const TOP=64, R=small?70:78;      // 蛇形振幅
-  const cx=W*0.5;
-  const pts=[];
-  SEQ.forEach((s,i)=>{ pts.push({x:cx + R*Math.sin(i*0.72), y:TOP + i*GAP}); s._x=pts[i].x; s._y=pts[i].y; });
-  const H=TOP + (SEQ.length-1)*GAP + 90;
+  const W=mapEl.clientWidth, small=W<420, cx=W*0.5;
+  const GAP=small?96:108;           // 支线内每课的竖向间距
+  const TOP=58;
+  const AMP=small?60:82;            // 支线离主干多远
+  const ZIG=small?26:34;            // 支线内轻微左右摆动
+  const nodes=[], branches=[];
+  let y=TOP;
+  nodes.push({type:'start', x:cx, y}); const startY=y;
+  y+=GAP*0.95;
+  REGIONS.forEach((r,k)=>{
+    const side=k%2===0?-1:1;                     // 左右交替分支
+    const junctionY=y;
+    const bx=cx+side*AMP;                         // 这条支线的中心列
+    const pts=[[cx,junctionY-GAP*0.55]];          // 从主干上引出
+    r.lessons.forEach((l,j)=>{
+      const lx=bx + side*((j%2)?ZIG:-ZIG*0.5);
+      const ly=junctionY + j*GAP;
+      nodes.push({type:'lesson', ...l, rc:r.color, region:r.name, side, ribbon:j===0?r:null, jY:junctionY, x:lx, y:ly});
+      pts.push([lx,ly]);
+    });
+    const chestDone=r.lessons.every(l=>isDone(l.id));
+    const cyy=junctionY + r.lessons.length*GAP;
+    const chx=cx+side*(AMP*0.5);
+    nodes.push({type:'chest', rc:r.color, ico:r.chest, region:r.name, gift:r.gift, done:chestDone, x:chx, y:cyy});
+    pts.push([chx,cyy]); pts.push([cx,cyy+GAP*0.5]);
+    branches.push({color:r.color, pts});
+    y=cyy+GAP;
+  });
+  const allDoneNow=ALL.every(l=>isDone(l.id));
+  nodes.push({type:'final', done:allDoneNow, x:cx, y}); const finalY=y;
+  const H=y+90;
   mapEl.style.height=H+'px';
-  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
-  svg.setAttribute('width',W); svg.setAttribute('height',H);
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`); svg.setAttribute('width',W); svg.setAttribute('height',H);
 
-  // 金色路线画到当前站点（未开始则第一段，全完成则整条）
-  let goldUntil=SEQ.length-1;
-  const curSeq=SEQ.findIndex(s=>s.type==='lesson'&&s.id===currentId);
-  if(curSeq>=0) goldUntil=curSeq;
-  const d=pts.map((p,i)=>(i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1)).join(' ');
-  const dGold=pts.slice(0,goldUntil+1).map((p,i)=>(i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1)).join(' ');
-  svg.innerHTML=`
-    <path d="${d}" fill="none" stroke="#c79a5f" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 20" opacity=".8"/>
-    <path d="${dGold}" fill="none" stroke="#f5b731" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 20"/>
-  `;
+  // 主干（棕色）+ 每条支线用该主题色
+  let paths=`<path d="M${cx} ${startY} L${cx} ${finalY}" fill="none" stroke="#c79a5f" stroke-width="8" stroke-linecap="round" stroke-dasharray="2 17" opacity=".65"/>`;
+  branches.forEach(b=>{ const dd=b.pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+    paths+=`<path d="${dd}" fill="none" stroke="${b.color}" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 15" opacity=".55"/>`; });
+  svg.innerHTML=paths;
 
   // 清掉旧节点，重画
   [...mapEl.querySelectorAll('.node,.ribbon')].forEach(n=>n.remove());
-  SEQ.forEach((s,i)=>{
+  nodes.forEach(s=>{
     if(s.ribbon){ const rb=document.createElement('div'); rb.className='ribbon';
       rb.style.setProperty('--rc',s.rc);
-      rb.style.left=(s._x<cx? s._x+ (small?60:70) : s._x-(small?60:70))+'px';
-      rb.style.top=s._y+'px';
+      rb.style.left=cx+'px'; rb.style.top=(s.jY-GAP*0.52)+'px';
       rb.innerHTML=`${s.ribbon.ico} ${s.ribbon.name}<small>探险区</small>`;
       mapEl.appendChild(rb); }
-    const el=document.createElement('div'); el.className='node'; el.style.left=s._x+'px'; el.style.top=s._y+'px';
+    const el=document.createElement('div'); el.className='node'; el.style.left=s.x+'px'; el.style.top=s.y+'px';
     el.style.setProperty('--rc', s.rc||'#c79a5f');
     if(s.type==='lesson'){
       if(isDone(s.id)) el.classList.add('done');
@@ -449,11 +465,11 @@ function layout(){
       el.onclick=()=>{ if(s.done) openChest(s); else bump(el); };
     } else if(s.type==='start'){
       el.classList.add('big');
-      el.innerHTML=`<div class="disc" style="box-shadow:0 8px 18px rgba(120,80,20,.25), inset 0 0 0 5px #ff9f43">🏁</div><div class="nm">出发！</div>`;
+      el.innerHTML=`<div class="disc" style="box-shadow:0 8px 18px rgba(120,80,20,.25), inset 0 0 0 5px #ff9f43">🏁</div><div class="nm">出发！</div><div class="nsub">挑一条主题支线</div>`;
     } else { // final
       el.classList.add('big'); if(!s.done) el.classList.add('locked');
       el.innerHTML=`<div class="disc" style="box-shadow:0 0 22px ${s.done?'rgba(245,183,49,.7)':'rgba(120,80,20,.2)'}, inset 0 0 0 5px ${s.done?'#f5b731':'#c79a5f'}">${s.done?'🏆':'🗝️'}</div>
-        <div class="nm">${s.done?'大宝藏！':'终极宝藏'}</div><div class="nsub">${s.done?'全部通关啦！':'走完全程解锁'}</div>`;
+        <div class="nm">${s.done?'大宝藏！':'终极宝藏'}</div><div class="nsub">${s.done?'全部通关啦！':'集齐所有宝箱解锁'}</div>`;
       el.onclick=()=>{ if(!s.done) bump(el); else burst(); };
     }
     mapEl.appendChild(el);

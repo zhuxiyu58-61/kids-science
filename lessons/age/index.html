@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>年龄问题 · 知识乐园</title>
+<style>
+  :root{ --accent:#2b7de9; --bg1:#e9f2ff; --bg2:#bcd8fb; --ink:#123a63; --ink2:#456a90; --card:#fff; --shadow:0 10px 30px rgba(30,90,160,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:92px; animation:bob 2.4s ease-in-out infinite;} @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+  .introCard{background:var(--card); border-radius:24px; padding:22px 28px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(15px,2.2vw,19px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#5aa0f0,#2b6fd0); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:18px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none; flex-direction:column; align-items:center; justify-content:center; gap:14px;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  .seqBox{background:var(--card); border-radius:20px; padding:18px 24px; box-shadow:var(--shadow); font-size:clamp(20px,4.6vw,28px); text-align:center; max-width:600px; font-weight:900; line-height:1.4;}
+  .seqQ{color:var(--ink2); font-size:18px; font-weight:900;}
+  .hintline{background:#eaf3ff; border-radius:12px; padding:7px 12px; font-size:14px; font-weight:800; color:#2b6fd0; max-width:560px; text-align:center;}
+  .optRow{display:flex; gap:14px; flex-wrap:wrap; justify-content:center;}
+  .optBtn{border:3px solid #cfe2fb; background:#f2f8ff; border-radius:16px; padding:12px 24px; font-size:26px; font-weight:900; cursor:pointer; box-shadow:var(--shadow);} .optBtn:active{transform:scale(.94);}
+  .optBtn.right{border-color:#41c98a; background:#e4fbef;} .optBtn.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .roundCap{font-weight:900; color:var(--ink2); font-size:14px; text-align:center; line-height:1.5; max-width:560px;}
+  .progDots{display:flex; gap:8px;} .pd{width:10px; height:10px; border-radius:50%; background:#cfe2fb;} .pd.done{background:var(--accent);}
+  .nextHint{background:#eaf3ff; border-radius:14px; padding:10px 14px; font-weight:800; color:#2b6fd0; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#5aa0f0,#2b6fd0); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:14px; width:100%; max-width:620px; justify-content:center;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #b3d3f5; border-radius:20px; padding:12px 8px; text-align:center; min-height:150px; transition:.2s;}
+  .bin.over{border-color:var(--accent); background:#eaf3ff;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:32px;} .bin .binName{font-weight:900; font-size:16px; margin-top:4px;} .bin .binHint{font-size:12px; color:var(--ink2); font-weight:700;}
+  .bin .binDrop{margin-top:8px; min-height:60px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:12px; margin-top:20px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:16px; box-shadow:var(--shadow); padding:10px 13px; text-align:center; cursor:grab; touch-action:none; max-width:150px;}
+  .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg); box-shadow:0 18px 36px rgba(30,90,160,.3);}
+  .item.placed{cursor:default; box-shadow:none; padding:5px 8px;}
+  .item .itName{font-weight:800; font-size:13px; line-height:1.3;} .item.placed .itName{font-size:10px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:19px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qtag{display:inline-block; font-size:12px; font-weight:900; padding:3px 10px; border-radius:10px; margin-bottom:6px;} .qtag.math{background:#e6f0ff;color:#2f7fe0;} .qtag.logic{background:#eef;color:#5a4bd0;} .qtag.en{background:#e3edff;color:#3f7ae0;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #cfe2fb; background:#f2f8ff; border-radius:14px; padding:13px; font-size:17px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#5aa0f0,#2b6fd0); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#e9f1fb; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">年龄问题<small>数学奥数 · 年龄差永远不变</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🎂</div>
+    <div class="introCard">你和妈妈，每过一年都<b>一起长大 1 岁</b>。所以不管过多少年，你们的<b>年龄差永远不变</b>！比如妈妈比你大 25 岁，10 年后她还是比你大 <b>25 岁</b>。记住这个秘密，年龄题就变简单啦～</div>
+    <button class="bigbtn" onclick="go('explore')">开始推算 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">➖ 年龄差不变</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">🎂 算年龄</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-A"></div>
+      <div class="subview" id="ex-B"></div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 年龄差答对 3 题（<span id="cntA">0</span>/3）+ 算年龄答对 3 题（<span id="cntB">0</span>/3），就能去闯关！</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 说得对不对<small>把「说得对」的，拖到 ✅ 筐里</small></div>
+    <div class="gsub on" id="g-round1">
+      <div class="bins">
+        <div class="bin" data-k="yes"><div class="binIco">✅</div><div class="binName">说得对</div><div class="binHint">符合规律</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="no"><div class="binIco">❌</div><div class="binName">说错了</div><div class="binHint">不符合</div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray"></div>
+      <div class="roundNext" id="r1next"><div class="ok">全对啦！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qtag" id="qtag"></div><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">🎂</div><h2>年龄题都被你破解啦！</h2><div class="medalName">🎖 年龄小侦探</div>
+      <p>你今天学到了：<br>• 两个人每年<b>一起长 1 岁</b>，所以<b>年龄差永远不变</b>；<br>• 求现在年龄差：<b>大的 − 小的</b>；<br>• 求几年后：<b>现在的岁数 + 过了几年</b>；<br>• 求几年前：<b>现在的岁数 − 过了几年</b>；<br>• 🔤 英语：年龄 <b>age</b>，岁 <b>years old</b>。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再玩一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-A').classList.toggle('on',v==='A'); document.getElementById('ex-B').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+let doneA=0, doneB=0;
+function unlockGame(){ if(doneA>=3 && doneB>=3){ nextHint.style.display='none'; nextBtn.style.display='block'; } }
+function makeMini(boxId, rounds, cntId, bumpDone){
+  let idx=0;
+  function render(){ const box=document.getElementById(boxId);
+    if(idx>=rounds.length){ box.innerHTML='<div class="seqBox">🎉 三题都答对啦！</div>'; return; }
+    const r=rounds[idx];
+    box.innerHTML=`<div class="progDots">${rounds.map((_,i)=>`<div class="pd ${i<idx?'done':''}"></div>`).join('')}</div>
+      <div class="seqQ">${r.q}</div><div class="seqBox">${r.show}</div>
+      <div class="hintline">💡 ${r.hint}</div>
+      <div class="optRow"></div><div class="roundCap"></div>`;
+    const row=box.querySelector('.optRow'), cap=box.querySelector('.roundCap');
+    r.opts.forEach((o,i)=>{ const b=document.createElement('div'); b.className='optBtn'; b.textContent=o;
+      b.onclick=()=>{ if(b.dataset.locked)return;
+        if(i===r.ans){ b.classList.add('right'); b.dataset.locked='1'; cap.innerHTML='✅ '+r.cap; bumpDone(); document.getElementById(cntId).textContent=(cntId==='cntA'?doneA:doneB); unlockGame(); setTimeout(()=>{ idx++; render(); },1300); }
+        else { b.classList.add('wrong'); setTimeout(()=>b.classList.remove('wrong'),400); cap.textContent='🤔 记住：两人一起长大，年龄差不变～'; } };
+      row.appendChild(b); });
+  }
+  render();
+}
+makeMini('ex-A',[
+ {q:'现在相差几岁？',show:'姐姐 8 岁，弟弟 5 岁',hint:'大的 − 小的',opts:['2','3','4'],ans:1,cap:'8 − 5 = 3 岁。'},
+ {q:'明年相差几岁？',show:'今年姐弟相差 3 岁',hint:'年龄差永远不变',opts:['3','4','2'],ans:0,cap:'差永远不变，还是 3 岁！'},
+ {q:'10 年后相差几岁？',show:'爸爸比你大 30 岁',hint:'年龄差永远不变',opts:['40','30','20'],ans:1,cap:'差不变，还是 30 岁。'},
+],'cntA',()=>doneA++);
+makeMini('ex-B',[
+ {q:'妈妈几岁？',show:'你 7 岁，妈妈比你大 25 岁',hint:'你的岁数 + 差',opts:['30','32','25'],ans:1,cap:'7 + 25 = 32 岁。'},
+ {q:'哥哥 3 年前几岁？',show:'哥哥今年 12 岁',hint:'现在 − 过了几年',opts:['9','15','8'],ans:0,cap:'12 − 3 = 9 岁。'},
+ {q:'你 5 年后几岁？',show:'你今年 8 岁',hint:'现在 + 过了几年',opts:['12','13','14'],ans:1,cap:'8 + 5 = 13 岁。'},
+],'cntB',()=>doneB++);
+
+const ITEMS=[
+ {key:'yes',t:'年龄差永远不变'},{key:'yes',t:'两人一起长1岁'},{key:'yes',t:'10年后差还是原来那么多'},
+ {key:'no',t:'明年年龄差多1岁'},{key:'no',t:'长大后差越来越大'},{key:'no',t:'过几年差会变没'},
+];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+(function buildSort(){
+  const tray=document.getElementById('tray');
+  shuffle([...ITEMS]).forEach(it=>{ const d=document.createElement('div'); d.className='item'; d.dataset.k=it.key;
+    d.innerHTML=`<div class="itName">${it.t}</div>`; tray.appendChild(d); });
+  let active=null,ox=0,oy=0,placed=0; const total=ITEMS.length; const box=document.getElementById('g-round1');
+  const binAt=(x,y)=>[...box.querySelectorAll('.bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+  box.querySelectorAll('.item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return;
+    active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top;
+    el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el);
+    el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+  function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px';
+    box.querySelectorAll('.bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b)b.classList.add('over'); }
+  addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+  addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null;
+    box.querySelectorAll('.bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+    const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+    if(bin&&bin.dataset.k===el.dataset.k){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); placed++;
+      if(placed===total) document.getElementById('r1next').style.display='block'; }
+    else { rst(); document.getElementById('tray').appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+})();
+
+const QUIZ=[
+ {tag:'math',tl:'数学',ico:'🎂',q:'姐姐 10 岁，妹妹 6 岁，相差几岁？',opts:[['4 岁',1],['16 岁',0],['3 岁',0]],fb:'10 − 6 = 4 岁。'},
+ {tag:'math',tl:'数学',ico:'👵',q:'奶奶比你大 55 岁，20 年后大几岁？',opts:[['55 岁',1],['75 岁',0],['35 岁',0]],fb:'年龄差永远不变，还是 55 岁。'},
+ {tag:'logic',tl:'逻辑',ico:'🤔',q:'为什么两人年龄差不变？',opts:[['每年一起长1岁',1],['大的长得快',0],['小的不长',0]],fb:'两人每年都长1岁，差就不变。'},
+ {tag:'en',tl:'英语',ico:'🔤',q:'英语角："年龄"用英语怎么说？',opts:[['age',1],['name',0],['tall',0]],fb:'age 年龄。'},
+];
+let qi=0; function startQuiz(){ document.getElementById('g-round1').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>数学 + 逻辑 + 英语</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; const tag=document.getElementById('qtag'); tag.className='qtag '+it.tag; tag.textContent=it.tl; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('age','🎂','年龄小侦探'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#2b7de9','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

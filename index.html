@@ -235,12 +235,15 @@
   </div>
 
   <!-- 某天的课程清单 -->
-  <div class="daysheet" id="daysheet">
+  <div class="daysheet" id="daysheet" onclick="if(event.target===this)closeDay()">
     <div class="daycard">
       <h3 id="dayTitle"></h3>
       <div class="dsub" id="daySub"></div>
       <div id="dayList"></div>
-      <button class="dayclose" onclick="closeDay()">收起</button>
+      <div style="display:flex; gap:10px; margin-top:8px;">
+        <button class="dayclose" style="flex:1; background:#fff0d6; color:#c9781f;" onclick="calFromDay()">📅 看日历（选其它天）</button>
+        <button class="dayclose" style="flex:1;" onclick="closeDay()">收起</button>
+      </div>
     </div>
   </div>
 
@@ -486,7 +489,8 @@ const todayGroup=bucket[todayStr]||[];               // 今天这一天的所有
 const todayTodo=todayGroup.filter(l=>!isDone(l.id));  // 今天还没上的
 
 /* 点日历某天 → 弹出这天的课程清单 */
-function openDay(ds){ const L=bucket[ds]; if(!L||!L.length) return;
+let curDay=null;
+function openDay(ds){ const L=bucket[ds]; if(!L||!L.length) return; curDay=ds;
   const p=ds.split('-').map(Number); const isToday=ds===todayStr, isPast=ds<todayStr;
   const doneN=L.filter(l=>isDone(l.id)).length;
   document.getElementById('dayTitle').textContent=p[1]+'月'+p[2]+'日'+(isToday?' · 今天':'');
@@ -495,13 +499,16 @@ function openDay(ds){ const L=bucket[ds]; if(!L||!L.length) return;
       : isPast ? `这天上了 ${L.length} 节课，全部完成 ✓`
       : `这天安排了 ${L.length} 节课（做完前面的就轮到这天）`;
   document.getElementById('dayList').innerHTML = L.map(l=>{ const done=isDone(l.id);
-    return `<div class="lrow ${done?'done':''}" onclick="location.href='lessons/${l.id}/index.html'">`
+    return `<div class="lrow ${done?'done':''}" onclick="goLesson('${l.id}')">`
       +`<div class="le">${l.e}</div><div class="lb"><div class="ln">${l.n}</div>`
       +`<div class="lst">${done?'✓ 已完成 · 点开可复习':'点这里去上这一课'}</div></div>`
       +`<div class="lgo">${done?'复习':'开始 ▶'}</div></div>`; }).join('');
   document.getElementById('daysheet').classList.add('on');
 }
+/* 进课前记住在看哪天，做完回来自动弹回这天清单 */
+function goLesson(id){ try{ if(curDay) localStorage.setItem('kidspark_ret', curDay); }catch(e){} location.href='lessons/'+id+'/index.html'; }
 function closeDay(){ document.getElementById('daysheet').classList.remove('on'); }
+function calFromDay(){ closeDay(); openCal(); }
 function cellTap(ds){ openDay(ds); }
 let calY=_now.getFullYear(), calM=_now.getMonth();
 function renderMonth(){
@@ -530,15 +537,18 @@ const today=document.getElementById('today'); const calToday=document.getElement
 if(todayTodo.length){
   const doneToday=todayGroup.length-todayTodo.length;
   const names=todayTodo.slice(0,3).map(l=>l.n).join('、');
-  today.innerHTML=`<div class="te">📅</div><div class="tb"><div class="tk">📅 今日任务</div><div class="tt">今天要上 ${todayGroup.length} 节课</div><div class="td">点开日历，看看今天上哪些～</div></div><div class="tgo">打开日历 ▶</div>`;
+  today.innerHTML=`<div class="te">📅</div><div class="tb"><div class="tk">📅 今日任务</div><div class="tt">今天要上 ${todayGroup.length} 节课</div><div class="td">点这里看今天上哪些课～</div></div><div class="tgo">今天的课 ▶</div>`;
   calToday.innerHTML=`<div class="cte">📚</div><div class="ctb"><div class="ctk">🎯 今天要上 ${todayGroup.length} 节课（已完成 ${doneToday}）</div><div class="ctt">${names}</div><div class="ctd">点这里看今天的全部课程 →</div></div><div class="ctgo">查看 ▶</div>`;
   calToday.onclick=()=>openDay(todayStr);
+  today.onclick=()=>openDay(todayStr);
 }else{
   today.innerHTML=`<div class="te">📅</div><div class="tb"><div class="tk">📅 今日任务</div><div class="tt">今天的都做完啦！🎉</div><div class="td">看看日历上的打卡，或回地图回味任意一关～</div></div><div class="tgo">打开日历 ▶</div>`;
   calToday.innerHTML=`<div class="cte">🎉</div><div class="ctb"><div class="ctk">✨ 全部完成</div><div class="ctt">今天没有新课啦</div><div class="ctd">新的一批马上就来，明天再见～</div></div>`;
   calToday.style.cursor='default';
+  today.onclick=openCal;
 }
-today.onclick=openCal;
+/* 做完一节课回来 → 自动弹回刚才在看的那天清单 */
+try{ const ret=localStorage.getItem('kidspark_ret'); if(ret){ localStorage.removeItem('kidspark_ret'); if(bucket[ret]&&bucket[ret].length) openDay(ret); } }catch(e){}
 
 /* 宝箱彩蛋 */
 function openChest(s){

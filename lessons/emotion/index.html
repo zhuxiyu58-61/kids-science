@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>认识情绪 · 知识乐园</title>
+<style>
+  :root{ --accent:#ef8c3c; --bg1:#fff3e2; --bg2:#ffdcab; --ink:#5a3410; --ink2:#8a6636; --card:#fff; --shadow:0 10px 30px rgba(180,110,30,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,26px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .steps{margin-left:auto; display:flex; gap:8px;} .dot{width:13px; height:13px; border-radius:50%; background:#ffffffb0; transition:.3s;} .dot.on{background:var(--accent); transform:scale(1.2);}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; padding:2px 16px 14px;} .scene.active{display:flex;}
+  #s-intro{align-items:center; justify-content:center; text-align:center;}
+  .kico{font-size:92px; animation:bob 2.4s ease-in-out infinite;} @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+  .introCard{background:var(--card); border-radius:24px; padding:22px 28px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(15px,2.2vw,19px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#f6a44e,#e0742a); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:18px;} .bigbtn:active{transform:scale(.95);}
+  .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+  .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
+  .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none; flex-direction:column; align-items:center; justify-content:center; gap:14px;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
+  .orbit{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-width:640px;}
+  .planet{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:10px 8px; width:108px; text-align:center; cursor:pointer; border:3px solid #f7e2c6; transition:.15s;}
+  .planet:active{transform:scale(.94);} .planet.seen{border-color:#41c98a; background:#f0fbf4;}
+  .planet .pe{font-size:34px;} .planet .pn{font-weight:800; font-size:13px; margin-top:2px;}
+  .factBox{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:14px 18px; max-width:560px; font-weight:800; font-size:15px; line-height:1.6; min-height:52px; display:flex; align-items:center; justify-content:center; text-align:center;} .factBox b{color:var(--accent);}
+  .seqBox{background:var(--card); border-radius:20px; padding:18px 24px; box-shadow:var(--shadow); font-size:20px; text-align:center; max-width:600px; font-weight:900;}
+  .seqQ{color:var(--ink2); font-size:18px; font-weight:900;}
+  .optRow{display:flex; gap:14px; flex-wrap:wrap; justify-content:center;}
+  .optBtn{border:3px solid #f4dcbc; background:#fff9f0; border-radius:16px; padding:12px 20px; font-size:18px; font-weight:900; cursor:pointer; box-shadow:var(--shadow);} .optBtn:active{transform:scale(.94);}
+  .optBtn.right{border-color:#41c98a; background:#e4fbef;} .optBtn.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .roundCap{font-weight:900; color:var(--ink2); font-size:14px; text-align:center; line-height:1.5; max-width:560px;}
+  .progDots{display:flex; gap:8px;} .pd{width:10px; height:10px; border-radius:50%; background:#f4dcbc;} .pd.done{background:var(--accent);}
+  .nextHint{background:#fff1dd; border-radius:14px; padding:10px 14px; font-weight:800; color:#c9781f; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#f6a44e,#e0742a); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
+  .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
+  .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
+  .bins{display:flex; gap:14px; width:100%; max-width:620px; justify-content:center;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #eecb9c; border-radius:20px; padding:12px 8px; text-align:center; min-height:150px; transition:.2s;}
+  .bin.over{border-color:var(--accent); background:#fff1dd;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin .binIco{font-size:32px;} .bin .binName{font-weight:900; font-size:16px; margin-top:4px;} .bin .binHint{font-size:12px; color:var(--ink2); font-weight:700;}
+  .bin .binDrop{margin-top:8px; min-height:60px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
+  .tray{display:flex; gap:12px; margin-top:20px; justify-content:center; flex-wrap:wrap;}
+  .item{background:#fff; border-radius:16px; box-shadow:var(--shadow); padding:10px 13px; text-align:center; cursor:grab; touch-action:none; max-width:150px;}
+  .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg); box-shadow:0 18px 36px rgba(180,110,30,.3);}
+  .item.placed{cursor:default; box-shadow:none; padding:5px 8px;}
+  .item .itName{font-weight:800; font-size:13px; line-height:1.3;} .item.placed .itName{font-size:10px;}
+  .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qtag{display:inline-block; font-size:12px; font-weight:900; padding:3px 10px; border-radius:10px; margin-bottom:6px;} .qtag.life{background:#fff1dd;color:#c9781f;} .qtag.logic{background:#eef;color:#5a4bd0;} .qtag.en{background:#e3edff;color:#3f7ae0;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #f4dcbc; background:#fff9f0; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
+  #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
+  .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#f6a44e,#e0742a); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#f7ecdd; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">认识情绪<small>生活 · 做自己心情的主人</small></div>
+    <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">😊</div>
+    <div class="introCard">每个人都有<b>各种各样的心情</b>：开心、难过、生气、害怕……这些都很正常！重要的是<b>认出</b>自己现在是什么心情，再用好办法让自己舒服一点。生气时深呼吸、难过时说出来——你就能当自己心情的<b>小主人</b>！</div>
+    <button class="bigbtn" onclick="go('explore')">认识心情 ▶</button>
+  </section>
+
+  <section class="scene" id="s-explore">
+    <div class="exTabs">
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">😃 四种心情</button>
+      <button class="exTab" id="tabB" onclick="switchEx('B')">🤔 想一想</button>
+    </div>
+    <div class="exBody">
+      <div class="subview on" id="ex-A"></div>
+      <div class="subview" id="ex-B"></div>
+    </div>
+    <div class="exFoot">
+      <div class="nextHint" id="nextHint">🔎 把 4 种心情都点一点（<span id="cntA">0</span>/4），再答对 3 题（<span id="cntB">0</span>/3），就能去闯关！</div>
+      <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
+    </div>
+  </section>
+
+  <section class="scene" id="s-game">
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 生气时怎么办<small>把做法拖到「好办法 / 会伤害人」的筐里</small></div>
+    <div class="gsub on" id="g-round1">
+      <div class="bins">
+        <div class="bin" data-k="good"><div class="binIco">🌈</div><div class="binName">好办法</div><div class="binHint">让心情变好</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="bad"><div class="binIco">💥</div><div class="binName">会伤害人</div><div class="binHint">别这样做</div><div class="binDrop"></div></div>
+      </div>
+      <div class="tray" id="tray"></div>
+      <div class="roundNext" id="r1next"><div class="ok">全对啦！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
+    </div>
+    <div class="gsub" id="g-quiz">
+      <div class="qprog" id="qprog"></div>
+      <div class="qcard"><div class="qtag" id="qtag"></div><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="finishCard"><div class="medal">😊</div><h2>你会管理心情啦！</h2><div class="medalName">🎖 情绪小主人</div>
+      <p>你今天学到了：<br>• 开心、难过、生气、害怕——<b>各种心情都很正常</b>；<br>• 先<b>认出</b>自己是什么心情，再想办法；<br>• 生气时<b>深呼吸、数到十</b>，别打人摔东西；<br>• 难过时<b>说出来、找人抱一抱</b>；害怕时<b>找大人</b>；<br>• 你可以做自己心情的小主人；<br>• 🔤 英语：开心 <b>happy</b>。</p>
+      <div class="finishBtns"><button class="fb2" onclick="location.reload()">再玩一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const SCENES=['intro','explore','game','finish'];
+function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
+function switchEx(v){ document.getElementById('ex-A').classList.toggle('on',v==='A'); document.getElementById('ex-B').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
+let doneA=0, doneB=0;
+function unlockGame(){ if(doneA>=4 && doneB>=3){ nextHint.style.display='none'; nextBtn.style.display='block'; } }
+
+const CARDS=[
+ {e:'😊',n:'开心',f:'玩得高兴、被表扬时会开心。开心时<b>笑一笑</b>，还能分享给好朋友！'},
+ {e:'😢',n:'难过',f:'东西丢了、被误会时会难过。难过时可以<b>哭一哭、说出来、找人抱抱</b>。'},
+ {e:'😠',n:'生气',f:'被抢东西时会生气。生气时先<b>深呼吸、数到十</b>，别动手打人。'},
+ {e:'😨',n:'害怕',f:'黑黑的、打雷时会害怕。害怕很正常，可以<b>找大人、开灯、抱抱娃娃</b>。'},
+];
+function renderA(){ const box=document.getElementById('ex-A');
+  box.innerHTML='<div class="orbit" id="orbit"></div><div class="factBox" id="factA">👆 点点看，每种心情怎么办～</div>';
+  const orbit=document.getElementById('orbit');
+  CARDS.forEach((p,i)=>{ const d=document.createElement('div'); d.className='planet'; d.dataset.i=i;
+    d.innerHTML=`<div class="pe">${p.e}</div><div class="pn">${p.n}</div>`;
+    d.onclick=()=>{ document.getElementById('factA').innerHTML=p.e+' <b>'+p.n+'</b>：'+p.f;
+      if(!d.dataset.seen){ d.dataset.seen='1'; d.classList.add('seen'); doneA++; document.getElementById('cntA').textContent=doneA;
+        if(doneA>=4) document.getElementById('factA').innerHTML='🎉 四种心情都认识啦！去右边答题吧～'; unlockGame(); } };
+    orbit.appendChild(d); });
+}
+const ROUNDS_B=[
+ {q:'生气的时候，先做什么最好？',opts:['深呼吸、数到十','打人','摔东西'],ans:0,cap:'深呼吸让自己冷静，再想办法。'},
+ {q:'难过的时候，可以？',opts:['说出来、找人抱抱','憋着不说','欺负别人'],ans:0,cap:'说出来、找人安慰，会好受很多。'},
+ {q:'各种各样的心情，是？',opts:['都很正常','不该有','坏事'],ans:0,cap:'每种心情都正常，认识它就好。'},
+];
+let idxB=0;
+function renderB(){ const box=document.getElementById('ex-B');
+  if(idxB>=ROUNDS_B.length){ box.innerHTML='<div class="seqBox">🎉 三题都答对啦！</div>'; return; }
+  const r=ROUNDS_B[idxB];
+  box.innerHTML=`<div class="progDots">${ROUNDS_B.map((_,i)=>`<div class="pd ${i<idxB?'done':''}"></div>`).join('')}</div>
+    <div class="seqQ">想一想～</div><div class="seqBox">${r.q}</div>
+    <div class="optRow" id="optRowB"></div><div class="roundCap" id="capB"></div>`;
+  const row=document.getElementById('optRowB');
+  r.opts.forEach((o,i)=>{ const b=document.createElement('div'); b.className='optBtn'; b.textContent=o;
+    b.onclick=()=>{ if(b.dataset.locked)return;
+      if(i===r.ans){ b.classList.add('right'); b.dataset.locked='1'; document.getElementById('capB').innerHTML='✅ '+r.cap;
+        doneB++; document.getElementById('cntB').textContent=doneB; unlockGame(); setTimeout(()=>{ idxB++; renderB(); },1300); }
+      else { b.classList.add('wrong'); setTimeout(()=>b.classList.remove('wrong'),400); document.getElementById('capB').textContent='🤔 想想什么办法既不伤人又让自己舒服～'; } };
+    row.appendChild(b); });
+}
+renderA(); renderB();
+
+const ITEMS=[
+ {key:'good',t:'深呼吸'},{key:'good',t:'说出来'},{key:'good',t:'找人抱抱'},
+ {key:'bad',t:'打人'},{key:'bad',t:'摔东西'},{key:'bad',t:'骂人'},
+];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+(function buildSort(){
+  const tray=document.getElementById('tray');
+  shuffle([...ITEMS]).forEach(it=>{ const d=document.createElement('div'); d.className='item'; d.dataset.k=it.key;
+    d.innerHTML=`<div class="itName">${it.t}</div>`; tray.appendChild(d); });
+  let active=null,ox=0,oy=0,placed=0; const total=ITEMS.length; const box=document.getElementById('g-round1');
+  const binAt=(x,y)=>[...box.querySelectorAll('.bin')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;});
+  box.querySelectorAll('.item').forEach(el=>el.addEventListener('pointerdown',e=>{ if(el.dataset.done)return;
+    active=el; const r=el.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top;
+    el.style.width=r.width+'px'; el.style.height=r.height+'px'; document.body.appendChild(el);
+    el.style.position='fixed'; el.style.zIndex=999; el.classList.add('dragging'); mv(e.clientX,e.clientY); e.preventDefault(); }));
+  function mv(x,y){ if(!active)return; active.style.left=(x-ox)+'px'; active.style.top=(y-oy)+'px';
+    box.querySelectorAll('.bin').forEach(b=>b.classList.remove('over')); const b=binAt(x,y); if(b)b.classList.add('over'); }
+  addEventListener('pointermove',e=>{if(active)mv(e.clientX,e.clientY);});
+  addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=null;
+    box.querySelectorAll('.bin').forEach(b=>b.classList.remove('over')); const bin=binAt(e.clientX,e.clientY);
+    const rst=()=>{el.classList.remove('dragging');['position','left','top','width','height','zIndex'].forEach(p=>el.style[p]='');};
+    if(bin&&bin.dataset.k===el.dataset.k){ el.dataset.done='1'; rst(); el.classList.add('placed'); bin.querySelector('.binDrop').appendChild(el); placed++;
+      if(placed===total) document.getElementById('r1next').style.display='block'; }
+    else { rst(); document.getElementById('tray').appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
+})();
+
+const QUIZ=[
+ {tag:'life',tl:'成长',ico:'😠',q:'很生气时，最好先？',opts:[['深呼吸冷静一下',1],['马上打人',0],['摔玩具',0]],fb:'深呼吸、数到十，先让自己冷静。'},
+ {tag:'life',tl:'成长',ico:'😢',q:'难过想哭，可以吗？',opts:[['可以，哭出来没关系',1],['不许哭',0],['憋着',0]],fb:'难过时哭一哭、说出来都可以。'},
+ {tag:'logic',tl:'逻辑',ico:'😨',q:'一个人在黑屋里害怕，怎么办？',opts:[['开灯、找大人',1],['一直哭不说',0],['吓自己',0]],fb:'开灯、找大人，害怕会慢慢消失。'},
+ {tag:'en',tl:'英语',ico:'🔤',q:'英语角："开心"用英语怎么说？',opts:[['happy',1],['sad',0],['fast',0]],fb:'happy 开心；sad 难过。'},
+];
+let qi=0; function startQuiz(){ document.getElementById('g-round1').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>成长 + 逻辑 + 英语</small>'; qi=0; renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; const tag=document.getElementById('qtag'); tag.className='qtag '+it.tag; tag.textContent=it.tl; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想～'; } }
+
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ saveBadge('emotion','😊','情绪小主人'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#ef8c3c','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
+</script>
+</body>
+</html>

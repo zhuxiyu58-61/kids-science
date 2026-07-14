@@ -159,6 +159,27 @@
     color:#a07c3e; font-size:12px; font-weight:800;}
   .cal-legend span{display:flex; align-items:center; gap:5px;}
   .cal-legend i{width:16px; height:16px; border-radius:6px; display:inline-block;}
+
+  /* 某天课程清单 */
+  .daysheet{position:fixed; inset:0; z-index:95; display:none; align-items:flex-end; justify-content:center; background:rgba(40,25,5,.45);}
+  .daysheet.on{display:flex;}
+  .daycard{background:#fff; border-radius:24px 24px 0 0; width:100%; max-width:560px; max-height:84vh; overflow-y:auto;
+    padding:16px 16px 26px; box-shadow:0 -10px 30px rgba(120,80,20,.3); animation:slideup .28s ease;}
+  @keyframes slideup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .daycard h3{margin:4px 0 2px; font-size:20px; font-weight:900; color:#7a4d17; text-align:center;}
+  .daycard .dsub{text-align:center; color:#a07c3e; font-weight:800; font-size:13px; margin-bottom:14px;}
+  .lrow{display:flex; align-items:center; gap:12px; background:#fff8ec; border-radius:16px; padding:11px 13px; margin-bottom:9px;
+    box-shadow:0 3px 8px rgba(150,100,30,.1); cursor:pointer; transition:transform .1s;}
+  .lrow:active{transform:scale(.98);}
+  .lrow.done{background:#eefaf0;}
+  .lrow .le{font-size:32px; width:40px; text-align:center; flex:none;}
+  .lrow .lb{flex:1; min-width:0;}
+  .lrow .ln{font-weight:900; font-size:16px; color:#5a4118;}
+  .lrow .lst{font-size:12px; font-weight:800; color:#b6842b; margin-top:1px;}
+  .lrow.done .lst{color:#2fa869;}
+  .lrow .lgo{background:linear-gradient(135deg,#ff9f43,#ff6a3d); color:#fff; font-weight:900; padding:9px 15px; border-radius:12px; font-size:14px; white-space:nowrap; flex:none;}
+  .lrow.done .lgo{background:#dff2e5; color:#2fa869;}
+  .dayclose{display:block; width:100%; margin-top:8px; border:none; background:#efe7d6; color:#7a4d17; font-weight:900; padding:13px; border-radius:14px; font-size:15px; cursor:pointer;}
 </style>
 </head>
 <body>
@@ -210,6 +231,16 @@
           <span><i style="background:#fff;opacity:.55"></i>后面的课</span>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- 某天的课程清单 -->
+  <div class="daysheet" id="daysheet">
+    <div class="daycard">
+      <h3 id="dayTitle"></h3>
+      <div class="dsub" id="daySub"></div>
+      <div id="dayList"></div>
+      <button class="dayclose" onclick="closeDay()">收起</button>
     </div>
   </div>
 
@@ -435,32 +466,43 @@ if(streak<1){ document.getElementById('chipStreak').style.opacity='.55'; }
 function fmt(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function addDays(s,n){const p=s.split('-').map(Number);return fmt(new Date(p[0],p[1]-1,p[2]+n));}
 const _now=new Date(), todayStr=fmt(_now);
+const PER_DAY=30; // 每天安排几课（想改多改少，改这一个数字就行）
 const bucket={}; const put=(ds,l)=>{(bucket[ds]||(bucket[ds]=[])).push(l);};
-/* 历史：已完成的课 → 按真实操作日期落到那两天，平均分成两半 */
-const doneList=ALL.filter(l=>isDone(l.id));
-doneList.sort((a,b)=>((badges[a.id].date||'')+'').localeCompare((badges[b.id].date||'')+''));
-const uniqD=[...new Set(doneList.map(l=>badges[l.id].date).filter(Boolean))].sort();
-let hd1,hd2;
-if(uniqD.length>=2){ hd1=uniqD[0]; hd2=uniqD[uniqD.length-1]; }
-else if(uniqD.length===1){ hd1=addDays(uniqD[0],-1); hd2=uniqD[0]; }
-else { hd1=addDays(todayStr,-2); hd2=addDays(todayStr,-1); }
-const half=Math.ceil(doneList.length/2);
-doneList.forEach((l,i)=>put(i<half?hd1:hd2,l));
-/* 未来：未完成的课 → 今天起每天一课（弹性：想多做可往后接） */
-let fk=0; ALL.forEach(l=>{ if(!isDone(l.id)){ put(addDays(todayStr,fk),l); fk++; } });
+/* 历史：已完成的课 → 按真实完成日期落位（她哪天做的就在哪天，今天做完的留今天） */
+ALL.forEach(l=>{ if(isDone(l.id)) put((badges[l.id]&&badges[l.id].date)||todayStr, l); });
+/* 未来：未完成的课 → 今天起每天 PER_DAY 课（弹性：想多做可往后接） */
+const undoneList=ALL.filter(l=>!isDone(l.id));
+undoneList.forEach((l,i)=> put(addDays(todayStr, Math.floor(i/PER_DAY)), l));
+const todayGroup=bucket[todayStr]||[];               // 今天这一天的所有课
+const todayTodo=todayGroup.filter(l=>!isDone(l.id));  // 今天还没上的
 
-const todayLesson=ALL.find(l=>l.id===currentId); // 第一个没完成的 = 今天这一课
-function cellTap(ds){ const L=bucket[ds]; if(!L||!L.length)return;
-  const t=L.find(l=>!isDone(l.id))||L[0]; location.href='lessons/'+t.id+'/index.html'; }
+/* 点日历某天 → 弹出这天的课程清单 */
+function openDay(ds){ const L=bucket[ds]; if(!L||!L.length) return;
+  const p=ds.split('-').map(Number); const isToday=ds===todayStr, isPast=ds<todayStr;
+  const doneN=L.filter(l=>isDone(l.id)).length;
+  document.getElementById('dayTitle').textContent=p[1]+'月'+p[2]+'日'+(isToday?' · 今天':'');
+  document.getElementById('daySub').textContent = isToday
+      ? `今天要上这 ${L.length} 节课 · 已完成 ${doneN}/${L.length}`
+      : isPast ? `这天上了 ${L.length} 节课，全部完成 ✓`
+      : `这天安排了 ${L.length} 节课（做完前面的就轮到这天）`;
+  document.getElementById('dayList').innerHTML = L.map(l=>{ const done=isDone(l.id);
+    return `<div class="lrow ${done?'done':''}" onclick="location.href='lessons/${l.id}/index.html'">`
+      +`<div class="le">${l.e}</div><div class="lb"><div class="ln">${l.n}</div>`
+      +`<div class="lst">${done?'✓ 已完成 · 点开可复习':'点这里去上这一课'}</div></div>`
+      +`<div class="lgo">${done?'复习':'开始 ▶'}</div></div>`; }).join('');
+  document.getElementById('daysheet').classList.add('on');
+}
+function closeDay(){ document.getElementById('daysheet').classList.remove('on'); }
+function cellTap(ds){ openDay(ds); }
 let calY=_now.getFullYear(), calM=_now.getMonth();
 function renderMonth(){
   document.getElementById('calLabel').textContent=calY+'年'+(calM+1)+'月';
   const wd=new Date(calY,calM,1).getDay(), dim=new Date(calY,calM+1,0).getDate();
   let html=''; for(let i=0;i<wd;i++) html+='<div class="cell empty"></div>';
   for(let d=1;d<=dim;d++){ const ds=fmt(new Date(calY,calM,d)); const L=bucket[ds]||[];
-    const done=L.length&&L.every(l=>isDone(l.id)), undone=L.find(l=>!isDone(l.id));
-    const isToday=ds===todayStr, isFuture=ds>todayStr&&!!undone;
-    const clickable=!!undone||(done&&L.length===1);
+    const done=L.length&&L.every(l=>isDone(l.id));
+    const isToday=ds===todayStr, isFuture=ds>todayStr;
+    const clickable=L.length>0;
     let cls='cell'; if(done)cls+=' done'; if(isToday)cls+=' today'; if(isFuture&&!isToday)cls+=' future'; if(clickable)cls+=' has';
     let inner='<div class="dnum">'+d+'</div>';
     if(L.length===1) inner+='<div class="cemo">'+L[0].e+'</div>';
@@ -476,10 +518,12 @@ function closeCal(){ document.getElementById('cal').classList.remove('on'); }
 
 /* 顶部入口卡 + 日历内今日横幅 */
 const today=document.getElementById('today'); const calToday=document.getElementById('calToday');
-if(todayLesson){
-  today.innerHTML=`<div class="te">📅</div><div class="tb"><div class="tk">📅 今日任务</div><div class="tt">今天这一课：${todayLesson.n}</div><div class="td">点开日历，把今天的一课做完就好～</div></div><div class="tgo">打开日历 ▶</div>`;
-  calToday.innerHTML=`<div class="cte">${todayLesson.e}</div><div class="ctb"><div class="ctk">🎯 今天要做</div><div class="ctt">${todayLesson.n}</div><div class="ctd">做完就打卡啦 · 想多做可以接着往后</div></div><div class="ctgo">开始 ▶</div>`;
-  calToday.onclick=()=>location.href='lessons/'+todayLesson.id+'/index.html';
+if(todayTodo.length){
+  const doneToday=todayGroup.length-todayTodo.length;
+  const names=todayTodo.slice(0,3).map(l=>l.n).join('、');
+  today.innerHTML=`<div class="te">📅</div><div class="tb"><div class="tk">📅 今日任务</div><div class="tt">今天要上 ${todayGroup.length} 节课</div><div class="td">点开日历，看看今天上哪些～</div></div><div class="tgo">打开日历 ▶</div>`;
+  calToday.innerHTML=`<div class="cte">📚</div><div class="ctb"><div class="ctk">🎯 今天要上 ${todayGroup.length} 节课（已完成 ${doneToday}）</div><div class="ctt">${names}</div><div class="ctd">点这里看今天的全部课程 →</div></div><div class="ctgo">查看 ▶</div>`;
+  calToday.onclick=()=>openDay(todayStr);
 }else{
   today.innerHTML=`<div class="te">📅</div><div class="tb"><div class="tk">📅 今日任务</div><div class="tt">今天的都做完啦！🎉</div><div class="td">看看日历上的打卡，或回地图回味任意一关～</div></div><div class="tgo">打开日历 ▶</div>`;
   calToday.innerHTML=`<div class="cte">🎉</div><div class="ctb"><div class="ctk">✨ 全部完成</div><div class="ctt">今天没有新课啦</div><div class="ctd">新的一批马上就来，明天再见～</div></div>`;
@@ -520,6 +564,7 @@ layout();
 addEventListener('resize', layout);
 if(location.hash==='#chest'){ const c=SEQ.find(s=>s.type==='chest'&&s.done)||SEQ.find(s=>s.type==='chest'); openChest(c); }
 if(location.hash.indexOf('cal')>=0) openCal();
+if(location.hash.indexOf('day')>=0){ openCal(); openDay(todayStr); }
 </script>
 </body>
 </html>

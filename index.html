@@ -398,37 +398,26 @@ SEQ.push({type:'final', done:allDone});
 let currentId=null;
 for(const l of ALL){ if(!isDone(l.id)){ currentId=l.id; break; } }
 
-/* ===== 布局：一个起点 → 多条主题支线（树形地图）===== */
+/* ===== 布局：枢纽式 —— 一个起点 → 各主题从主干分叉（鱼骨图）===== */
 const mapEl=document.getElementById('map');
 const svg=document.getElementById('trail');
 function layout(){
   const W=mapEl.clientWidth, small=W<420, cx=W*0.5;
-  const GAP=small?96:108;           // 支线内每课的竖向间距
-  const TOP=58;
-  const AMP=small?60:82;            // 支线离主干多远
-  const ZIG=small?26:34;            // 支线内轻微左右摆动
-  const nodes=[], branches=[];
+  const ROW=small?126:140;          // 主题节点竖向间距
+  const TOP=70;
+  const SIDE=small?70:96;           // 主题节点离主干多远
+  const nodes=[], links=[];
   let y=TOP;
   nodes.push({type:'start', x:cx, y}); const startY=y;
-  y+=GAP*0.95;
+  y+=ROW*0.9;
   REGIONS.forEach((r,k)=>{
-    const side=k%2===0?-1:1;                     // 左右交替分支
-    const junctionY=y;
-    const bx=cx+side*AMP;                         // 这条支线的中心列
-    const pts=[[cx,junctionY-GAP*0.55]];          // 从主干上引出
-    r.lessons.forEach((l,j)=>{
-      const lx=bx + side*((j%2)?ZIG:-ZIG*0.5);
-      const ly=junctionY + j*GAP;
-      nodes.push({type:'lesson', ...l, rc:r.color, region:r.name, side, ribbon:j===0?r:null, jY:junctionY, x:lx, y:ly});
-      pts.push([lx,ly]);
-    });
-    const chestDone=r.lessons.every(l=>isDone(l.id));
-    const cyy=junctionY + r.lessons.length*GAP;
-    const chx=cx+side*(AMP*0.5);
-    nodes.push({type:'chest', rc:r.color, ico:r.chest, region:r.name, gift:r.gift, done:chestDone, x:chx, y:cyy});
-    pts.push([chx,cyy]); pts.push([cx,cyy+GAP*0.5]);
-    branches.push({color:r.color, pts});
-    y=cyy+GAP;
+    const side=k%2===0?-1:1;                     // 左右交替
+    const nx=cx+side*SIDE;
+    const total=r.lessons.length, done=r.lessons.filter(l=>isDone(l.id)).length;
+    const hasCur=r.lessons.some(l=>l.id===currentId);
+    nodes.push({type:'region', k, r, done, total, allDone:done===total, hasCur, x:nx, y});
+    links.push({color:r.color, x1:cx, y1:y, x2:nx, y2:y});   // 主干→主题 的横向分叉
+    y+=ROW;
   });
   const allDoneNow=ALL.every(l=>isDone(l.id));
   nodes.push({type:'final', done:allDoneNow, x:cx, y}); const finalY=y;
@@ -436,38 +425,29 @@ function layout(){
   mapEl.style.height=H+'px';
   svg.setAttribute('viewBox',`0 0 ${W} ${H}`); svg.setAttribute('width',W); svg.setAttribute('height',H);
 
-  // 主干（棕色）+ 每条支线用该主题色
-  let paths=`<path d="M${cx} ${startY} L${cx} ${finalY}" fill="none" stroke="#c79a5f" stroke-width="8" stroke-linecap="round" stroke-dasharray="2 17" opacity=".65"/>`;
-  branches.forEach(b=>{ const dd=b.pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
-    paths+=`<path d="${dd}" fill="none" stroke="${b.color}" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 15" opacity=".55"/>`; });
+  // 主干（棕色竖线）+ 每条分叉用该主题色
+  let paths=`<path d="M${cx} ${startY} L${cx} ${finalY}" fill="none" stroke="#c79a5f" stroke-width="9" stroke-linecap="round" stroke-dasharray="2 16" opacity=".7"/>`;
+  links.forEach(b=>{ paths+=`<path d="M${cx} ${b.y1.toFixed(1)} L${b.x2.toFixed(1)} ${b.y2.toFixed(1)}" fill="none" stroke="${b.color}" stroke-width="9" stroke-linecap="round" stroke-dasharray="2 14" opacity=".7"/>`; });
   svg.innerHTML=paths;
 
   // 清掉旧节点，重画
   [...mapEl.querySelectorAll('.node,.ribbon')].forEach(n=>n.remove());
   nodes.forEach(s=>{
-    if(s.ribbon){ const rb=document.createElement('div'); rb.className='ribbon';
-      rb.style.setProperty('--rc',s.rc);
-      rb.style.left=cx+'px'; rb.style.top=(s.jY-GAP*0.52)+'px';
-      rb.innerHTML=`${s.ribbon.ico} ${s.ribbon.name}<small>探险区</small>`;
-      mapEl.appendChild(rb); }
     const el=document.createElement('div'); el.className='node'; el.style.left=s.x+'px'; el.style.top=s.y+'px';
-    el.style.setProperty('--rc', s.rc||'#c79a5f');
-    if(s.type==='lesson'){
-      if(isDone(s.id)) el.classList.add('done');
-      if(s.id===currentId) el.classList.add('here');
-      el.innerHTML=`${s.id===currentId?'<div class="hereFlag">🧭 你在这里</div>':''}
-        <div class="disc">${s.e}</div><div class="nm">${s.n}</div>`;
-      el.onclick=()=>location.href=`lessons/${s.id}/index.html`;
-    } else if(s.type==='chest'){
-      el.classList.add('big','chest'); if(s.done) el.classList.add('open'); else el.classList.add('locked');
-      el.innerHTML=`<div class="disc">${s.done?'🎁':'📦'}</div>
-        <div class="nm">${s.region}</div><div class="nsub">${s.done?'✨ 点开领宝物':'集齐徽章开启'}</div>`;
-      el.onclick=()=>{ if(s.done) openChest(s); else bump(el); };
+    if(s.type==='region'){
+      el.classList.add('big'); el.style.setProperty('--rc', s.allDone? '#f5b731' : s.r.color);
+      if(s.allDone) el.classList.add('done');
+      if(s.hasCur) el.classList.add('here');
+      el.innerHTML=`${s.hasCur?'<div class="hereFlag">🧭 现在这里</div>':''}
+        <div class="disc">${s.allDone?'🎁':s.r.ico}</div>
+        <div class="nm">${s.r.name}</div>
+        <div class="nsub">${s.allDone? '✨ 全通关·点开领宝' : '已完成 '+s.done+'/'+s.total}</div>`;
+      el.onclick=()=>openRegion(s.k);
     } else if(s.type==='start'){
-      el.classList.add('big');
-      el.innerHTML=`<div class="disc" style="box-shadow:0 8px 18px rgba(120,80,20,.25), inset 0 0 0 5px #ff9f43">🏁</div><div class="nm">出发！</div><div class="nsub">挑一条主题支线</div>`;
+      el.classList.add('big'); el.style.setProperty('--rc','#ff9f43');
+      el.innerHTML=`<div class="disc" style="box-shadow:0 8px 18px rgba(120,80,20,.25), inset 0 0 0 5px #ff9f43">🏁</div><div class="nm">出发！</div><div class="nsub">挑一个主题开始</div>`;
     } else { // final
-      el.classList.add('big'); if(!s.done) el.classList.add('locked');
+      el.classList.add('big'); el.style.setProperty('--rc', s.done?'#f5b731':'#c79a5f'); if(!s.done) el.classList.add('locked');
       el.innerHTML=`<div class="disc" style="box-shadow:0 0 22px ${s.done?'rgba(245,183,49,.7)':'rgba(120,80,20,.2)'}, inset 0 0 0 5px ${s.done?'#f5b731':'#c79a5f'}">${s.done?'🏆':'🗝️'}</div>
         <div class="nm">${s.done?'大宝藏！':'终极宝藏'}</div><div class="nsub">${s.done?'全部通关啦！':'集齐所有宝箱解锁'}</div>`;
       el.onclick=()=>{ if(!s.done) bump(el); else burst(); };
@@ -475,6 +455,21 @@ function layout(){
     mapEl.appendChild(el);
   });
 }
+/* 点主题 → 弹出该区课程清单 */
+function openRegion(k){ const r=REGIONS[k], L=r.lessons; const done=L.filter(l=>isDone(l.id)).length; curDay=null;
+  document.getElementById('dayTitle').textContent=r.ico+' '+r.name;
+  document.getElementById('daySub').textContent = done===L.length
+    ? `全区 ${L.length} 节全部完成 ✓ · 宝物：${r.gift.name}`
+    : `共 ${L.length} 节 · 已完成 ${done}/${L.length}`;
+  let html='';
+  if(done===L.length) html+=`<div class="lrow done" onclick="openChestByRegion(${k})"><div class="le">${r.gift.e}</div><div class="lb"><div class="ln">领取宝物：${r.gift.name}</div><div class="lst">全区通关啦，点开领奖～</div></div><div class="lgo">领取</div></div>`;
+  html+=L.map(l=>{ const dn=isDone(l.id);
+    return `<div class="lrow ${dn?'done':''}" onclick="goLessonR('${l.id}',${k})"><div class="le">${l.e}</div><div class="lb"><div class="ln">${l.n}</div><div class="lst">${dn?'✓ 已完成 · 点开可复习':'点这里去上这一课'}</div></div><div class="lgo">${dn?'复习':'开始 ▶'}</div></div>`; }).join('');
+  document.getElementById('dayList').innerHTML=html;
+  document.getElementById('daysheet').classList.add('on');
+}
+function openChestByRegion(k){ const r=REGIONS[k]; closeDay(); openChest({region:r.name, gift:r.gift, done:true}); }
+function goLessonR(id,k){ try{ localStorage.removeItem('kidspark_ret'); localStorage.setItem('kidspark_retR', k); }catch(e){} location.href='lessons/'+id+'/index.html'; }
 function bump(el){ el.animate([{transform:'translate(-50%,-50%) scale(1)'},{transform:'translate(-50%,-50%) scale(1.08)'},{transform:'translate(-50%,-50%) scale(1)'}],{duration:280}); }
 
 /* ===== HUD + 战利品架 ===== */
@@ -522,7 +517,7 @@ function openDay(ds){ const L=bucket[ds]; if(!L||!L.length) return; curDay=ds;
   document.getElementById('daysheet').classList.add('on');
 }
 /* 进课前记住在看哪天，做完回来自动弹回这天清单 */
-function goLesson(id){ try{ if(curDay) localStorage.setItem('kidspark_ret', curDay); }catch(e){} location.href='lessons/'+id+'/index.html'; }
+function goLesson(id){ try{ localStorage.removeItem('kidspark_retR'); if(curDay) localStorage.setItem('kidspark_ret', curDay); }catch(e){} location.href='lessons/'+id+'/index.html'; }
 function closeDay(){ document.getElementById('daysheet').classList.remove('on'); }
 function calFromDay(){ closeDay(); openCal(); }
 function cellTap(ds){ openDay(ds); }
@@ -563,8 +558,11 @@ if(todayTodo.length){
   calToday.style.cursor='default';
   today.onclick=openCal;
 }
-/* 做完一节课回来 → 自动弹回刚才在看的那天清单 */
-try{ const ret=localStorage.getItem('kidspark_ret'); if(ret){ localStorage.removeItem('kidspark_ret'); if(bucket[ret]&&bucket[ret].length) openDay(ret); } }catch(e){}
+/* 做完一节课回来 → 自动弹回刚才在看的清单（日历那天 / 或某主题） */
+try{ const ret=localStorage.getItem('kidspark_ret'), retR=localStorage.getItem('kidspark_retR');
+  if(ret){ localStorage.removeItem('kidspark_ret'); if(bucket[ret]&&bucket[ret].length) openDay(ret); }
+  else if(retR!=null){ localStorage.removeItem('kidspark_retR'); const kk=+retR; if(REGIONS[kk]) openRegion(kk); }
+}catch(e){}
 
 /* 宝箱彩蛋 */
 function openChest(s){

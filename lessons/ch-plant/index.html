@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>植物大挑战 · 知识乐园</title>
+<style>
+  :root{ --acc:#3fa34d; --acc2:#2e8b47; --bg1:#f0fbe8; --bg2:#d9f2c8; --ink:#2c4a22; --ink2:#5e7d52; --card:#fff; --shadow:0 10px 30px rgba(60,120,50,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,24px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; align-items:center; justify-content:center; padding:6px 16px 16px; text-align:center;} .scene.active{display:flex;}
+  .kico{font-size:96px; animation:bob 2.2s ease-in-out infinite;} @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .card{background:var(--card); border-radius:24px; padding:22px 26px; box-shadow:var(--shadow); max-width:600px; width:100%;}
+  .introTxt{font-size:clamp(15px,2.2vw,19px); font-weight:700; line-height:1.7;} .introTxt b{color:var(--acc);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 40px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,var(--acc),var(--acc2)); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:18px;} .bigbtn:active{transform:scale(.95);}
+  .prog{display:flex; align-items:center; justify-content:space-between; width:100%; max-width:600px; margin-bottom:10px; font-weight:900; color:var(--ink2);}
+  .stars{font-size:15px; letter-spacing:0;}
+  .qtag{display:inline-block; font-size:12px; font-weight:900; padding:3px 10px; border-radius:10px; margin-bottom:8px; background:#e6f6da; color:var(--acc2);}
+  .qico{font-size:48px;} .qtext{font-size:20px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qopts{display:flex; flex-direction:column; gap:11px;} .qopt{border:3px solid #cdeabf; background:#f4fbef; border-radius:15px; padding:14px; font-size:17px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt:active{transform:scale(.98);}
+  .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;}
+  .medal{font-size:104px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  h2{margin:6px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,var(--acc),var(--acc2)); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 10px;}
+  .bigstars{font-size:34px; letter-spacing:3px; margin:6px 0 4px;}
+  .resTxt{color:var(--ink2); font-weight:700; font-size:15px; margin:6px 0 16px;}
+  .fbtns{display:flex; gap:12px; justify-content:center;} .fbtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--acc); color:#fff;} .fb2{background:#e6f6da; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">🏆 植物大挑战<small>植物花园 · 高阶挑战</small></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🏆</div>
+    <div class="card"><div class="introTxt">这是<b>植物花园</b>的大挑战！把你学过的<b>光合作用、传粉、年轮、蘑菇、食虫植物、落叶…</b>都用上。答对 <b>8 道</b>就能拿下【<b>植物挑战王</b>】徽章。<br>第一次就答对才得 ⭐，看看你能拿几颗星！</div>
+      <button class="bigbtn" onclick="startQuiz()">接受挑战 ▶</button></div>
+  </section>
+
+  <section class="scene" id="s-quiz">
+    <div class="prog"><span id="pnum"></span><span class="stars" id="pstars"></span></div>
+    <div class="card"><div class="qtag" id="qtag">挑战</div><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="card"><div class="medal" id="medal">🏅</div><h2 id="fhead">挑战成功！</h2>
+      <div class="medalName">🎖 植物挑战王</div>
+      <div class="bigstars" id="bigstars"></div><div class="resTxt" id="resTxt"></div>
+      <div class="fbtns"><button class="fb2" onclick="location.reload()">再挑战一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+const BADGE={id:'ch-plant', emoji:'🏆', name:'植物挑战王'};
+const QUIZ=[{"ico":"🌞","q":"植物\"做饭\"（光合作用）必须要有？","opts":[["阳光",1],["音乐",0],["巧克力",0]],"fb":"阳光是植物做饭的\"火\"。"},{"ico":"🎁","q":"植物做完饭放出来送给我们的是？","opts":[["氧气",1],["二氧化碳",0],["棉花糖",0]],"fb":"植物送氧气，我们呼吸全靠它。"},{"ico":"🐝","q":"蜜蜂钻花丛帮花做的大事是？","opts":[["传粉",1],["浇水",0],["唱歌",0]],"fb":"传了粉花才能结果。"},{"ico":"🪵","q":"树桩上一圈圈的年轮，一圈代表？","opts":[["一年",1],["一天",0],["一小时",0]],"fb":"数圈数就知道树的年龄。"},{"ico":"🍄","q":"蘑菇是植物吗？","opts":[["不是，是真菌",1],["是植物",0],["是动物",0]],"fb":"它没有叶绿素，属于真菌。"},{"ico":"🪤","q":"捕蝇草猪笼草吃虫子，是因为？","opts":[["土壤贫瘠要补营养",1],["讨厌虫子",0],["肚子咕咕叫",0]],"fb":"抓虫是为了补营养加餐。"},{"ico":"🍂","q":"秋天叶子变黄，是因为？","opts":[["叶绿素退了黄色素露出来",1],["被晒黄了",0],["刷了油漆",0]],"fb":"黄色素一直在，绿色退了才露脸。"},{"ico":"🌲","q":"树冬天落叶是为了？","opts":[["省能量好过冬",1],["换发型",0],["生气了",0]],"fb":"落叶是过冬的聪明办法。"}];
+
+let qi=0, wrongThis=0, stars=0;
+function show(n){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+n).classList.add('active'); }
+function startQuiz(){ qi=0; stars=0; show('quiz'); renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; wrongThis=0;
+  document.getElementById('pnum').textContent=`第 ${qi+1} / ${QUIZ.length} 关`;
+  document.getElementById('pstars').textContent='⭐'.repeat(stars)+'☆'.repeat(QUIZ.length-stars);
+  document.getElementById('qico').textContent=it.ico; document.getElementById('qtext').textContent=it.q;
+  const box=document.getElementById('qopts'); box.innerHTML=''; document.getElementById('qfb').textContent='';
+  shuffle(it.opts.slice()).forEach(([l,ok])=>{ const b=document.createElement('div'); b.className='qopt'; b.textContent=l; b.onclick=()=>ans(b,ok,it.fb); box.appendChild(b); });
+}
+function ans(el,ok,fb){ const fbEl=document.getElementById('qfb');
+  if(ok){ el.classList.add('right'); document.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none');
+    if(wrongThis===0) stars++;
+    fbEl.style.color='#2ba36a'; fbEl.innerHTML='✅ '+fb;
+    setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else finish(); },1400);
+  } else { wrongThis++; el.classList.add('wrong'); el.style.pointerEvents='none'; fbEl.style.color='#e06060'; fbEl.textContent='🤔 再想想～'; }
+}
+function finish(){ show('finish');
+  document.getElementById('bigstars').textContent='⭐'.repeat(stars)+'☆'.repeat(QUIZ.length-stars);
+  document.getElementById('resTxt').textContent = stars===QUIZ.length? '太厉害啦！全部一次答对，满星通关！🎉' : `你拿到了 ${stars} / ${QUIZ.length} 颗星，很棒！再挑战一次能拿满星哦～`;
+  saveBadge(BADGE.id,BADGE.emoji,BADGE.name); celebrate();
+}
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#3fa34d','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:140},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<240)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash==='#quiz') startQuiz();
+</script>
+</body>
+</html>

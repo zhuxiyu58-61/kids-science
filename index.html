@@ -385,6 +385,46 @@ const REGIONS=[
      {id:'askhelp',    e:'🤗', n:'说出来会好受', bn:'暖心小天使'},
      {id:'ch-heart', e:'🏆', n:'情绪大挑战', bn:'情绪挑战王', boss:true},
    ]},
+  {name:'植物花园', ico:'🌷', color:'#3fa34d', chest:'🌼', gift:{e:'🌻', name:'向日葵金花'},
+   lessons:[
+     {id:'sunshine',   e:'🌞', n:'阳光做饭',     bn:'光合小厨师'},
+     {id:'flower',     e:'🌸', n:'花和蜜蜂',     bn:'传粉小蜜蜂'},
+     {id:'rings',      e:'🪵', n:'树的年轮',     bn:'年轮小侦探'},
+     {id:'mushroom',   e:'🍄', n:'蘑菇不是植物', bn:'真菌小专家'},
+     {id:'trap',       e:'🪤', n:'会吃虫的植物', bn:'食虫植物观察员'},
+     {id:'autumnleaf', e:'🍂', n:'叶子为什么变黄', bn:'落叶小博士'},
+     {id:'ch-plant', e:'🏆', n:'植物大挑战', bn:'植物挑战王', boss:true},
+   ]},
+  {name:'语文诗词园', ico:'📜', color:'#d24a43', chest:'🏮', gift:{e:'🖌️', name:'神笔小毛笔'},
+   lessons:[
+     {id:'hanzi',    e:'✍️', n:'象形字的秘密', bn:'汉字小神探'},
+     {id:'idiom',    e:'🦊', n:'成语故事会',   bn:'成语小达人'},
+     {id:'antonym',  e:'🔁', n:'反义词朋友',   bn:'反义词高手'},
+     {id:'measure',  e:'📏', n:'量词点点名',   bn:'量词小管家'},
+     {id:'poem',     e:'🍃', n:'古诗里的四季', bn:'小小诗人'},
+     {id:'metaphor', e:'🌙', n:'比喻句魔法',   bn:'比喻小作家'},
+     {id:'ch-chinese', e:'🏆', n:'语文大挑战', bn:'语文挑战王', boss:true},
+   ]},
+  {name:'美食科学厨房', ico:'🍳', color:'#e8842c', chest:'🍱', gift:{e:'🍯', name:'魔法蜂蜜罐'},
+   lessons:[
+     {id:'rice',     e:'🍚', n:'大米的旅行',     bn:'米饭小侦探'},
+     {id:'bread',    e:'🍞', n:'面包为什么松软', bn:'发酵小面点师'},
+     {id:'fridge',   e:'🧊', n:'冰箱为什么保鲜', bn:'保鲜小管家'},
+     {id:'taste',    e:'👅', n:'酸甜苦辣咸',     bn:'味觉小美食家'},
+     {id:'eggmagic', e:'🥚', n:'鸡蛋变魔术',     bn:'鸡蛋魔术师'},
+     {id:'preserve', e:'🫙', n:'食物保存的智慧', bn:'保存小能手'},
+     {id:'ch-food', e:'🏆', n:'美食大挑战', bn:'美食挑战王', boss:true},
+   ]},
+  {name:'数学勇士营', ico:'⚖️', color:'#2b7de9', chest:'🎖️', gift:{e:'💎', name:'智慧蓝宝石'},
+   lessons:[
+     {id:'backward',   e:'🔙', n:'倒推还原',   bn:'倒推小神探'},
+     {id:'cycle',      e:'🔄', n:'周期问题',   bn:'周期小达人'},
+     {id:'balance',    e:'⚖️', n:'等量代换',   bn:'代换小天才'},
+     {id:'evenup',     e:'🤝', n:'移多补少',   bn:'匀一匀小能手'},
+     {id:'matchstick', e:'🥢', n:'火柴棒游戏', bn:'火柴棒魔术师'},
+     {id:'sumdiff',    e:'➕', n:'和差问题',   bn:'和差小勇士'},
+     {id:'ch-math2', e:'🏆', n:'勇士大挑战', bn:'数学勇士王', boss:true},
+   ]},
 ];
 
 /* ===== 读进度 ===== */
@@ -420,7 +460,7 @@ let currentId=null;
 for(const l of ALL){ if(!isDone(l.id)){ currentId=l.id; break; } }
 
 /* 课程 → 主题key（给今日大挑战按当天涉及的主题出题）*/
-const REGION_KEYS=['nature','art','world','bio','game','logic','space','math','animal','tech','life','heart'];
+const REGION_KEYS=['nature','art','world','bio','game','logic','space','math','animal','tech','life','heart','plant','chinese','food','math2'];
 const L2R={}; REGIONS.forEach((r,k)=> r.lessons.forEach(l=> L2R[l.id]=REGION_KEYS[k]||'x'));
 
 /* ===== 布局：枢纽式 —— 一个起点 → 各主题从主干分叉（鱼骨图）===== */

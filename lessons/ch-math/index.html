@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>奥数大挑战 · 知识乐园</title>
+<style>
+  :root{ --acc:#2b7de9; --acc2:#1a5bb0; --bg1:#e9f2ff; --bg2:#bcd8fb; --ink:#123a63; --ink2:#456a90; --card:#fff; --shadow:0 10px 30px rgba(60,60,90,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,24px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; align-items:center; justify-content:center; padding:6px 16px 16px; text-align:center;} .scene.active{display:flex;}
+  .kico{font-size:96px; animation:bob 2.2s ease-in-out infinite;} @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .card{background:var(--card); border-radius:24px; padding:22px 26px; box-shadow:var(--shadow); max-width:600px; width:100%;}
+  .introTxt{font-size:clamp(15px,2.2vw,19px); font-weight:700; line-height:1.7;} .introTxt b{color:var(--acc);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 40px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,var(--acc),var(--acc2)); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:18px;} .bigbtn:active{transform:scale(.95);}
+  .prog{display:flex; align-items:center; justify-content:space-between; width:100%; max-width:600px; margin-bottom:10px; font-weight:900; color:var(--ink2);}
+  .stars{font-size:15px; letter-spacing:0;}
+  .qtag{display:inline-block; font-size:12px; font-weight:900; padding:3px 10px; border-radius:10px; margin-bottom:8px; background:#eef0f6; color:var(--acc2);}
+  .qico{font-size:48px;} .qtext{font-size:20px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qopts{display:flex; flex-direction:column; gap:11px;} .qopt{border:3px solid #e3e6ef; background:#f7f8fc; border-radius:15px; padding:14px; font-size:17px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt:active{transform:scale(.98);}
+  .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;}
+  .medal{font-size:104px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  h2{margin:6px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,var(--acc),var(--acc2)); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 10px;}
+  .bigstars{font-size:34px; letter-spacing:3px; margin:6px 0 4px;}
+  .resTxt{color:var(--ink2); font-weight:700; font-size:15px; margin:6px 0 16px;}
+  .fbtns{display:flex; gap:12px; justify-content:center;} .fbtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--acc); color:#fff;} .fb2{background:#eef0f6; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">🏆 奥数大挑战<small>数学奇兵 · 高阶挑战</small></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🏆</div>
+    <div class="card"><div class="introTxt">这是<b>数学奇兵</b>的大挑战！题目把<b>凑十速算、植树问题、鸡兔同笼、年龄、搭配、高斯求和…</b>全揉在一起，要算一算。答对 <b>8 道</b>就能拿下【<b>奥数挑战王</b>】徽章。<br>第一次就答对才得 ⭐，看看你能拿几颗星！</div>
+      <button class="bigbtn" onclick="startQuiz()">接受挑战 ▶</button></div>
+  </section>
+
+  <section class="scene" id="s-quiz">
+    <div class="prog"><span id="pnum"></span><span class="stars" id="pstars"></span></div>
+    <div class="card"><div class="qtag" id="qtag">挑战</div><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="card"><div class="medal" id="medal">🏅</div><h2 id="fhead">挑战成功！</h2>
+      <div class="medalName">🎖 奥数挑战王</div>
+      <div class="bigstars" id="bigstars"></div><div class="resTxt" id="resTxt"></div>
+      <div class="fbtns"><button class="fb2" onclick="location.reload()">再挑战一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+const BADGE={id:'ch-math', emoji:'🔢', name:'奥数挑战王'};
+const QUIZ=[
+ {ico:'🧮',q:'先凑十再算：8 + 2 + 7 = ?',opts:[['17',1],['16',0],['18',0]],fb:'8+2=10，再+7=17。'},
+ {ico:'🌳',q:'一条路两端都种，分成 5 段，要几棵树？',opts:[['6 棵',1],['5 棵',0],['4 棵',0]],fb:'棵数 = 段数 + 1 = 6。'},
+ {ico:'🐔',q:'笼子里共 3 个头、10 条腿，有几只兔？',opts:[['2 只',1],['1 只',0],['3 只',0]],fb:'全当鸡=6条腿，多出 4 条 ÷2 = 2 只兔。'},
+ {ico:'🎂',q:'姐姐 8 岁、妹妹 5 岁，10 年后相差几岁？',opts:[['3 岁',1],['13 岁',0],['30 岁',0]],fb:'年龄差永远不变，还是 3 岁。'},
+ {ico:'👕',q:'2 件上衣配 3 条裤子，能搭几套？',opts:[['6 套',1],['5 套',0],['8 套',0]],fb:'2 × 3 = 6 套（搭配用乘法）。'},
+ {ico:'🔢',q:'1 一直加到 10，一共是多少？',opts:[['55',1],['50',0],['45',0]],fb:'首尾配对：5 对 × 11 = 55。'},
+ {ico:'💯',q:'凑整十再算：19 + 6 = ?',opts:[['25',1],['24',0],['26',0]],fb:'19+1=20，再+5=25。'},
+ {ico:'🌲',q:'一排 4 棵树，中间有几个间隔？',opts:[['3 个',1],['4 个',0],['5 个',0]],fb:'间隔 = 棵数 − 1 = 3。'},
+];
+
+let qi=0, wrongThis=0, stars=0;
+function show(n){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+n).classList.add('active'); }
+function startQuiz(){ qi=0; stars=0; show('quiz'); renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; wrongThis=0;
+  document.getElementById('pnum').textContent=`第 ${qi+1} / ${QUIZ.length} 关`;
+  document.getElementById('pstars').textContent='⭐'.repeat(stars)+'☆'.repeat(QUIZ.length-stars);
+  document.getElementById('qico').textContent=it.ico; document.getElementById('qtext').textContent=it.q;
+  const box=document.getElementById('qopts'); box.innerHTML=''; document.getElementById('qfb').textContent='';
+  it.opts.forEach(([l,ok])=>{ const b=document.createElement('div'); b.className='qopt'; b.textContent=l; b.onclick=()=>ans(b,ok,it.fb); box.appendChild(b); });
+}
+function ans(el,ok,fb){ const fbEl=document.getElementById('qfb');
+  if(ok){ el.classList.add('right'); document.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none');
+    if(wrongThis===0) stars++;
+    fbEl.style.color='#2ba36a'; fbEl.innerHTML='✅ '+fb;
+    setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else finish(); },1400);
+  } else { wrongThis++; el.classList.add('wrong'); el.style.pointerEvents='none'; fbEl.style.color='#e06060'; fbEl.textContent='🤔 再想想～'; }
+}
+function finish(){ show('finish');
+  document.getElementById('bigstars').textContent='⭐'.repeat(stars)+'☆'.repeat(QUIZ.length-stars);
+  document.getElementById('resTxt').textContent = stars===QUIZ.length? '太厉害啦！全部一次答对，满星通关！🎉' : `你拿到了 ${stars} / ${QUIZ.length} 颗星，很棒！再挑战一次能拿满星哦～`;
+  saveBadge(BADGE.id,BADGE.emoji,BADGE.name); celebrate();
+}
+function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
+function celebrate(){ const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#2b7de9','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:140},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<240)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash==='#quiz') startQuiz();
+</script>
+</body>
+</html>

@@ -271,6 +271,7 @@ const REGIONS=[
      {id:'stars',    e:'✨', n:'星空星座',     bn:'星空观察员'},
      {id:'static',   e:'⚡', n:'静电',         bn:'静电小博士'},
      {id:'shadow',   e:'🌑', n:'光和影子',     bn:'影子小侦探'},
+     {id:'ch-nature', e:'🏆', n:'自然大挑战', bn:'自然挑战王', boss:true},
    ]},
   {name:'艺术城堡', ico:'🎨', color:'#b58bff', chest:'🎭', gift:{e:'🎼', name:'魔法乐谱'},
    lessons:[
@@ -280,6 +281,7 @@ const REGIONS=[
      {id:'masterpiece',e:'🖼️', n:'名画里的故事',   bn:'小小艺术侦探'},
      {id:'rhythm',     e:'🥁', n:'节奏和拍子',     bn:'节奏小达人'},
      {id:'shapes',     e:'🔺', n:'形状和线条的心情', bn:'形状小侦探'},
+     {id:'ch-art', e:'🏆', n:'艺术大挑战', bn:'艺术挑战王', boss:true},
    ]},
   {name:'环球探险区', ico:'🧭', color:'#ff9f43', chest:'🧳', gift:{e:'🗺️', name:'古老藏宝图'},
    lessons:[
@@ -290,6 +292,7 @@ const REGIONS=[
      {id:'volcano',   e:'🌋', n:'火山喷发',     bn:'火山探险家'},
      {id:'seasons',   e:'🍂', n:'四季怎么来',   bn:'四季小博士'},
      {id:'invention', e:'🏮', n:'四大发明',     bn:'发明小达人'},
+     {id:'ch-world', e:'🏆', n:'环球大挑战', bn:'环球挑战王', boss:true},
    ]},
   {name:'生命实验室', ico:'🧬', color:'#35c98a', chest:'🔬', gift:{e:'🧪', name:'生命结晶'},
    lessons:[
@@ -300,6 +303,7 @@ const REGIONS=[
      {id:'dino',     e:'🦕', n:'恐龙时代',   bn:'恐龙探险家'},
      {id:'germs',    e:'🦠', n:'细菌和病毒', bn:'健康小卫士'},
      {id:'teeth',    e:'🦷', n:'牙齿的秘密', bn:'牙齿小卫士'},
+     {id:'ch-bio', e:'🏆', n:'生命大挑战', bn:'生命挑战王', boss:true},
    ]},
   {name:'游戏工坊', ico:'🎮', color:'#e05bb5', chest:'👾', gift:{e:'🕹️', name:'黄金手柄'},
    lessons:[
@@ -309,6 +313,7 @@ const REGIONS=[
      {id:'game-level',    e:'🗺️', n:'关卡怎么设计', bn:'关卡设计师'},
      {id:'game-ai',       e:'🤖', n:'电脑敌人',     bn:'AI训练师'},
      {id:'game-audio',    e:'🎧', n:'游戏音效',     bn:'音效设计师'},
+     {id:'ch-game', e:'🏆', n:'游戏大挑战', bn:'游戏挑战王', boss:true},
    ]},
   {name:'智慧森林', ico:'🦉', color:'#a97c3a', chest:'🧩', gift:{e:'🔑', name:'智慧钥匙'},
    lessons:[
@@ -318,6 +323,7 @@ const REGIONS=[
      {id:'countshapes', e:'🔺', n:'数图形',         bn:'数图形高手'},
      {id:'queue',       e:'🧍', n:'排队问题',       bn:'排队小专家'},
      {id:'maze',        e:'🗺️', n:'走迷宫和一笔画', bn:'迷宫探险家'},
+     {id:'ch-logic', e:'🏆', n:'智慧大挑战', bn:'智慧挑战王', boss:true},
    ]},
   {name:'太空宇宙站', ico:'🚀', color:'#6c5ce7', chest:'🛸', gift:{e:'🌌', name:'星河宝石'},
    lessons:[
@@ -327,6 +333,7 @@ const REGIONS=[
      {id:'lunar',     e:'🌕', n:'月球探秘',       bn:'月球探险家'},
      {id:'blackhole', e:'🕳️', n:'神秘的黑洞',     bn:'黑洞探险家'},
      {id:'comet',     e:'☄️', n:'流星和彗星',     bn:'追星达人'},
+     {id:'ch-space', e:'🏆', n:'太空大挑战', bn:'太空挑战王', boss:true},
    ]},
   {name:'数学奇兵', ico:'🔢', color:'#2b7de9', chest:'🧮', gift:{e:'🏅', name:'奥数金牌'},
    lessons:[
@@ -336,6 +343,7 @@ const REGIONS=[
      {id:'age',           e:'🎂', n:'年龄问题',   bn:'年龄小侦探'},
      {id:'combo',         e:'👕', n:'搭配问题',   bn:'搭配小能手'},
      {id:'gauss',         e:'🔢', n:'高斯巧算',   bn:'高斯小天才'},
+     {id:'ch-math', e:'🏆', n:'奥数大挑战', bn:'奥数挑战王', boss:true},
    ]},
   {name:'动物王国', ico:'🦁', color:'#0ea5a5', chest:'🦁', gift:{e:'👑', name:'百兽之冠'},
    lessons:[
@@ -345,6 +353,7 @@ const REGIONS=[
      {id:'migration',   e:'🦅', n:'动物大搬家',   bn:'迁徙观察员'},
      {id:'hibernate',   e:'🐻', n:'谁在冬眠',     bn:'冬眠小专家'},
      {id:'superpower',  e:'🦇', n:'动物超能力',   bn:'超能观察员'},
+     {id:'ch-animal', e:'🏆', n:'动物大挑战', bn:'动物挑战王', boss:true},
    ]},
   {name:'科技发明馆', ico:'🔧', color:'#4b6cb7', chest:'🤖', gift:{e:'⚙️', name:'黄金齿轮'},
    lessons:[
@@ -354,6 +363,7 @@ const REGIONS=[
      {id:'bridge',      e:'🌉', n:'桥为什么不塌', bn:'造桥小工程师'},
      {id:'magnify',     e:'🔍', n:'放大镜和镜子', bn:'光学小玩家'},
      {id:'flight',      e:'✈️', n:'为什么能飞',   bn:'飞行小设计师'},
+     {id:'ch-tech', e:'🏆', n:'科技大挑战', bn:'科技挑战王', boss:true},
    ]},
   {name:'生活小达人', ico:'🍎', color:'#ef8c3c', chest:'🎒', gift:{e:'🌟', name:'生活达人勋章'},
    lessons:[
@@ -363,6 +373,7 @@ const REGIONS=[
      {id:'recycle',   e:'♻️', n:'垃圾分类',   bn:'环保小卫士'},
      {id:'manners',   e:'🤝', n:'礼貌待人',   bn:'文明小天使'},
      {id:'emotion',   e:'😊', n:'认识情绪',   bn:'情绪小主人'},
+     {id:'ch-life', e:'🏆', n:'生活大挑战', bn:'生活挑战王', boss:true},
    ]},
 ];
 
@@ -456,14 +467,21 @@ function layout(){
   });
 }
 /* 点主题 → 弹出该区课程清单 */
-function openRegion(k){ const r=REGIONS[k], L=r.lessons; const done=L.filter(l=>isDone(l.id)).length; curDay=null;
+function openRegion(k){ const r=REGIONS[k], L=r.lessons; curDay=null;
+  const norm=L.filter(l=>!l.boss), normDone=norm.filter(l=>isDone(l.id)).length;
+  const bossUnlocked = normDone===norm.length;      // 本区常规课全通关才解锁挑战
+  const allDoneReg=L.every(l=>isDone(l.id));
   document.getElementById('dayTitle').textContent=r.ico+' '+r.name;
-  document.getElementById('daySub').textContent = done===L.length
-    ? `全区 ${L.length} 节全部完成 ✓ · 宝物：${r.gift.name}`
-    : `共 ${L.length} 节 · 已完成 ${done}/${L.length}`;
+  document.getElementById('daySub').textContent = allDoneReg
+    ? `全区通关啦 ✓ · 宝物：${r.gift.name}`
+    : `${norm.length} 节课 + 1 挑战 · 已完成 ${normDone}/${norm.length}`;
   let html='';
-  if(done===L.length) html+=`<div class="lrow done" onclick="openChestByRegion(${k})"><div class="le">${r.gift.e}</div><div class="lb"><div class="ln">领取宝物：${r.gift.name}</div><div class="lst">全区通关啦，点开领奖～</div></div><div class="lgo">领取</div></div>`;
+  if(allDoneReg) html+=`<div class="lrow done" onclick="openChestByRegion(${k})"><div class="le">${r.gift.e}</div><div class="lb"><div class="ln">领取宝物：${r.gift.name}</div><div class="lst">全区通关啦，点开领奖～</div></div><div class="lgo">领取</div></div>`;
   html+=L.map(l=>{ const dn=isDone(l.id);
+    if(l.boss){
+      if(!bossUnlocked) return `<div class="lrow" style="opacity:.6"><div class="le">🔒</div><div class="lb"><div class="ln">${l.n}</div><div class="lst">先把本区其它课上完，再来挑战～</div></div><div class="lgo" style="background:#e6e0d2;color:#9a8a6a">未解锁</div></div>`;
+      return `<div class="lrow ${dn?'done':''}" style="background:${dn?'#eefaf0':'#fff4e0'}" onclick="goLessonR('${l.id}',${k})"><div class="le">${l.e}</div><div class="lb"><div class="ln">${l.n}<span style="font-size:11px;color:#e0692c"> 高阶</span></div><div class="lst">${dn?'✓ 挑战成功 · 可再战':'⚔️ 综合大挑战，来试试！'}</div></div><div class="lgo">${dn?'再战':'挑战 ▶'}</div></div>`;
+    }
     return `<div class="lrow ${dn?'done':''}" onclick="goLessonR('${l.id}',${k})"><div class="le">${l.e}</div><div class="lb"><div class="ln">${l.n}</div><div class="lst">${dn?'✓ 已完成 · 点开可复习':'点这里去上这一课'}</div></div><div class="lgo">${dn?'复习':'开始 ▶'}</div></div>`; }).join('');
   document.getElementById('dayList').innerHTML=html;
   document.getElementById('daysheet').classList.add('on');
@@ -491,10 +509,10 @@ function addDays(s,n){const p=s.split('-').map(Number);return fmt(new Date(p[0],
 const _now=new Date(), todayStr=fmt(_now);
 const PER_DAY=24; // 每天安排几课（想改多改少，改这一个数字就行）
 const bucket={}; const put=(ds,l)=>{(bucket[ds]||(bucket[ds]=[])).push(l);};
-/* 历史：已完成的课 → 按真实完成日期落位（她哪天做的就在哪天，今天做完的留今天） */
-ALL.forEach(l=>{ if(isDone(l.id)) put((badges[l.id]&&badges[l.id].date)||todayStr, l); });
+/* 历史：已完成的课 → 按真实完成日期落位（挑战课boss不进日历，是可选高阶） */
+ALL.forEach(l=>{ if(l.boss) return; if(isDone(l.id)) put((badges[l.id]&&badges[l.id].date)||todayStr, l); });
 /* 未来：未完成的课 → 今天起每天 PER_DAY 课（弹性：想多做可往后接） */
-const undoneList=ALL.filter(l=>!isDone(l.id));
+const undoneList=ALL.filter(l=>!isDone(l.id) && !l.boss);
 undoneList.forEach((l,i)=> put(addDays(todayStr, Math.floor(i/PER_DAY)), l));
 const todayGroup=bucket[todayStr]||[];               // 今天这一天的所有课
 const todayTodo=todayGroup.filter(l=>!isDone(l.id));  // 今天还没上的

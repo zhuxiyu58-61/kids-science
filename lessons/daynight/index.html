@@ -197,6 +197,7 @@
   <canvas class="confetti" id="confetti"></canvas>
 
 <script>
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
 /* ===== 场景 ===== */
 const SCENES=['intro','explore','game','finish'];
 function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active'));
@@ -342,7 +343,7 @@ let qi=0;
 function startQuiz(){ document.getElementById('g-sort').classList.remove('on'); document.getElementById('g-quiz').classList.add('on');
   document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>选一个正确的答案</small>'; qi=0; renderQ(); }
 function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q;
-  qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([label,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=label;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+  qopts.innerHTML=''; qfb.textContent=''; shuffle(it.opts.slice()).forEach(([label,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=label;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
 function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none');
     qfb.style.color='#2ba36a'; qfb.textContent='✅ 答对啦！'+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1300);
   } else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='🤔 再想想～'; } }

@@ -173,6 +173,7 @@
   <canvas class="confetti" id="confetti"></canvas>
 
 <script>
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
 const SCENES=['intro','explore','game','finish'];
 function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active');
   const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
@@ -281,7 +282,7 @@ const QUIZ=[
   {ico:'🍲',q:'烧开水时锅口冒出的“白气”，其实是什么？',opts:[['水蒸气遇冷凝结成的小水滴',1],['水蒸气本身',0],['白色的烟',0]],fb:'水蒸气是看不见的，白气是它一遇到冷空气凝结成的小水滴。'},
 ];
 let qi=0; function startQuiz(){ document.getElementById('g-sort').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 用一用<small>把学到的知识用到生活里</small>'; qi=0; renderQ(); }
-function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; shuffle(it.opts.slice()).forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
 function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想，联系一下温度和状态变化～'; } }
 
 function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }

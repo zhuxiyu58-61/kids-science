@@ -126,6 +126,7 @@
   <canvas class="confetti" id="confetti"></canvas>
 
 <script>
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
 const SCENES=['intro','explore','game','finish'];
 function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
 function switchEx(v){ document.getElementById('ex-join').classList.toggle('on',v==='A'); document.getElementById('ex-know').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
@@ -192,7 +193,7 @@ const QUIZ=[
  {ico:'💫',q:'星星看起来一闪一闪“眨眼睛”，是因为？',opts:[['星光穿过晃动的空气，被抖了一下',1],['星星在跟我们打招呼',0],['星星一会儿亮一会儿灭',0]],fb:'是空气晃动让星光看起来闪烁。'},
 ];
 let qi=0; function startQuiz(){ document.getElementById('g-sort').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>用“恒星·反光·星座”推一推</small>'; qi=0; renderQ(); }
-function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; shuffle(it.opts.slice()).forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
 function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='想想哪些星自己发光～'; } }
 
 function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }

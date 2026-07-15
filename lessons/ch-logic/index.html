@@ -61,6 +61,7 @@
   <canvas class="confetti" id="confetti"></canvas>
 
 <script>
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
 const BADGE={id:'ch-logic', emoji:'🦉', name:'智慧挑战王'};
 const QUIZ=[
  {ico:'🔁',q:'🔴🔵🔴🔵🔴 下一个应该是？',opts:[['🔵',1],['🔴',0],['🟡',0]],fb:'红蓝红蓝一直重复，下一个是蓝。'},
@@ -81,7 +82,7 @@ function renderQ(){ const it=QUIZ[qi]; wrongThis=0;
   document.getElementById('pstars').textContent='⭐'.repeat(stars)+'☆'.repeat(QUIZ.length-stars);
   document.getElementById('qico').textContent=it.ico; document.getElementById('qtext').textContent=it.q;
   const box=document.getElementById('qopts'); box.innerHTML=''; document.getElementById('qfb').textContent='';
-  it.opts.forEach(([l,ok])=>{ const b=document.createElement('div'); b.className='qopt'; b.textContent=l; b.onclick=()=>ans(b,ok,it.fb); box.appendChild(b); });
+  shuffle(it.opts.slice()).forEach(([l,ok])=>{ const b=document.createElement('div'); b.className='qopt'; b.textContent=l; b.onclick=()=>ans(b,ok,it.fb); box.appendChild(b); });
 }
 function ans(el,ok,fb){ const fbEl=document.getElementById('qfb');
   if(ok){ el.classList.add('right'); document.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none');

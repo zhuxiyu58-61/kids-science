@@ -382,7 +382,7 @@ function renderQ(){
   document.getElementById('qprog').textContent=`第 ${qi+1} / ${QUIZ.length} 题`;
   document.getElementById('qico').textContent=it.ico; document.getElementById('qtext').textContent=it.q;
   const box=document.getElementById('qopts'); box.innerHTML=''; document.getElementById('qfb').textContent='';
-  it.opts.forEach(([label,ok])=>{ const b=document.createElement('div'); b.className='qopt'; b.textContent=label; b.onclick=()=>ans(b,ok,it.fb); box.appendChild(b); });
+  shuffle(it.opts.slice()).forEach(([label,ok])=>{ const b=document.createElement('div'); b.className='qopt'; b.textContent=label; b.onclick=()=>ans(b,ok,it.fb); box.appendChild(b); });
 }
 function ans(el,ok,fb){
   const box=document.getElementById('qfb');

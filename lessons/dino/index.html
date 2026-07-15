@@ -126,6 +126,7 @@
   <canvas class="confetti" id="confetti"></canvas>
 
 <script>
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
 const SCENES=['intro','explore','game','finish'];
 function go(name){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const idx=SCENES.indexOf(name); SCENES.forEach((_,i)=>document.getElementById('p'+i).classList.toggle('on', i<=idx)); if(name==='finish') celebrate(); }
 function switchEx(v){ document.getElementById('ex-dig').classList.toggle('on',v==='A'); document.getElementById('ex-kinds').classList.toggle('on',v==='B'); document.getElementById('tabA').classList.toggle('on',v==='A'); document.getElementById('tabB').classList.toggle('on',v==='B'); }
@@ -194,7 +195,7 @@ const QUIZ=[
  {ico:'🌋',q:'关于恐龙的“灭绝”，下面哪句对？',opts:[['很久以前恐龙几乎都消失了，但科学家仍不断有新发现',1],['恐龙还成群活在深山里',0],['恐龙是被人类猎光的',0]],fb:'恐龙早已灭绝，人类出现得比它们晚很多。'},
 ];
 let qi=0; function startQuiz(){ document.getElementById('g-sort').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>用“化石·食草食肉·灭绝”推一推</small>'; qi=0; renderQ(); }
-function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; it.opts.forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
+function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; shuffle(it.opts.slice()).forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
 function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='想想牙齿、身体给的线索～'; } }
 
 function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }

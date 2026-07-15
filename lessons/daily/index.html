@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>今日大挑战 · 知识乐园</title>
+<style>
+  :root{ --acc:#ff7a3d; --acc2:#e0692c; --bg1:#fff4e6; --bg2:#ffd9b0; --ink:#5a3410; --ink2:#8a6636; --card:#fff; --shadow:0 10px 30px rgba(60,60,90,.16); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
+  html,body{height:100%; margin:0;}
+  body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, var(--bg1) 0%, var(--bg2) 70%, var(--bg2) 100%);
+    overflow:hidden; touch-action:manipulation; display:flex; flex-direction:column; height:100vh; }
+  .topbar{display:flex; align-items:center; gap:10px; padding:10px 16px;}
+  .back{font-size:19px; background:#fff; border:none; border-radius:16px; padding:8px 14px; box-shadow:var(--shadow); color:var(--ink); font-weight:800; cursor:pointer;}
+  .title{font-size:clamp(17px,2.8vw,24px); font-weight:900;} .title small{display:block; font-size:12px; color:var(--ink2); font-weight:700;}
+  .scene{flex:1; min-height:0; display:none; flex-direction:column; align-items:center; justify-content:center; padding:6px 16px 16px; text-align:center;} .scene.active{display:flex;}
+  .kico{font-size:96px; animation:bob 2.2s ease-in-out infinite;} @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .card{background:var(--card); border-radius:24px; padding:22px 26px; box-shadow:var(--shadow); max-width:600px; width:100%;}
+  .introTxt{font-size:clamp(15px,2.2vw,19px); font-weight:700; line-height:1.7;} .introTxt b{color:var(--acc);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 40px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,var(--acc),var(--acc2)); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:18px;} .bigbtn:active{transform:scale(.95);}
+  .prog{display:flex; align-items:center; justify-content:space-between; width:100%; max-width:600px; margin-bottom:10px; font-weight:900; color:var(--ink2);}
+  .stars{font-size:15px; letter-spacing:0;}
+  .qtag{display:inline-block; font-size:12px; font-weight:900; padding:3px 10px; border-radius:10px; margin-bottom:8px; background:#eef0f6; color:var(--acc2);}
+  .qico{font-size:48px;} .qtext{font-size:20px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
+  .qopts{display:flex; flex-direction:column; gap:11px;} .qopt{border:3px solid #e3e6ef; background:#f7f8fc; border-radius:15px; padding:14px; font-size:17px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt:active{transform:scale(.98);}
+  .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;}
+  .medal{font-size:104px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+  h2{margin:6px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,var(--acc),var(--acc2)); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 10px;}
+  .bigstars{font-size:34px; letter-spacing:3px; margin:6px 0 4px;}
+  .resTxt{color:var(--ink2); font-weight:700; font-size:15px; margin:6px 0 16px;}
+  .fbtns{display:flex; gap:12px; justify-content:center;} .fbtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--acc); color:#fff;} .fb2{background:#eef0f6; color:var(--ink);}
+  .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
+    <div class="title">🏆 今日大挑战<small>复习今天上过的课</small></div>
+  </div>
+
+  <section class="scene active" id="s-intro">
+    <div class="kico">🏆</div>
+    <div class="card"><div class="introTxt">你把<b>今天的课都上完啦</b>，真棒！来一场<b>今日大挑战</b>——题目都来自你<b>今天学过的内容</b>，看看记住了多少。答对越多星越多！<br>第一次就答对才得 ⭐～</div>
+      <button class="bigbtn" onclick="startQuiz()">接受挑战 ▶</button></div>
+  </section>
+
+  <section class="scene" id="s-quiz">
+    <div class="prog"><span id="pnum"></span><span class="stars" id="pstars"></span></div>
+    <div class="card"><div class="qtag" id="qtag">今日</div><div class="qico" id="qico">❓</div><div class="qtext" id="qtext"></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div></div>
+  </section>
+
+  <section class="scene" id="s-finish">
+    <div class="card"><div class="medal" id="medal">🏅</div><h2 id="fhead">今日通关！</h2>
+      <div class="medalName">🎖 今日闯关成功</div>
+      <div class="bigstars" id="bigstars"></div><div class="resTxt" id="resTxt"></div>
+      <div class="fbtns"><button class="fb2" onclick="location.reload()">再挑战一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园</button></div>
+    </div>
+  </section>
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+/* 各主题题库（复用主题挑战题，做完当天课后按当天涉及的主题出题）*/
+const QBANK={
+ nature:[
+  {ico:'💧',q:'一杯水放进冰箱结冰，是因为？',opts:[['遇冷',1],['遇热',0],['吹风',0]],fb:'遇冷会结冰。'},
+  {ico:'🧲',q:'磁铁能吸铁钉，塑料尺呢？',opts:[['吸不住',1],['也能吸',0]],fb:'磁铁只吸铁一类，塑料吸不住。'},
+  {ico:'🌈',q:'彩虹一般什么时候出现？',opts:[['太阳照到小雨滴时',1],['晚上',0]],fb:'阳光穿过小雨滴分成七色。'},
+  {ico:'🌍',q:'白天黑夜换来换去，是地球在？',opts:[['自转',1],['不动',0]],fb:'地球自转，向着太阳就是白天。'},
+  {ico:'🌕',q:'月亮自己会发光吗？',opts:[['不会，反射太阳光',1],['会',0]],fb:'月亮反射太阳光。'}],
+ art:[
+  {ico:'🎨',q:'红色 + 黄色 =？',opts:[['橙色',1],['绿色',0]],fb:'红+黄=橙。'},
+  {ico:'🎨',q:'蓝色 + 黄色 =？',opts:[['绿色',1],['紫色',0]],fb:'蓝+黄=绿。'},
+  {ico:'🎺',q:'靠「吹」发声的乐器是？',opts:[['笛子',1],['鼓',0]],fb:'笛子是吹奏乐器。'},
+  {ico:'🥁',q:'敲鼓越用力，声音会？',opts:[['越响',1],['越轻',0]],fb:'用力大声音越响。'},
+  {ico:'🖼️',q:'画画三原色是？',opts:[['红黄蓝',1],['黑白灰',0]],fb:'红黄蓝三原色。'}],
+ world:[
+  {ico:'🌅',q:'太阳从哪边升起？',opts:[['东边',1],['西边',0]],fb:'东升西落。'},
+  {ico:'🗺️',q:'中国最长的河？',opts:[['长江',1],['黄河',0]],fb:'长江最长。'},
+  {ico:'🌋',q:'火山喷出来的是？',opts:[['岩浆',1],['冰水',0]],fb:'滚烫的岩浆。'},
+  {ico:'🧭',q:'指南针指向？',opts:[['南和北',1],['东和西',0]],fb:'指南针指南北。'},
+  {ico:'🍂',q:'四季是因为地球？',opts:[['斜着绕太阳转',1],['转得忽快忽慢',0]],fb:'斜着绕太阳转就有四季。'}],
+ bio:[
+  {ico:'🐛',q:'毛毛虫长大变成？',opts:[['蝴蝶',1],['苍蝇',0]],fb:'卵→毛虫→蛹→蝴蝶。'},
+  {ico:'🦁',q:'食物链里谁吃草？',opts:[['兔子',1],['老虎',0]],fb:'兔子吃草。'},
+  {ico:'🦴',q:'骨头的作用是？',opts:[['支撑保护身体',1],['帮忙消化',0]],fb:'骨头撑起身体、保护内脏。'},
+  {ico:'🦷',q:'换牙掉的是？',opts:[['乳牙',1],['恒牙',0]],fb:'掉乳牙，长恒牙。'},
+  {ico:'🦕',q:'恐龙现在还有吗？',opts:[['很久前灭绝了',1],['在动物园',0]],fb:'恐龙早已灭绝。'}],
+ game:[
+  {ico:'🎮',q:'让游戏角色动起来要给它？',opts:[['指令',1],['糖',0]],fb:'角色听指令才动。'},
+  {ico:'⚙️',q:'游戏「假重力」让东西？',opts:[['往下掉',1],['往上飘',0]],fb:'物理引擎让东西往下掉。'},
+  {ico:'📈',q:'好关卡难度应该？',opts:[['先易后难',1],['一上来最难',0]],fb:'先易后难。'},
+  {ico:'🤖',q:'电脑敌人追你，靠？',opts:[['程序判断看到你',1],['运气',0]],fb:'按程序判断。'},
+  {ico:'🎧',q:'跳跃音效是？',opts:[['设计出来的',1],['真人喊',0]],fb:'音效是设计合成的。'}],
+ logic:[
+  {ico:'🔁',q:'🔴🔵🔴🔵🔴 下一个？',opts:[['🔵',1],['🔴',0]],fb:'红蓝重复，下一个蓝。'},
+  {ico:'🔢',q:'2、4、6、8、__ ？',opts:[['10',1],['9',0]],fb:'每次+2，是10。'},
+  {ico:'🧍',q:'8人排队，小明前3人，他后面几人？',opts:[['4',1],['5',0]],fb:'8−3−1=4。'},
+  {ico:'🔺',q:'正方形画一条对角线，分成几个三角形？',opts:[['2个',1],['4个',0]],fb:'分成2个三角形。'},
+  {ico:'📏',q:'小明比小红高，小红比小华高，谁最高？',opts:[['小明',1],['小华',0]],fb:'小明最高。'}],
+ space:[
+  {ico:'🪐',q:'离太阳最近的行星？',opts:[['水星',1],['海王星',0]],fb:'水星最近。'},
+  {ico:'🚀',q:'火箭靠什么飞？',opts:[['往下喷火反推',1],['翅膀',0]],fb:'喷火反推上天。'},
+  {ico:'👨‍🚀',q:'太空里东西会？',opts:[['飘起来',1],['掉下来',0]],fb:'没有重力就飘。'},
+  {ico:'🌕',q:'月球上跳会？',opts:[['更高',1],['更低',0]],fb:'引力小，跳更高。'},
+  {ico:'🕳️',q:'黑洞连什么都逃不掉？',opts:[['光',1],['声音',0]],fb:'连光都逃不出。'}],
+ math:[
+  {ico:'🧮',q:'8 + 2 + 7 = ?',opts:[['17',1],['16',0]],fb:'8+2=10再+7=17。'},
+  {ico:'🌳',q:'两端都种，分5段，几棵？',opts:[['6棵',1],['5棵',0]],fb:'段数+1=6。'},
+  {ico:'🐔',q:'3个头10条腿，几只兔？',opts:[['2只',1],['3只',0]],fb:'抬腿法：多4条÷2=2只兔。'},
+  {ico:'👕',q:'2件上衣配3条裤子几套？',opts:[['6套',1],['5套',0]],fb:'2×3=6套。'},
+  {ico:'🔢',q:'1一直加到10 = ?',opts:[['55',1],['50',0]],fb:'5对×11=55。'}],
+ animal:[
+  {ico:'🐋',q:'世界上最大的动物？',opts:[['蓝鲸',1],['大象',0]],fb:'蓝鲸最大。'},
+  {ico:'🐧',q:'企鹅住在？',opts:[['南极',1],['沙漠',0]],fb:'企鹅住南极。'},
+  {ico:'🦎',q:'变色龙靠什么躲敌人？',opts:[['变颜色伪装',1],['跑得快',0]],fb:'变颜色藏起来。'},
+  {ico:'🦢',q:'大雁冬天飞南方叫？',opts:[['迁徙',1],['冬眠',0]],fb:'换季搬家叫迁徙。'},
+  {ico:'🦇',q:'蝙蝠黑暗里靠什么「看」？',opts:[['回声',1],['眼睛',0]],fb:'靠回声定位。'}],
+ tech:[
+  {ico:'⚡',q:'家里的电哪来的？',opts:[['发电厂',1],['天上',0]],fb:'电在发电厂发出来。'},
+  {ico:'🪝',q:'撬棍（杠杆）能？',opts:[['省力撬重物',1],['发光',0]],fb:'杠杆省力。'},
+  {ico:'👁️',q:'机器人的眼睛耳朵是？',opts:[['传感器',1],['帽子',0]],fb:'传感器帮它看和听。'},
+  {ico:'🔺',q:'最稳的形状是？',opts:[['三角形',1],['正方形',0]],fb:'三角形最稳。'},
+  {ico:'✈️',q:'飞机靠什么飞上天？',opts:[['机翼和速度',1],['轮子',0]],fb:'机翼产生升力。'}],
+ life:[
+  {ico:'🍗',q:'想长高长壮多吃？',opts:[['肉蛋奶',1],['糖果',0]],fb:'肉蛋奶帮长身体。'},
+  {ico:'🪙',q:'1元等于几角？',opts:[['10角',1],['5角',0]],fb:'1元=10角。'},
+  {ico:'🚦',q:'红灯亮了过马路要？',opts:[['停下等',1],['快点冲',0]],fb:'红灯停。'},
+  {ico:'♻️',q:'塑料瓶属于？',opts:[['可回收',1],['厨余',0]],fb:'塑料瓶可回收。'},
+  {ico:'🙏',q:'别人帮了你要说？',opts:[['谢谢',1],['走开',0]],fb:'说谢谢。'}],
+ heart:[
+  {ico:'😟',q:'又担心又紧张时，先做？',opts:[['深呼吸',1],['憋着',0]],fb:'深呼吸让身体平静。'},
+  {ico:'🗣️',q:'难受的心事最好？',opts:[['说给信任的人听',1],['一直藏着',0]],fb:'说出来心就轻了。'},
+  {ico:'😤',q:'快发火时先？',opts:[['停一下深呼吸',1],['马上打人',0]],fb:'先停、深呼吸。'},
+  {ico:'💪',q:'害怕做一件事，哪句更好？',opts:[['我可以试试',1],['我肯定不行',0]],fb:'换成「我可以试试」。'},
+  {ico:'🛡️',q:'被欺负了要？',opts:[['告诉老师爸妈',1],['忍着不说',0]],fb:'说出来是保护自己。'}]
+};
+
+const params=new URLSearchParams(location.search);
+let regs=(params.get('r')||'').split(',').map(s=>s.trim()).filter(k=>QBANK[k]);
+if(!regs.length) regs=Object.keys(QBANK);
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+let pool=[]; regs.forEach(rk=> QBANK[rk].forEach(q=>pool.push(q)) );
+shuffle(pool);
+const QUIZ = pool.slice(0, Math.min(10, Math.max(6, pool.length>=8?10:pool.length)));
+
+let qi=0, wrongThis=0, stars=0;
+function show(n){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+n).classList.add('active'); }
+function startQuiz(){ qi=0; stars=0; show('quiz'); renderQ(); }
+function renderQ(){ const it=QUIZ[qi]; wrongThis=0;
+  document.getElementById('pnum').textContent=`第 ${qi+1} / ${QUIZ.length} 关`;
+  document.getElementById('pstars').textContent='⭐'.repeat(stars)+'☆'.repeat(QUIZ.length-stars);
+  document.getElementById('qico').textContent=it.ico; document.getElementById('qtext').textContent=it.q;
+  const box=document.getElementById('qopts'); box.innerHTML=''; document.getElementById('qfb').textContent='';
+  shuffle([...it.opts]).forEach(([l,ok])=>{ const b=document.createElement('div'); b.className='qopt'; b.textContent=l; b.onclick=()=>ans(b,ok,it.fb); box.appendChild(b); });
+}
+function ans(el,ok,fb){ const fbEl=document.getElementById('qfb');
+  if(ok){ el.classList.add('right'); document.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none');
+    if(wrongThis===0) stars++;
+    fbEl.style.color='#2ba36a'; fbEl.innerHTML='✅ '+fb;
+    setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else finish(); },1300);
+  } else { wrongThis++; el.classList.add('wrong'); el.style.pointerEvents='none'; fbEl.style.color='#e06060'; fbEl.textContent='🤔 再想想～'; }
+}
+function finish(){ show('finish');
+  document.getElementById('bigstars').textContent='⭐'.repeat(stars)+'☆'.repeat(QUIZ.length-stars);
+  document.getElementById('resTxt').textContent = stars===QUIZ.length? '太厉害啦！今天的内容你全记住了，满星通关！🎉' : `你答对拿到了 ${stars} / ${QUIZ.length} 颗星，很棒！再来一次能拿满星哦～`;
+  celebrate();
+}
+function celebrate(){ const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#ff7a3d','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:150},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+  let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<240)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
+if(location.hash==='#quiz') startQuiz();
+</script>
+</body>
+</html>

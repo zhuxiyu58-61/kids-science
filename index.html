@@ -419,6 +419,10 @@ SEQ.push({type:'final', done:allDone});
 let currentId=null;
 for(const l of ALL){ if(!isDone(l.id)){ currentId=l.id; break; } }
 
+/* 课程 → 主题key（给今日大挑战按当天涉及的主题出题）*/
+const REGION_KEYS=['nature','art','world','bio','game','logic','space','math','animal','tech','life','heart'];
+const L2R={}; REGIONS.forEach((r,k)=> r.lessons.forEach(l=> L2R[l.id]=REGION_KEYS[k]||'x'));
+
 /* ===== 布局：枢纽式 —— 一个起点 → 各主题从主干分叉（鱼骨图）===== */
 const mapEl=document.getElementById('map');
 const svg=document.getElementById('trail');
@@ -537,7 +541,11 @@ function openDay(ds){ const L=bucket[ds]; if(!L||!L.length) return; curDay=ds;
       ? `今天要上这 ${L.length} 节课 · 已完成 ${doneN}/${L.length}`
       : isPast ? `这天上了 ${L.length} 节课，全部完成 ✓`
       : `这天安排了 ${L.length} 节课（做完前面的就轮到这天）`;
-  document.getElementById('dayList').innerHTML = L.map(l=>{ const done=isDone(l.id);
+  const allDayDone=L.every(l=>isDone(l.id));
+  let head='';
+  if(allDayDone){ const regs=[...new Set(L.map(l=>L2R[l.id]).filter(Boolean))].join(',');
+    head=`<div class="lrow" style="background:#fff0dd" onclick="location.href='lessons/daily/index.html?r=${regs}'"><div class="le">🏆</div><div class="lb"><div class="ln">今日大挑战<span style="font-size:11px;color:#e0692c"> 综合</span></div><div class="lst">这天的课都上完啦，来复习闯关拿星星！</div></div><div class="lgo">挑战 ▶</div></div>`; }
+  document.getElementById('dayList').innerHTML = head + L.map(l=>{ const done=isDone(l.id);
     return `<div class="lrow ${done?'done':''}" onclick="goLesson('${l.id}')">`
       +`<div class="le">${l.e}</div><div class="lb"><div class="ln">${l.n}</div>`
       +`<div class="lst">${done?'✓ 已完成 · 点开可复习':'点这里去上这一课'}</div></div>`

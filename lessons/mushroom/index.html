@@ -144,7 +144,7 @@ function renderB(){ const box=document.getElementById('ex-B');
     b.onclick=()=>{ if(b.dataset.locked)return;
       if(i===r.ans){ b.classList.add('right'); b.dataset.locked='1'; document.getElementById('capB').innerHTML='✅ '+r.cap;
         doneB++; document.getElementById('cntB').textContent=doneB; unlockGame(); setTimeout(()=>{ idxB++; renderB(); },1300); }
-      else { b.classList.add('wrong'); setTimeout(()=>b.classList.remove('wrong'),400); document.getElementById('capB').textContent='🤔 再想想～'; } };
+      else { _mzMini(b, (typeof r!=='undefined'&&r&&r.cap)?r.cap:'', document.getElementById('capB'), '🤔 再想想～'); } };
     row.appendChild(b); });
 }
 renderA(); renderB();
@@ -251,6 +251,54 @@ function ans(el,ok,fb){
   var last = _mzR2 ? (_mzRetry.length<=1) : (qi>=QUIZ.length-1 && !_mzRetry.length);
   _mzBtn(last?'我懂了，完成 ▶':'我懂了，下一题 ▶', _mzAdvance);
 }
+
+
+/* ===== 探索判错 v1 ===== */
+/* 探索题答错:划掉错选项 + 讲解 + 锁 3 秒读完再选 */
+function _mzMini(el, cap, capEl, fallback){
+  if(el.dataset.dead) return;
+  el.classList.add('wrong'); el.dataset.dead='1'; el.style.pointerEvents='none'; el.style.opacity='.4';
+  var sibs = el.parentElement ? el.parentElement.children : [];
+  for(var i=0;i<sibs.length;i++){ if(!sibs[i].dataset.dead) sibs[i].style.pointerEvents='none'; }
+  var msg = cap || fallback || '';
+  if(capEl){
+    capEl.innerHTML = '❌ 不对哦～<br><span style="color:#4a5058;font-weight:700">💡 '+msg+'</span>'
+      + '<br><span class="_mzT2" style="color:#9aa0a8;font-size:13px;font-weight:700">读一读，<b>3</b> 秒后再选…</span>';
+  }
+  var n=3, t=setInterval(function(){
+    n--;
+    var tk = capEl && capEl.querySelector('._mzT2');
+    if(n>0){ if(tk) tk.innerHTML='读一读，<b>'+n+'</b> 秒后再选…'; return; }
+    clearInterval(t);
+    for(var j=0;j<sibs.length;j++){ if(!sibs[j].dataset.dead) sibs[j].style.pointerEvents=''; }
+    if(tk) tk.innerHTML='👆 再选一次';
+  },1000);
+}
+
+
+/* ===== 开场读秒 v1 ===== */
+(function(){
+  var sec = document.getElementById('s-intro');
+  var btn = sec && sec.querySelector('.bigbtn');
+  if(!btn) return;
+  var card = sec.querySelector('.introCard');
+  var len = card ? (card.innerText||'').replace(/\s/g,'').length : 60;
+  var n = Math.max(3, Math.min(6, Math.round(len/18)));   /* 3~6 秒,按开场文字长短 */
+  var orig = btn.textContent, css = btn.style.cssText;
+  btn.disabled = true; btn.style.opacity = '.4'; btn.style.cursor = 'default';
+  var tip = document.createElement('div');
+  tip.style.cssText = 'margin:10px auto 0;color:#9aa0a8;font-size:14px;font-weight:800;';
+  tip.innerHTML = '👀 先读一读上面这段…';
+  btn.insertAdjacentElement('afterend', tip);
+  btn.textContent = orig + '（' + n + '）';
+  var t = setInterval(function(){
+    n--;
+    if(n>0){ btn.textContent = orig + '（' + n + '）'; return; }
+    clearInterval(t);
+    btn.disabled = false; btn.style.cssText = css; btn.textContent = orig;
+    tip.remove();
+  },1000);
+})();
 
 </script>
 </body>

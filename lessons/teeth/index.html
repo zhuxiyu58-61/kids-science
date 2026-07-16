@@ -289,6 +289,31 @@ function ans(el,ok,fb){
   _mzBtn(last?'我懂了，完成 ▶':'我懂了，下一题 ▶', _mzAdvance);
 }
 
+
+/* ===== 开场读秒 v1 ===== */
+(function(){
+  var sec = document.getElementById('s-intro');
+  var btn = sec && sec.querySelector('.bigbtn');
+  if(!btn) return;
+  var card = sec.querySelector('.introCard');
+  var len = card ? (card.innerText||'').replace(/\s/g,'').length : 60;
+  var n = Math.max(3, Math.min(6, Math.round(len/18)));   /* 3~6 秒,按开场文字长短 */
+  var orig = btn.textContent, css = btn.style.cssText;
+  btn.disabled = true; btn.style.opacity = '.4'; btn.style.cursor = 'default';
+  var tip = document.createElement('div');
+  tip.style.cssText = 'margin:10px auto 0;color:#9aa0a8;font-size:14px;font-weight:800;';
+  tip.innerHTML = '👀 先读一读上面这段…';
+  btn.insertAdjacentElement('afterend', tip);
+  btn.textContent = orig + '（' + n + '）';
+  var t = setInterval(function(){
+    n--;
+    if(n>0){ btn.textContent = orig + '（' + n + '）'; return; }
+    clearInterval(t);
+    btn.disabled = false; btn.style.cssText = css; btn.textContent = orig;
+    tip.remove();
+  },1000);
+})();
+
 </script>
 </body>
 </html>

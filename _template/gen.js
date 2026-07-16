@@ -308,3 +308,13 @@ for(const B of BOSSES){
   fs.mkdirSync(dir); fs.writeFileSync(path.join(dir,'index.html'), bossPage(B)); made++;
 }
 console.log('生成完成: '+made+' 个页面');
+
+/* 新课必须带上「掌握模式」,否则又退回"选项一个个试出来"(2026-07-16)。
+   三个注入脚本都有标记位、重复跑安全,生成后无脑跑一遍即可。 */
+if(made){
+  const ids=[...LESSONS.map(l=>l.id), ...BOSSES.map(b=>b.id)];
+  for(const s of ['inject-mastery.js','inject-explore.js','inject-intro.js']){
+    try{ require('child_process').execFileSync(process.execPath, [path.join(__dirname,s), ...ids], {stdio:'inherit'}); }
+    catch(e){ console.error('⚠️ '+s+' 注入失败,新课会退回可试错的老规则:', e.message); }
+  }
+}

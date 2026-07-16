@@ -585,7 +585,7 @@ if(streak<1){ document.getElementById('chipStreak').style.opacity='.55'; }
 function fmt(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function addDays(s,n){const p=s.split('-').map(Number);return fmt(new Date(p[0],p[1]-1,p[2]+n));}
 const _now=new Date(), todayStr=fmt(_now);
-const PER_DAY=24; // 每天安排几课（想改多改少，改这一个数字就行）
+const PER_DAY=15; // 每天安排几课（想改多改少，改这一个数字就行）
 const bucket={}; const put=(ds,l)=>{(bucket[ds]||(bucket[ds]=[])).push(l);};
 /* 历史：已完成的课 → 按真实完成日期落位（挑战课boss不进日历，是可选高阶） */
 ALL.forEach(l=>{ if(l.boss) return; if(isDone(l.id)) put((badges[l.id]&&badges[l.id].date)||todayStr, l); });

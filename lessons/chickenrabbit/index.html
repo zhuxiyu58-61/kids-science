@@ -57,6 +57,12 @@
   .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
   .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#e9f1fb; color:var(--ink);}
   .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+  .stepWrap{display:flex; flex-direction:column; align-items:center; gap:10px; width:100%; max-width:600px;}
+  .stepBar{display:flex; gap:5px;} .sp{width:24px; height:6px; border-radius:3px; background:#cfe2fb; transition:.25s;} .sp.on{background:var(--accent);}
+  .stepTxt{background:var(--card); border-radius:18px; padding:13px 20px; box-shadow:var(--shadow); font-size:clamp(14px,2.1vw,16px); font-weight:800; line-height:1.65; text-align:center; width:100%;} .stepTxt b{color:var(--accent);} .stepTxt .big{color:#e8720c; font-size:1.15em;}
+  #crCanvas{background:#fff; border-radius:18px; box-shadow:var(--shadow); width:100%; max-width:560px; height:auto;}
+  .legCount{font-size:17px; font-weight:900; color:var(--ink2);} .legCount b{color:var(--accent); font-size:23px;} .legCount .need{color:#e8720c;}
+  .stepBtn{border:none; border-radius:16px; padding:12px 30px; font-size:17px; font-weight:900; color:#fff; background:linear-gradient(160deg,#5aa0f0,#2b6fd0); box-shadow:var(--shadow); cursor:pointer;} .stepBtn:active{transform:scale(.96);}
 </style>
 </head>
 <body>
@@ -74,7 +80,7 @@
 
   <section class="scene" id="s-explore">
     <div class="exTabs">
-      <button class="exTab on" id="tabA" onclick="switchEx('A')">🦵 数一数腿</button>
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🧠 跟我想一遍</button>
       <button class="exTab" id="tabB" onclick="switchEx('B')">🕵️ 抬腿法猜</button>
     </div>
     <div class="exBody">
@@ -82,7 +88,7 @@
       <div class="subview" id="ex-B"></div>
     </div>
     <div class="exFoot">
-      <div class="nextHint" id="nextHint">🔎 数腿答对 3 题（<span id="cntA">0</span>/3）+ 抬腿法答对 3 题（<span id="cntB">0</span>/3），就能去闯关！</div>
+      <div class="nextHint" id="nextHint">🧠 跟着想一遍，路上答对 3 个问题（<span id="cntA">0</span>/3）+ 自己算对 3 题（<span id="cntB">0</span>/3），就能去闯关！</div>
       <button class="nextBtn" id="nextBtn" onclick="go('game')">去闯关 ▶</button>
     </div>
   </section>
@@ -135,11 +141,93 @@ function makeMini(boxId, rounds, cntId, bumpDone){
   }
   render();
 }
-makeMini('ex-A',[
- {q:'一共几条腿？',show:'🐔🐔 + 🐰（2鸡1兔）',hint:'鸡2条、兔4条',opts:['6','8','10'],ans:1,cap:'2×2 + 4 = 8 条腿。'},
- {q:'一共几条腿？',show:'🐔 + 🐰🐰（1鸡2兔）',hint:'鸡2条、兔4条',opts:['8','10','12'],ans:1,cap:'2 + 4×2 = 10 条腿。'},
- {q:'一共几条腿？',show:'🐔🐔🐔（3只鸡）',hint:'每只鸡2条',opts:['6','8','5'],ans:0,cap:'3×2 = 6 条腿。'},
-],'cntA',()=>doneA++);
+/* ===== tab A:带着她把「假设法(抬腿法)」想一遍,而不是甩三个字 =====
+   -1=还没决定(问号) 0=鸡(2条腿) 1=兔(4条腿);每步腿数实时重算,她自己算、自己换 */
+const A_STEPS=[
+  { pose:[-1,-1,-1], t:'笼子里关着鸡🐔和兔🐰。<br>我们只能看见：<span class="big">3 个头</span>、<span class="big">10 条腿</span>。<br>鸡和兔<b>各有几只</b>呢？', btn:'不知道…怎么办？' },
+  { pose:[0,0,0], t:'不知道，就<b>先假装</b>！<br>假装笼子里<b>全是鸡</b>——看看会怎么样。', btn:'好，先数数它们的腿 ▶' },
+  { pose:[0,0,0], t:'3 只鸡站好了，每只鸡 <b>2</b> 条腿。<br>你数数看——', q:'一共几条腿？', opts:['6 条','8 条','10 条'], ans:0, cap:'3 只鸡，每只 2 条：3×2=<b>6</b> 条腿。' },
+  { pose:[0,0,0], t:'可是笼子里<b>真的有 10 条腿</b>，<br>我们假装成鸡，只数出 <b>6</b> 条。', q:'那少了几条腿？', opts:['4 条','2 条','16 条'], ans:0, cap:'10−6=<b>4</b> 条腿不见了。' },
+  { pose:[0,0,0], t:'少的这 <b>4</b> 条腿，是<b>谁</b>的呢？<br>是<b>兔子</b>的呀！鸡只有 2 条腿，兔子有 4 条——<br>把 1 只鸡换成兔子，腿就<b>多出 2 条</b>。', btn:'换 1 只试试看 ▶' },
+  { pose:[1,0,0], hi:[0], t:'看！换了 <b>1</b> 只兔，腿从 6 变成了 <b>8</b>——<br>真的多了 <b>2</b> 条。', q:'还少 2 条腿，还要再换几只？', opts:['再换 1 只','再换 2 只','再换 4 只'], ans:0, cap:'8+2=10，再换 <b>1</b> 只就正好啦。' },
+  { pose:[1,1,0], hi:[1], t:'🎉 再换 1 只，<span class="big">10 条腿</span>，正好对上！<br>笼子里是 <b>2 只兔</b>、<b>1 只鸡</b>。<br>验算：2×4 + 1×2 = 8+2 = <b>10</b> ✓', final:1 },
+];
+let aStep=0;
+const legsOf=p=>p.reduce((s,x)=>s+(x===1?4:x===0?2:0),0);
+
+function drawAnimal(ctx,x,g,kind,hi){
+  if(kind===-1){
+    ctx.fillStyle='#e3ecf8'; ctx.beginPath(); ctx.ellipse(x,g-46,34,28,0,0,7); ctx.fill();
+    ctx.fillStyle='#8fa8c4'; ctx.font='900 34px sans-serif'; ctx.textAlign='center'; ctx.fillText('?',x,g-34);
+    ctx.fillStyle='#8fa8c4'; ctx.font='900 13px sans-serif'; ctx.fillText('鸡？兔？',x,g+17); return;
+  }
+  const rab=kind===1, legX = rab?[-24,-9,9,24]:[-11,11];
+  legX.forEach(dx=>{ ctx.strokeStyle=hi?'#2ba36a':(rab?'#9b8d84':'#e0a02a'); ctx.lineWidth=hi?6:5; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(x+dx,g-24); ctx.lineTo(x+dx,g); ctx.stroke(); });
+  ctx.fillStyle=rab?'#edeaf3':'#f7cf51';
+  ctx.beginPath(); ctx.ellipse(x,g-46,32,26,0,0,7); ctx.fill();
+  ctx.beginPath(); ctx.arc(x+24,g-74,17,0,7); ctx.fill();
+  if(rab){ ctx.fillStyle='#edeaf3';
+    ctx.beginPath(); ctx.ellipse(x+17,g-99,5,16,-.22,0,7); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x+31,g-101,5,16,.14,0,7); ctx.fill();
+    ctx.fillStyle='#f6b6c8'; ctx.beginPath(); ctx.ellipse(x+17,g-99,2,9,-.22,0,7); ctx.fill();
+  } else { ctx.fillStyle='#ef5b5b';
+    ctx.beginPath(); ctx.arc(x+19,g-89,5,0,7); ctx.fill(); ctx.beginPath(); ctx.arc(x+27,g-91,5,0,7); ctx.fill();
+    ctx.fillStyle='#f08a2a'; ctx.beginPath(); ctx.moveTo(x+40,g-73); ctx.lineTo(x+53,g-69); ctx.lineTo(x+40,g-65); ctx.fill(); }
+  ctx.fillStyle='#3a3a44'; ctx.beginPath(); ctx.arc(x+29,g-77,2.6,0,7); ctx.fill();
+  ctx.fillStyle=hi?'#2ba36a':(rab?'#8b7f76':'#b8860b'); ctx.font='900 13px sans-serif'; ctx.textAlign='center';
+  ctx.fillText(rab?'兔 · 4 条腿':'鸡 · 2 条腿',x,g+17);
+}
+function drawScene(pose,hi){
+  const c=document.getElementById('crCanvas'); if(!c) return;
+  const ctx=c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height);
+  const g=168; ctx.strokeStyle='#dce8f7'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(20,g); ctx.lineTo(c.width-20,g); ctx.stroke();
+  const hiAll = hi==='all';
+  [100,280,460].forEach((x,i)=> drawAnimal(ctx,x,g,pose[i], hiAll || (Array.isArray(hi)&&hi.indexOf(i)>=0)));
+}
+function paintStep(){
+  const s=A_STEPS[aStep], legs=legsOf(s.pose);
+  document.getElementById('aBar').innerHTML=A_STEPS.map((_,i)=>`<div class="sp ${i<=aStep?'on':''}"></div>`).join('');
+  const txt=document.getElementById('aTxt');
+  txt.innerHTML=s.t||''; txt.style.display=s.t?'':'none';
+  drawScene(s.pose, s.hi);
+  const lc=document.getElementById('aLegs');
+  lc.innerHTML = s.pose[0]===-1 ? '🦵 需要数出 <span class="need">10</span> 条腿'
+    : `🦵 现在一共 <b>${legs}</b> 条腿${legs===10?' ✅':` · 还差 <span class="need">${10-legs}</span> 条`}`;
+  const act=document.getElementById('aAct'); act.innerHTML='';
+  if(s.final){ act.innerHTML='<div class="hintline">💡 记住这一招：<b>先假设全是鸡</b> → 少的腿 ÷ 2 = <b>兔子的只数</b></div>'; return; }
+  if(s.q){
+    const wrap=document.createElement('div'); wrap.style.cssText='display:flex;flex-direction:column;align-items:center;gap:10px;';
+    wrap.innerHTML=`<div class="seqQ">${s.q}</div>`;
+    const row=document.createElement('div'); row.className='optRow';
+    const cap=document.createElement('div'); cap.className='roundCap';
+    if(!s._sh){ const c0=s.opts[s.ans]; shuffle(s.opts); s.ans=s.opts.indexOf(c0); s._sh=1; }
+    s.opts.forEach((o,i)=>{ const b=document.createElement('div'); b.className='optBtn'; b.style.fontSize='20px'; b.textContent=o;
+      b.onclick=()=>{ if(b.dataset.locked||b.dataset.dead) return;
+        if(i===s.ans){ b.classList.add('right'); b.dataset.locked='1';
+          [...row.children].forEach(x=>x.style.pointerEvents='none');
+          cap.innerHTML='✅ '+s.cap;
+          if(!s._got){ s._got=1; doneA++; document.getElementById('cntA').textContent=doneA; unlockGame(); }
+          const nb=document.createElement('button'); nb.className='stepBtn'; nb.style.marginTop='4px'; nb.textContent='懂了，接着想 ▶';
+          nb.onclick=()=>{ aStep++; paintStep(); }; wrap.appendChild(nb);
+        } else { _mzMini(b, s.cap, cap); } };
+      row.appendChild(b); });
+    wrap.appendChild(row); wrap.appendChild(cap); act.appendChild(wrap);
+    return;
+  }
+  const b=document.createElement('button'); b.className='stepBtn'; b.textContent=s.btn;
+  b.onclick=()=>{ aStep++; paintStep(); };
+  act.appendChild(b);
+}
+function renderA(){
+  document.getElementById('ex-A').innerHTML=
+    `<div class="stepWrap"><div class="stepBar" id="aBar"></div><div class="stepTxt" id="aTxt"></div>
+     <canvas id="crCanvas" width="560" height="200"></canvas>
+     <div class="legCount" id="aLegs"></div><div id="aAct"></div></div>`;
+  paintStep();
+}
+renderA();
 makeMini('ex-B',[
  {q:'几只兔？（抬腿法）',show:'3 个头，10 条腿',hint:'全鸡=3×2=6，多出的÷2',opts:['1 只','2 只','3 只'],ans:1,cap:'多 4 条 ÷2 = 2 只兔（1 只鸡）。'},
  {q:'几只兔？（抬腿法）',show:'4 个头，12 条腿',hint:'全鸡=4×2=8，多出的÷2',opts:['2 只','3 只','4 只'],ans:0,cap:'多 4 条 ÷2 = 2 只兔（2 只鸡）。'},

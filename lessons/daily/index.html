@@ -219,8 +219,22 @@ function ans(el,ok,fb){ const fbEl=document.getElementById('qfb');
 function finish(){ show('finish');
   document.getElementById('bigstars').textContent='⭐'.repeat(stars)+'☆'.repeat(QUIZ.length-stars);
   document.getElementById('resTxt').textContent = stars===QUIZ.length? '太厉害啦！今天的内容你全记住了，满星通关！🎉' : `你答对拿到了 ${stars} / ${QUIZ.length} 颗星，很棒！再来一次能拿满星哦～`;
+  saveDaily();
   celebrate();
 }
+/* 记下这天大挑战的成绩，好让首页清单看得出做没做过(2026-07-18)。
+   只往 kidspark_v1 里加一个新的 daily 字段，badges/days 一个字都不动，
+   所以已学课程进度完全不受影响。日期由首页用 ?d= 传进来，没传就按本机当天算。*/
+function saveDaily(){ try{
+  const k='kidspark_v1', d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}');
+  d.daily = d.daily || {};
+  const t=new Date(), p=n=>String(n).padStart(2,'0');
+  const ds = params.get('d') || (t.getFullYear()+'-'+p(t.getMonth()+1)+'-'+p(t.getDate()));
+  const old = d.daily[ds];
+  /* 再战只往上刷新最好成绩，不覆盖成更差的 */
+  if(!old || stars > old.s) d.daily[ds] = {s:stars, t:QUIZ.length};
+  localStorage.setItem(k, JSON.stringify(d));
+}catch(e){} }
 function celebrate(){ const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#ff7a3d','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:150},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
   let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<240)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
 if(location.hash==='#quiz') startQuiz();

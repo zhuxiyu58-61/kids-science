@@ -201,7 +201,7 @@
   .lrow.done .lst{color:#2fa869;}
   .lrow .lgo{background:linear-gradient(135deg,#ff9f43,#ff6a3d); color:#fff; font-weight:900; padding:9px 15px; border-radius:12px; font-size:14px; white-space:nowrap; flex:none;}
   .lrow.done .lgo{background:#dff2e5; color:#2fa869;}
-  .dayclose{display:block; width:100%; margin-top:8px; border:none; background:#efe7d6; color:#7a4d17; font-weight:900; padding:13px; border-radius:14px; font-size:15px; cursor:pointer;}
+  .dayclose{display:block; width:100%; margin-top:8px; border:none; background:#efe7d6; color:#7a4d17; font-weight:900; padding:13px 10px; border-radius:14px; font-size:15px; cursor:pointer; white-space:nowrap;}
 </style>
 </head>
 <body>
@@ -263,7 +263,7 @@
       <div class="dsub" id="daySub"></div>
       <div id="dayList"></div>
       <div style="display:flex; gap:10px; margin-top:8px;">
-        <button class="dayclose" style="flex:1; background:#fff0d6; color:#c9781f;" onclick="calFromDay()">📅 看日历（选其它天）</button>
+        <button class="dayclose" style="flex:1; background:#fff0d6; color:#c9781f;" onclick="calFromDay()">📅 看其它天</button>
         <button class="dayclose" style="flex:1;" onclick="closeDay()">收起</button>
       </div>
     </div>
@@ -494,7 +494,7 @@ function loadData(){
   try{ return JSON.parse(localStorage.getItem('kidspark_v1')||'{"badges":{},"days":[]}'); }
   catch(e){ return {badges:{},days:[]}; }
 }
-const data=loadData(), badges=data.badges||{}, days=data.days||[];
+const data=loadData(), badges=data.badges||{}, days=data.days||[], daily=data.daily||{};
 const isDone=id=>!!badges[id];
 
 /* ===== 组装线性站点序列 ===== */
@@ -655,16 +655,20 @@ function openDay(ds){ const L=bucket[ds]; if(!L||!L.length) return; curDay=ds;
       : isPast ? `这天上了 ${L.length} 节课，全部完成 ✓`
       : `这天安排了 ${L.length} 节课（做完前面的就轮到这天）`;
   const allDayDone=L.every(l=>isDone(l.id));
-  let head='';
+  /* 大挑战做没做过、拿了几颗星，都要看得出来；做过了就跟课程一样沉到底部 */
+  let head='', tailRow='';
   if(allDayDone){ const regs=[...new Set(L.map(l=>L2R[l.id]).filter(Boolean))].join(',');
-    head=`<div class="lrow" style="background:#fff0dd" onclick="location.href='lessons/daily/index.html?r=${regs}'"><div class="le">🏆</div><div class="lb"><div class="ln">今日大挑战<span style="font-size:11px;color:#e0692c"> 综合</span></div><div class="lst">这天的课都上完啦，来复习闯关拿星星！</div></div><div class="lgo">挑战 ▶</div></div>`; }
+    const go=`location.href='lessons/daily/index.html?r=${regs}&d=${ds}'`;
+    const dc=daily[ds];
+    if(dc) tailRow=`<div class="lrow done" onclick="${go}"><div class="le">🏆</div><div class="lb"><div class="ln">今日大挑战<span style="font-size:11px;color:#e0692c"> 综合</span></div><div class="lst">✓ 已挑战 · ${'⭐'.repeat(dc.s)}${'☆'.repeat(Math.max(0,dc.t-dc.s))} ${dc.s}/${dc.t} 星${dc.s<dc.t?' · 再战能拿满星':''}</div></div><div class="lgo">再战</div></div>`;
+    else head=`<div class="lrow" style="background:#fff0dd" onclick="${go}"><div class="le">🏆</div><div class="lb"><div class="ln">今日大挑战<span style="font-size:11px;color:#e0692c"> 综合</span></div><div class="lst">这天的课都上完啦，来复习闯关拿星星！</div></div><div class="lgo">挑战 ▶</div></div>`; }
   /* 没上的排前面、已完成的沉到底部（各自内部保持原顺序），娃一打开就看到该做哪节 */
   const rows=[...L].sort((a,b)=>(isDone(a.id)?1:0)-(isDone(b.id)?1:0));
   document.getElementById('dayList').innerHTML = head + rows.map(l=>{ const done=isDone(l.id);
     return `<div class="lrow ${done?'done':''}" onclick="goLesson('${l.id}')">`
       +`<div class="le">${l.e}</div><div class="lb"><div class="ln">${l.n}</div>`
       +`<div class="lst">${done?'✓ 已完成 · 点开可复习':'点这里去上这一课'}</div></div>`
-      +`<div class="lgo">${done?'复习':'开始 ▶'}</div></div>`; }).join('');
+      +`<div class="lgo">${done?'复习':'开始 ▶'}</div></div>`; }).join('') + tailRow;
   document.getElementById('daysheet').classList.add('on');
 }
 /* 进课前记住在看哪天，做完回来自动弹回这天清单 */
@@ -704,10 +708,21 @@ if(todayTodo.length){
   calToday.onclick=()=>openDay(todayStr);
   today.onclick=()=>openDay(todayStr);
 }else{
-  today.innerHTML=`<div class="te">📅</div><div class="tb"><div class="tk">📅 今日任务</div><div class="tt">今天的都做完啦！🎉</div><div class="td">看看日历上的打卡，或回地图回味任意一关～</div></div><div class="tgo">打开日历 ▶</div>`;
-  calToday.innerHTML=`<div class="cte">🎉</div><div class="ctb"><div class="ctk">✨ 全部完成</div><div class="ctt">今天没有新课啦</div><div class="ctd">新的一批马上就来，明天再见～</div></div>`;
-  calToday.style.cursor='default';
-  today.onclick=openCal;
+  /* 课上完了不等于今天完事了——大挑战可能还没做，别急着说"全部完成"，
+     而且这时候要能直接点进当天清单（原来跳日历，娃根本看不到大挑战）*/
+  const dc=daily[todayStr], hasDay=todayGroup.length>0;
+  if(hasDay && !dc){
+    today.innerHTML=`<div class="te">🏆</div><div class="tb"><div class="tk">📅 今日任务</div><div class="tt">课都上完啦，还差最后一关！</div><div class="td">今日大挑战还没做，去拿星星～</div></div><div class="tgo">去挑战 ▶</div>`;
+    calToday.innerHTML=`<div class="cte">🏆</div><div class="ctb"><div class="ctk">🎯 今天 ${todayGroup.length} 节课全上完</div><div class="ctt">还差今日大挑战</div><div class="ctd">点这里去挑战 →</div></div><div class="ctgo">挑战 ▶</div>`;
+    calToday.onclick=()=>openDay(todayStr);
+    today.onclick=()=>openDay(todayStr);
+  }else{
+    const st=dc?` · 大挑战 ${'⭐'.repeat(dc.s)}${'☆'.repeat(Math.max(0,dc.t-dc.s))} ${dc.s}/${dc.t} 星`:'';
+    today.innerHTML=`<div class="te">🎉</div><div class="tb"><div class="tk">📅 今日任务</div><div class="tt">今天全部完成啦！🎉</div><div class="td">${dc?'大挑战拿了 '+dc.s+'/'+dc.t+' 星，':''}点这里回看今天的课～</div></div><div class="tgo">${hasDay?'今天的课 ▶':'打开日历 ▶'}</div>`;
+    calToday.innerHTML=`<div class="cte">🎉</div><div class="ctb"><div class="ctk">✨ 全部完成${st}</div><div class="ctt">今天没有新课啦</div><div class="ctd">新的一批马上就来，明天再见～</div></div>`;
+    calToday.style.cursor='default';
+    today.onclick=()=>hasDay?openDay(todayStr):openCal();
+  }
 }
 /* 做完一节课回来 → 自动弹回刚才在看的清单（日历那天 / 或某主题） */
 try{ const ret=localStorage.getItem('kidspark_ret'), retR=localStorage.getItem('kidspark_retR');

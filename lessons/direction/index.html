@@ -64,6 +64,18 @@
   .finishCard p{color:var(--ink2); font-weight:700; line-height:1.8; margin:0 0 18px; font-size:15px;} .finishCard p b{color:var(--accent);}
   .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:18px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#f5efe6; color:var(--ink);}
   .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+
+/* ===== 手机端排版修正 v1 ===== */
+.finishBtns button{white-space:nowrap;}
+@media (max-width:430px){
+  /* 4 张知识卡排成 2×2,卡名不再从词中间断 */
+  .orbit{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; width:100%; max-width:340px;}
+  .planet{width:auto;}
+  /* 内容顶到上面,别垂直居中留一大片空白 */
+  .subview{justify-content:flex-start; padding-top:4px;}
+  /* 通关页两个按钮各占一行宽度的一半,不断行 */
+  .finishBtns button{padding:13px 14px; font-size:15px;}
+}
 </style>
 </head>
 <body>

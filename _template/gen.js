@@ -316,7 +316,7 @@ console.log('生成完成: '+made+' 个页面');
    三个注入脚本都有标记位、重复跑安全,生成后无脑跑一遍即可。 */
 if(made){
   const ids=[...LESSONS.map(l=>l.id), ...BOSSES.map(b=>b.id)];
-  for(const s of ['inject-mastery.js','inject-explore.js','inject-intro.js']){
+  for(const s of ['inject-mastery.js','inject-explore.js','inject-intro.js','inject-mobile.js']){
     try{ require('child_process').execFileSync(process.execPath, [path.join(__dirname,s), ...ids], {stdio:'inherit'}); }
     catch(e){ console.error('⚠️ '+s+' 注入失败,新课会退回可试错的老规则:', e.message); }
   }

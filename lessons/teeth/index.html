@@ -76,7 +76,7 @@
 
   <section class="scene" id="s-explore">
     <div class="exTabs">
-      <button class="exTab on" id="tabA" onclick="switchEx('A')">🪥 刷牙大作战</button>
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">😁 刷牙大作战</button>
       <button class="exTab" id="tabB" onclick="switchEx('B')">🦷 牙齿家族</button>
     </div>
     <div class="exBody">
@@ -174,7 +174,7 @@ document.querySelectorAll('#tipRow .tc').forEach(c=>c.addEventListener('click',(
 
 /* ===== 闯关1 拖拽分类 ===== */
 const ITEMS=[
- {key:'good',ico:'🪥',name:'早晚刷牙2次'},
+ {key:'good',ico:'😁',name:'早晚刷牙2次'},
  {key:'good',ico:'🥦',name:'多吃蔬菜水果'},
  {key:'good',ico:'👩‍⚕️',name:'定期看牙医'},
  {key:'bad',ico:'🍭',name:'睡前吃糖不刷牙'},
@@ -205,7 +205,7 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;
 
 /* ===== 闯关2 判断（含数学·英语）===== */
 const QUIZ=[
- {tag:'sci',tl:'科学',ico:'🪥',q:'为什么每天都要刷牙？',opts:[['清除牙齿上的细菌和食物残渣，防止蛀牙',1],['让牙齿变得更甜',0],['其实没什么用',0]],fb:'刷牙能清掉细菌和食物残渣，保护牙齿不被蛀掉。'},
+ {tag:'sci',tl:'科学',ico:'😁',q:'为什么每天都要刷牙？',opts:[['清除牙齿上的细菌和食物残渣，防止蛀牙',1],['让牙齿变得更甜',0],['其实没什么用',0]],fb:'刷牙能清掉细菌和食物残渣，保护牙齿不被蛀掉。'},
  {tag:'math',tl:'数学',ico:'🔢',q:'一共有 20 颗乳牙，如果已经换了 12 颗恒牙，还有几颗乳牙没换？',opts:[['8 颗',1],['12 颗',0],['20 颗',0]],fb:'20 − 12 = 8，还剩 8 颗乳牙没换。'},
  {tag:'sci',tl:'科学',ico:'🕑',q:'一天应该刷几次牙比较好？',opts:[['早晚各 1 次，一共 2 次',1],['一周刷 1 次',0],['想起来才刷',0]],fb:'早晚各刷一次，才能一直保持牙齿干净。'},
  {tag:'en',tl:'英语',ico:'🔤',q:'“牙刷”用英语怎么说？',opts:[['toothbrush',1],['tooth candy',0],['smile',0]],fb:'toothbrush 牙刷，tooth 是牙齿，brush 是刷子。'},

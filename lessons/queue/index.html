@@ -60,7 +60,7 @@
   </div>
 
   <section class="scene active" id="s-intro">
-    <div class="kico">🧍🧍🧍</div>
+    <div class="kico">👤👤👤</div>
     <div class="introCard">排队的时候，怎么才能不数错人数呢？这里藏着一个<b>所有人都会犯</b>的小陷阱——别忘了把<b>自己</b>也数进去哦！今天来做排队小专家。</div>
     <button class="bigbtn" onclick="go('explore')">开始数一数 ▶</button>
   </section>
@@ -115,7 +115,7 @@ function renderA(){ const box=document.getElementById('ex-A');
   if(idxA>=ROUNDS_A.length){ box.innerHTML='<div class="roundCap">🎉 两题都答对啦！</div>'; return; }
   const r=ROUNDS_A[idxA]; if(!r._sh){var _c=r.opts[r.ans]; shuffle(r.opts); r.ans=r.opts.indexOf(_c); r._sh=1;}
   box.innerHTML=`<div class="progDots">${ROUNDS_A.map((_,i)=>`<div class="pd ${i<idxA?'done':''}"></div>`).join('')}</div>
-    <div class="lineRow">${'🧍'.repeat(r.front)}<span class="me">🐰</span>${'🧍'.repeat(r.back)}</div>
+    <div class="lineRow">${'👤'.repeat(r.front)}<span class="me">🐰</span>${'👤'.repeat(r.back)}</div>
     <div class="qWord">🐰小兔排队，前面有 <b>${r.front}</b> 人，后面有 <b>${r.back}</b> 人，一共有几人排队？</div>
     <div class="optRow" id="optRowA"></div>
     <div class="roundCap" id="capA"></div>`;
@@ -177,7 +177,7 @@ renderGame();
 
 /* ===== 闯关2 判断 ===== */
 const QUIZ=[
- {tag:'logic',tl:'逻辑',ico:'🧍',q:'小华排队，前面有5人，后面有1人，一共有几人排队？',opts:[['7个',1],['6个',0],['5个',0]],fb:'5 + 1 + 自己1个 = 7个。'},
+ {tag:'logic',tl:'逻辑',ico:'👤',q:'小华排队，前面有5人，后面有1人，一共有几人排队？',opts:[['7个',1],['6个',0],['5个',0]],fb:'5 + 1 + 自己1个 = 7个。'},
  {tag:'logic',tl:'逻辑',ico:'🔁',q:'从前往后数，小刚排第3；从后往前数，小刚排第5。一共有几人排队？',opts:[['7个',1],['8个',0],['9个',0]],fb:'3 + 5 − 1 = 7，减掉重复数的自己。'},
  {tag:'logic',tl:'逻辑',ico:'🤔',q:'算"前面加后面"的人数时，为什么还要再加1？',opts:[['因为还要把自己算进去',1],['因为要加倍',0],['不需要加1',0]],fb:'前面、后面都不包括自己，所以要单独加上自己这1个。'},
  {tag:'en',tl:'英语',ico:'🔤',q:'英语角："排队"用英语怎么说？',opts:[['line up',1],['sit down',0],['stand up',0]],fb:'line up 排队。'},
@@ -187,7 +187,7 @@ function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.l
 function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想～'; } }
 
 function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
-function celebrate(){ saveBadge('queue','🧍','排队小专家'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#c9962f','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+function celebrate(){ saveBadge('queue','👤','排队小专家'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#c9962f','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
   let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
 if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
 

@@ -84,6 +84,28 @@
   .medal.locked .m{background:#f0ece2; box-shadow:none; filter:grayscale(1); opacity:.45;}
   .medal .mn{font-size:11px; font-weight:800; margin-top:4px; line-height:1.25; color:#6a5327;}
   .medal.locked .mn{color:#b3a789;}
+  /* 战利品架：150 个全平铺会刷屏，改成「最新 + 按区折叠」 */
+  .shelfCount{margin-left:auto; background:#fff3d9; color:#c9781f; font-size:13px; font-weight:900; padding:4px 11px; border-radius:12px;}
+  .shSub{font-size:12.5px; font-weight:900; color:#a07c3e; margin:2px 0 8px;}
+  .shNew{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:6px;}
+  .shEmpty{color:#a07c3e; font-weight:700; font-size:13.5px; text-align:center; padding:12px 0 16px; line-height:1.6;}
+  .shDiv{height:1px; background:#f0e7d5; margin:12px 0 12px;}
+  .shRow{display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:16px;
+    background:#fff8ec; margin-bottom:8px; cursor:pointer; transition:transform .1s;}
+  .shRow:active{transform:scale(.99);}
+  .shRow.full{background:linear-gradient(135deg,#fff6df,#ffe9b8);}
+  .shRow .sIco{width:38px; height:38px; border-radius:50%; background:#fff; flex:none;
+    display:flex; align-items:center; justify-content:center; font-size:21px; box-shadow:0 3px 8px rgba(150,100,30,.15);}
+  .shRow .sB{flex:1; min-width:0;}
+  .shRow .sN{font-weight:900; font-size:14px; color:#5a4118;}
+  .shRow .sBar{height:7px; border-radius:4px; background:#ece2cd; margin-top:5px; overflow:hidden;}
+  .shRow .sBar i{display:block; height:100%; border-radius:4px; background:linear-gradient(90deg,#ffc65c,#ff9f43);}
+  .shRow.full .sBar i{background:linear-gradient(90deg,#ffd36b,#f5b731);}
+  .shRow .sNum{font-weight:900; font-size:13px; color:#b6842b; flex:none;}
+  .shRow .sAr{color:#c9b48a; font-weight:900; font-size:13px; flex:none; transition:transform .2s;}
+  .shRow.open .sAr{transform:rotate(90deg);}
+  .shGrid{display:none; flex-wrap:wrap; gap:10px; padding:2px 4px 14px;}
+  .shGrid.open{display:flex;}
 
   footer{max-width:720px; margin:18px auto 40px; text-align:center; color:#a07c3e; font-size:13px; font-weight:700;}
 
@@ -248,8 +270,10 @@
   </div>
 
   <div class="shelf">
-    <h3>🎖 我的战利品架</h3>
-    <div class="shelf-grid" id="shelf"></div>
+    <h3>🎖 我的战利品架 <span class="shelfCount" id="shelfCount"></span></h3>
+    <div id="shelfNew"></div>
+    <div class="shDiv"></div>
+    <div id="shelf"></div>
   </div>
 
   <footer>为小探险家设计 · 每天闯一关约 15–20 分钟 · 边玩边学</footer>
@@ -281,6 +305,7 @@ const REGIONS=[
      {id:'masterpiece',e:'🖼️', n:'名画里的故事',   bn:'小小艺术侦探'},
      {id:'rhythm',     e:'🥁', n:'节奏和拍子',     bn:'节奏小达人'},
      {id:'shapes',     e:'🔺', n:'形状和线条的心情', bn:'形状小侦探'},
+     {id:'symmetry',   e:'🦋', n:'对称的美',         bn:'对称小设计师'},
      {id:'ch-art', e:'🏆', n:'艺术大挑战', bn:'艺术挑战王', boss:true},
    ]},
   {name:'环球探险区', ico:'🧭', color:'#ff9f43', chest:'🧳', gift:{e:'🗺️', name:'古老藏宝图'},
@@ -292,6 +317,7 @@ const REGIONS=[
      {id:'volcano',   e:'🌋', n:'火山喷发',     bn:'火山探险家'},
      {id:'seasons',   e:'🍂', n:'四季怎么来',   bn:'四季小博士'},
      {id:'invention', e:'🏮', n:'四大发明',     bn:'发明小达人'},
+     {id:'timezone',  e:'🌐', n:'地球上的时间差', bn:'时区小向导'},
      {id:'ch-world', e:'🏆', n:'环球大挑战', bn:'环球挑战王', boss:true},
    ]},
   {name:'生命实验室', ico:'🧬', color:'#35c98a', chest:'🔬', gift:{e:'🧪', name:'生命结晶'},
@@ -321,7 +347,7 @@ const REGIONS=[
      {id:'venn',        e:'🟣', n:'圈圈里的秘密',   bn:'交集小专家'},
      {id:'deduce',      e:'🕵️', n:'逻辑小侦探',     bn:'逻辑小侦探'},
      {id:'countshapes', e:'🔺', n:'数图形',         bn:'数图形高手'},
-     {id:'queue',       e:'🧍', n:'排队问题',       bn:'排队小专家'},
+     {id:'queue',       e:'👤', n:'排队问题',       bn:'排队小专家'},
      {id:'maze',        e:'🗺️', n:'走迷宫和一笔画', bn:'迷宫探险家'},
      {id:'drawer',      e:'🧦', n:'抽屉原理',     bn:'抽屉小博士'},
      {id:'weigh',       e:'⚖️', n:'天平找次品',   bn:'称重小神探'},
@@ -331,7 +357,7 @@ const REGIONS=[
    ]},
   {name:'太空宇宙站', ico:'🚀', color:'#6c5ce7', chest:'🛸', gift:{e:'🌌', name:'星河宝石'},
    lessons:[
-     {id:'solar',     e:'🪐', n:'太阳系大家庭',   bn:'行星向导'},
+     {id:'solar',     e:'🌍', n:'太阳系大家庭',   bn:'行星向导'},
      {id:'rocket',    e:'🚀', n:'火箭怎么飞上天', bn:'火箭工程师'},
      {id:'astronaut', e:'👨‍🚀', n:'宇航员的一天', bn:'太空生活家'},
      {id:'lunar',     e:'🌕', n:'月球探秘',       bn:'月球探险家'},
@@ -351,6 +377,7 @@ const REGIONS=[
      {id:'square',        e:'🔲', n:'方阵问题',   bn:'方阵小将军'},
      {id:'multiple',      e:'✖️', n:'和倍问题',   bn:'和倍小勇士'},
      {id:'average',       e:'📊', n:'平均数问题', bn:'平均数小能手'},
+     {id:'unit',          e:'🍎', n:'归一问题',   bn:'归一小神算'},
      {id:'ch-math', e:'🏆', n:'奥数大挑战', bn:'奥数挑战王', boss:true},
    ]},
   {name:'动物王国', ico:'🦁', color:'#0ea5a5', chest:'🦁', gift:{e:'👑', name:'百兽之冠'},
@@ -365,6 +392,7 @@ const REGIONS=[
      {id:'babies',      e:'🐣', n:'动物宝宝哪来的', bn:'动物保姆'},
      {id:'builders',    e:'🏗️', n:'动物建筑师',   bn:'动物建筑师'},
      {id:'night',       e:'🌃', n:'夜行动物',     bn:'夜探小达人'},
+     {id:'tail',        e:'🐒', n:'尾巴有什么用', bn:'尾巴小专家'},
      {id:'ch-animal', e:'🏆', n:'动物大挑战', bn:'动物挑战王', boss:true},
    ]},
   {name:'科技发明馆', ico:'🔧', color:'#4b6cb7', chest:'🤖', gift:{e:'⚙️', name:'黄金齿轮'},
@@ -409,10 +437,11 @@ const REGIONS=[
    lessons:[
      {id:'sunshine',   e:'🌞', n:'阳光做饭',     bn:'光合小厨师'},
      {id:'flower',     e:'🌸', n:'花和蜜蜂',     bn:'传粉小蜜蜂'},
-     {id:'rings',      e:'🪵', n:'树的年轮',     bn:'年轮小侦探'},
+     {id:'rings',      e:'🌳', n:'树的年轮',     bn:'年轮小侦探'},
      {id:'mushroom',   e:'🍄', n:'蘑菇不是植物', bn:'真菌小专家'},
-     {id:'trap',       e:'🪤', n:'会吃虫的植物', bn:'食虫植物观察员'},
+     {id:'trap',       e:'🌿', n:'会吃虫的植物', bn:'食虫植物观察员'},
      {id:'autumnleaf', e:'🍂', n:'叶子为什么变黄', bn:'落叶小博士'},
+     {id:'root',       e:'🌱', n:'根的大本领',   bn:'根系小专家'},
      {id:'ch-plant', e:'🏆', n:'植物大挑战', bn:'植物挑战王', boss:true},
    ]},
   {name:'语文诗词园', ico:'📜', color:'#d24a43', chest:'🏮', gift:{e:'🖌️', name:'神笔小毛笔'},
@@ -436,7 +465,8 @@ const REGIONS=[
      {id:'fridge',   e:'🧊', n:'冰箱为什么保鲜', bn:'保鲜小管家'},
      {id:'taste',    e:'👅', n:'酸甜苦辣咸',     bn:'味觉小美食家'},
      {id:'eggmagic', e:'🥚', n:'鸡蛋变魔术',     bn:'鸡蛋魔术师'},
-     {id:'preserve', e:'🫙', n:'食物保存的智慧', bn:'保存小能手'},
+     {id:'preserve', e:'🥫', n:'食物保存的智慧', bn:'保存小能手'},
+     {id:'onion',    e:'🧅', n:'切洋葱为什么流泪', bn:'洋葱小厨师'},
      {id:'ch-food', e:'🏆', n:'美食大挑战', bn:'美食挑战王', boss:true},
    ]},
   {name:'数学勇士营', ico:'⚖️', color:'#2b7de9', chest:'🎖️', gift:{e:'💎', name:'智慧蓝宝石'},
@@ -591,7 +621,24 @@ const bucket={}; const put=(ds,l)=>{(bucket[ds]||(bucket[ds]=[])).push(l);};
 ALL.forEach(l=>{ if(l.boss) return; if(isDone(l.id)) put((badges[l.id]&&badges[l.id].date)||todayStr, l); });
 /* 未来：未完成的课 → 今天起每天 PER_DAY 课（弹性：想多做可点明天的格子提前上） */
 /* 今天的额度要先扣掉今天已完成的，不然做完一批又补一批，越做越多 */
-const undoneList=ALL.filter(l=>!isDone(l.id) && !l.boss);
+/* 顺序随机：按课程id做稳定哈希打乱，让奥数等同类不扎堆、每天混着不同主题；
+   用哈希而非Math.random()，保证每次刷新顺序不变、日历不乱跳 */
+function _seed(s){let x=2166136261>>>0;for(let i=0;i<s.length;i++){x^=s.charCodeAt(i);x=Math.imul(x,16777619);}return x>>>0;}
+/* 光按 id 哈希排会碰巧把同一个区的课排到同一天（出现过一天全是数学勇士营）。
+   改成「按区轮流发牌」：先把未完成的课按区分组，每组内部哈希打乱，
+   然后第 1 轮每个区各出 1 课、第 2 轮再各出 1 课……
+   这样连着的课必定来自不同区，一天 PER_DAY 课自然覆盖 PER_DAY 个不同主题（≥5）。*/
+const _undone=ALL.filter(l=>!isDone(l.id) && !l.boss);
+const _byRegion=new Map();
+_undone.forEach(l=>{ const r=L2R[l.id]||'x'; if(!_byRegion.has(r)) _byRegion.set(r,[]); _byRegion.get(r).push(l); });
+_byRegion.forEach(g=> g.sort((a,b)=>_seed(a.id)-_seed(b.id)));           // 区内顺序随机
+const _regions=[..._byRegion.keys()].sort((a,b)=>_seed(a)-_seed(b));     // 区的出场顺序也随机
+const undoneList=[];
+for(let round=0; ; round++){
+  let picked=false;
+  for(const r of _regions){ const g=_byRegion.get(r); if(round<g.length){ undoneList.push(g[round]); picked=true; } }
+  if(!picked) break;
+}
 const capToday=Math.max(0, PER_DAY-(bucket[todayStr]||[]).length);
 undoneList.forEach((l,i)=> put(addDays(todayStr, i<capToday ? 0 : 1+Math.floor((i-capToday)/PER_DAY)), l));
 const todayGroup=bucket[todayStr]||[];               // 今天这一天的所有课
@@ -611,7 +658,9 @@ function openDay(ds){ const L=bucket[ds]; if(!L||!L.length) return; curDay=ds;
   let head='';
   if(allDayDone){ const regs=[...new Set(L.map(l=>L2R[l.id]).filter(Boolean))].join(',');
     head=`<div class="lrow" style="background:#fff0dd" onclick="location.href='lessons/daily/index.html?r=${regs}'"><div class="le">🏆</div><div class="lb"><div class="ln">今日大挑战<span style="font-size:11px;color:#e0692c"> 综合</span></div><div class="lst">这天的课都上完啦，来复习闯关拿星星！</div></div><div class="lgo">挑战 ▶</div></div>`; }
-  document.getElementById('dayList').innerHTML = head + L.map(l=>{ const done=isDone(l.id);
+  /* 没上的排前面、已完成的沉到底部（各自内部保持原顺序），娃一打开就看到该做哪节 */
+  const rows=[...L].sort((a,b)=>(isDone(a.id)?1:0)-(isDone(b.id)?1:0));
+  document.getElementById('dayList').innerHTML = head + rows.map(l=>{ const done=isDone(l.id);
     return `<div class="lrow ${done?'done':''}" onclick="goLesson('${l.id}')">`
       +`<div class="le">${l.e}</div><div class="lb"><div class="ln">${l.n}</div>`
       +`<div class="lst">${done?'✓ 已完成 · 点开可复习':'点这里去上这一课'}</div></div>`
@@ -673,11 +722,31 @@ function openChest(s){
   document.getElementById('rDesc').textContent = `你集齐了「${s.region}」的全部徽章，赢得区域宝物：${s.gift? s.gift.name : ''}！`;
   document.getElementById('reward').classList.add('on'); burst();
 }
-document.getElementById('shelf').innerHTML=ALL.map(l=>{ const b=badges[l.id];
-  return b
-    ? `<div class="medal"><div class="m">${l.e}</div><div class="mn">${l.bn}</div></div>`
-    : `<div class="medal locked"><div class="m">🔒</div><div class="mn">${l.bn}</div></div>`;
+/* 战利品架：150 枚全平铺会刷屏（实测 3251px，占首页一大半，且 138 枚是灰锁），
+   改成「最新赢到的 + 按区折叠」：默认只露最近 6 枚和 16 行进度条，想看细节再点开。*/
+function medalH(l,on){ return on
+  ? `<div class="medal"><div class="m">${l.e}</div><div class="mn">${l.bn}</div></div>`
+  : `<div class="medal locked"><div class="m">🔒</div><div class="mn">${l.bn}</div></div>`; }
+const earned=ALL.filter(l=>badges[l.id]);
+document.getElementById('shelfCount').textContent=earned.length+' / '+ALL.length;
+/* 最近赢到的排前面（按徽章上记的完成日期倒序） */
+const recent=[...earned].sort((a,b)=>((badges[b.id]||{}).date||'').localeCompare((badges[a.id]||{}).date||'')).slice(0,6);
+document.getElementById('shelfNew').innerHTML = earned.length
+  ? `<div class="shSub">✨ 最新赢到的${earned.length>6?'（近 6 枚）':''}</div>
+     <div class="shNew">${recent.map(l=>medalH(l,true)).join('')}</div>`
+  : `<div class="shEmpty">还没有战利品～<br>上完一课就能赢到第一枚徽章！</div>`;
+document.getElementById('shelf').innerHTML=REGIONS.map((r,k)=>{
+  const got=r.lessons.filter(l=>badges[l.id]).length, tot=r.lessons.length, full=got===tot;
+  return `<div class="shRow ${full?'full':''}" onclick="toggleShelf(${k},this)">
+      <div class="sIco">${full?'🏅':r.ico}</div>
+      <div class="sB"><div class="sN">${r.name}${full?' · 全收齐！':''}</div>
+        <div class="sBar"><i style="width:${Math.round(got/tot*100)}%"></i></div></div>
+      <div class="sNum">${got}/${tot}</div><div class="sAr">▶</div>
+    </div>
+    <div class="shGrid" id="sg${k}">${r.lessons.map(l=>medalH(l,!!badges[l.id])).join('')}</div>`;
 }).join('');
+function toggleShelf(k,row){ const g=document.getElementById('sg'+k);
+  row.classList.toggle('open', g.classList.toggle('open')); }
 
 /* 继续探险 → 滚到当前站点 */
 document.getElementById('goBtn').onclick=()=>{

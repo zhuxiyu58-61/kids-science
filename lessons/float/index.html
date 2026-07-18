@@ -111,7 +111,7 @@
         <div class="bin" data-k="sink"><div class="binIco">🔽</div><div class="binName">会沉</div><div class="binHint">比水重</div><div class="binDrop"></div></div>
       </div>
       <div class="tray" id="tray">
-        <div class="item" data-k="float"><div class="itIco">🪵</div><div class="itName">木块</div></div>
+        <div class="item" data-k="float"><div class="itIco">🌳</div><div class="itName">木块</div></div>
         <div class="item" data-k="float"><div class="itIco">🍎</div><div class="itName">苹果</div></div>
         <div class="item" data-k="float"><div class="itIco">🍶</div><div class="itName">空瓶</div></div>
         <div class="item" data-k="sink"><div class="itIco">🪨</div><div class="itName">石头</div></div>
@@ -142,7 +142,7 @@ function switchEx(v){ document.getElementById('ex-tank').classList.toggle('on',v
 function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='block'; }
 
 /* 沉浮实验 */
-const OBJ=[{e:'🪵',n:'木块',f:true,why:'木头比同样大小的水<b>轻</b>，所以浮在水面。'},
+const OBJ=[{e:'🌳',n:'木块',f:true,why:'木头比同样大小的水<b>轻</b>，所以浮在水面。'},
  {e:'🪨',n:'石头',f:false,why:'石头比同样大小的水<b>重</b>，所以沉到水底。'},
  {e:'🍶',n:'空瓶',f:true,why:'瓶里装的是<b>空气</b>，非常轻，所以整体能浮。'},
  {e:'🔩',n:'铁钉',f:false,why:'铁很重，一枚实心铁钉比水重，会沉下去。'},
@@ -188,7 +188,7 @@ addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=nul
   else { rst(); tray.appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
 
 /* 闯关2 判断 */
-const QUIZ=[{ico:'🪵',q:'同样大小的一块木头和一块石头一起放进水里，会怎样？',opts:[['木头浮、石头沉（木头比水轻）',1],['两个都浮',0],['两个都沉',0]],fb:'比水轻的浮，比水重的沉。'},
+const QUIZ=[{ico:'🌳',q:'同样大小的一块木头和一块石头一起放进水里，会怎样？',opts:[['木头浮、石头沉（木头比水轻）',1],['两个都浮',0],['两个都沉',0]],fb:'比水轻的浮，比水重的沉。'},
  {ico:'🚢',q:'一大块实心铁会沉，为什么钢铁做的大轮船却能浮在海上？',opts:[['做成空心船形，排开很多水',1],['海水特别有力气',0],['铁在水里会变轻',0]],fb:'船是空心的，能排开大量水、装很多空气，所以能浮。'},
  {ico:'🍶',q:'把空塑料瓶盖紧丢进水里，它会？',opts:[['浮，因为瓶里是空气，很轻',1],['沉到水底',0],['融化掉',0]],fb:'瓶里是空气，整体比水轻，所以浮。'},
  {ico:'⚖️',q:'要判断一个东西在水里浮还是沉，最该比的是？',opts:[['同样大小下，它比水轻还是比水重',1],['它是什么颜色',0],['它好不好看',0]],fb:'关键看“同样大小谁更轻更重”。'}];

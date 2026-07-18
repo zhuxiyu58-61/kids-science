@@ -28,7 +28,7 @@
   .planet{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:10px 8px; width:112px; text-align:center; cursor:pointer; border:3px solid #f4d6ac; transition:.15s;}
   .planet:active{transform:scale(.94);} .planet.seen{border-color:#41c98a; background:#f0fbf4;}
   .planet .pe{font-size:34px;} .planet .pn{font-weight:800; font-size:13px; margin-top:2px;}
-  .factBox{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:14px 18px; max-width:560px; font-weight:800; font-size:15px; line-height:1.6; min-height:52px; display:flex; align-items:center; justify-content:center; text-align:center;} .factBox b{color:var(--accent);}
+  .factBox{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:14px 18px; max-width:560px; font-weight:800; font-size:15px; line-height:1.8; min-height:52px; text-align:center;} .factBox b{color:var(--accent);}
   .seqBox{background:var(--card); border-radius:20px; padding:18px 24px; box-shadow:var(--shadow); font-size:19px; text-align:center; max-width:600px; font-weight:900;}
   .seqQ{color:var(--ink2); font-size:18px; font-weight:900;}
   .optRow{display:flex; gap:14px; flex-wrap:wrap; justify-content:center;}
@@ -78,7 +78,7 @@
 
   <section class="scene" id="s-explore">
     <div class="exTabs">
-      <button class="exTab on" id="tabA" onclick="switchEx('A')">🫧 面团吹泡泡</button>
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">💨 面团吹泡泡</button>
       <button class="exTab" id="tabB" onclick="switchEx('B')">💡 想一想</button>
     </div>
     <div class="exBody">
@@ -94,7 +94,7 @@
   <section class="scene" id="s-game">
     <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 谁需要发酵<small>把食物拖进「要发酵 / 不用发酵」的筐</small></div>
     <div class="gsub on" id="g-round1">
-      <div class="bins"><div class="bin" data-k="good"><div class="binIco">🫧</div><div class="binName">要发酵</div><div class="binHint">松软有孔</div><div class="binDrop"></div></div>
+      <div class="bins"><div class="bin" data-k="good"><div class="binIco">💨</div><div class="binName">要发酵</div><div class="binHint">松软有孔</div><div class="binDrop"></div></div>
         <div class="bin" data-k="bad"><div class="binIco">🚫</div><div class="binName">不用发酵</div><div class="binHint">直接做</div><div class="binDrop"></div></div></div>
       <div class="tray" id="tray"></div>
       <div class="roundNext" id="r1next"><div class="ok">全对啦！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>

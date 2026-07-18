@@ -27,7 +27,7 @@
   .planet{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:10px 8px; width:108px; text-align:center; cursor:pointer; border:3px solid #dae3f6; transition:.15s;}
   .planet:active{transform:scale(.94);} .planet.seen{border-color:#41c98a; background:#f0fbf4;}
   .planet .pe{font-size:34px;} .planet .pn{font-weight:800; font-size:13px; margin-top:2px;}
-  .factBox{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:14px 18px; max-width:560px; font-weight:800; font-size:15px; line-height:1.6; min-height:52px; display:flex; align-items:center; justify-content:center; text-align:center;} .factBox b{color:var(--accent);}
+  .factBox{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:14px 18px; max-width:560px; font-weight:800; font-size:15px; line-height:1.8; min-height:52px; text-align:center;} .factBox b{color:var(--accent);}
   .seqBox{background:var(--card); border-radius:20px; padding:18px 24px; box-shadow:var(--shadow); font-size:20px; text-align:center; max-width:600px; font-weight:900;}
   .seqQ{color:var(--ink2); font-size:18px; font-weight:900;}
   .optRow{display:flex; gap:14px; flex-wrap:wrap; justify-content:center;}
@@ -96,7 +96,7 @@
     <div class="gsub on" id="g-round1">
       <div class="bins">
         <div class="bin" data-k="mag"><div class="binIco">🔍</div><div class="binName">能把东西放大</div><div class="binHint">看得更清</div><div class="binDrop"></div></div>
-        <div class="bin" data-k="mir"><div class="binIco">🪞</div><div class="binName">能照出自己</div><div class="binHint">反射光</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="mir"><div class="binIco">💿</div><div class="binName">能照出自己</div><div class="binHint">反射光</div><div class="binDrop"></div></div>
       </div>
       <div class="tray" id="tray"></div>
       <div class="roundNext" id="r1next"><div class="ok">全对啦！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
@@ -124,7 +124,7 @@ function unlockGame(){ if(doneA>=4 && doneB>=3){ nextHint.style.display='none'; 
 
 const CARDS=[
  {e:'🔍',n:'放大镜',f:'中间鼓鼓的玻璃，能把光<b>弯一弯</b>，让小字、小虫子看起来<b>变大</b>！'},
- {e:'🪞',n:'镜子',f:'又光又亮，把照过来的光<b>弹回去（反射）</b>，就照出了你自己。'},
+ {e:'💿',n:'镜子',f:'又光又亮，把照过来的光<b>弹回去（反射）</b>，就照出了你自己。'},
  {e:'🔬',n:'显微镜',f:'比放大镜更厉害，能把<b>看不见</b>的小东西放得很大很大。'},
  {e:'💧',n:'平静水面',f:'不动的水面也像镜子，能<b>倒映</b>出天空和你的脸。'},
 ];
@@ -162,7 +162,7 @@ renderA(); renderB();
 
 const ITEMS=[
  {key:'mag',ico:'🔍',name:'放大镜'},{key:'mag',ico:'🔬',name:'显微镜'},{key:'mag',ico:'👓',name:'老花镜'},
- {key:'mir',ico:'🪞',name:'镜子'},{key:'mir',ico:'💧',name:'平静水面'},{key:'mir',ico:'🥄',name:'亮勺子'},
+ {key:'mir',ico:'💿',name:'镜子'},{key:'mir',ico:'💧',name:'平静水面'},{key:'mir',ico:'🥄',name:'亮勺子'},
 ];
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
 (function buildSort(){
@@ -188,7 +188,7 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;
 
 const QUIZ=[
  {tag:'sci',tl:'科学',ico:'🔍',q:'放大镜的作用是？',opts:[['把小东西看大',1],['把大东西变小',0],['照出自己',0]],fb:'放大镜让小东西看起来变大。'},
- {tag:'sci',tl:'科学',ico:'🪞',q:'镜子靠什么照出你？',opts:[['反射光',1],['画画',0],['发光',0]],fb:'镜子把光反射回来。'},
+ {tag:'sci',tl:'科学',ico:'💿',q:'镜子靠什么照出你？',opts:[['反射光',1],['画画',0],['发光',0]],fb:'镜子把光反射回来。'},
  {tag:'logic',tl:'安全',ico:'☀️',q:'放大镜对着太阳聚光，会？',opts:[['很烫，别乱照',1],['凉凉的',0],['变冰',0]],fb:'聚光点很烫，别对眼睛或纸！'},
  {tag:'en',tl:'英语',ico:'🔤',q:'英语角："镜子"用英语怎么说？',opts:[['mirror',1],['door',0],['book',0]],fb:'mirror 镜子。'},
 ];

@@ -104,7 +104,7 @@
         <div class="item" data-k="perc"><div class="itIco">🥁</div><div class="itName">鼓</div></div>
         <div class="item" data-k="perc"><div class="itIco">🔔</div><div class="itName">铃铛</div></div>
         <div class="item" data-k="wind"><div class="itIco">🎺</div><div class="itName">小号</div></div>
-        <div class="item" data-k="wind"><div class="itIco">🪈</div><div class="itName">笛子</div></div>
+        <div class="item" data-k="wind"><div class="itIco">🎷</div><div class="itName">笛子</div></div>
         <div class="item" data-k="string"><div class="itIco">🎸</div><div class="itName">吉他</div></div>
         <div class="item" data-k="string"><div class="itIco">🎻</div><div class="itName">小提琴</div></div>
       </div>
@@ -139,7 +139,7 @@ const INS=[
  {e:'🥁',n:'鼓',fm:'打击乐',how:'<b>鼓</b>：用手或鼓棒<b>敲</b>，鼓面震动，发出“咚咚”的低沉声。',play:playPerc},
  {e:'🔔',n:'铃铛',fm:'打击乐',how:'<b>铃铛</b>：摇一摇，金属互相<b>撞击震动</b>，发出清脆的高音。',play:()=>playTone(1200,'triangle',0.4)},
  {e:'🎺',n:'小号',fm:'吹奏乐',how:'<b>小号</b>：往里<b>吹气</b>，让管里的空气柱震动，声音明亮响亮。',play:()=>playTone(330,'sawtooth',0.7,0.05)},
- {e:'🪈',n:'笛子',fm:'吹奏乐',how:'<b>笛子</b>：<b>吹气</b>让笛管里的空气震动，声音清亮悠扬。',play:()=>playTone(587,'sine',0.7,0.05)},
+ {e:'🎷',n:'笛子',fm:'吹奏乐',how:'<b>笛子</b>：<b>吹气</b>让笛管里的空气震动，声音清亮悠扬。',play:()=>playTone(587,'sine',0.7,0.05)},
  {e:'🎸',n:'吉他',fm:'弦乐',how:'<b>吉他</b>：用手<b>拨动琴弦</b>，弦震动发声，一拨就响、慢慢变轻。',play:()=>playTone(196,'triangle',0.7)},
  {e:'🎻',n:'小提琴',fm:'弦乐',how:'<b>小提琴</b>：用琴弓<b>拉琴弦</b>，让弦一直震动，声音连绵。',play:()=>playTone(440,'sawtooth',0.8,0.08)},
 ];
@@ -168,7 +168,7 @@ addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=nul
 /* 闯关2 判断 */
 const QUIZ=[{ico:'🥁',q:'鼓是怎么发出声音的？',opts:[['敲它，让鼓面震动',1],['往里吹气',0],['拨动琴弦',0]],fb:'鼓属于打击乐，靠敲打鼓面震动发声。'},
  {ico:'🎸',q:'吉他、小提琴这类乐器，靠什么发声？',opts:[['琴弦的震动',1],['敲打鼓面',0],['吹气',0]],fb:'它们是弦乐，靠弦震动发声。'},
- {ico:'🪈',q:'笛子、小号属于哪一类乐器？',opts:[['吹奏乐',1],['打击乐',0],['弦乐',0]],fb:'靠吹气让空气震动，是吹奏乐。'},
+ {ico:'🎷',q:'笛子、小号属于哪一类乐器？',opts:[['吹奏乐',1],['打击乐',0],['弦乐',0]],fb:'靠吹气让空气震动，是吹奏乐。'},
  {ico:'🎵',q:'不管敲、吹还是拨弦，乐器能发声的共同点是？',opts:[['都让某个东西在震动',1],['都要插电',0],['都很大',0]],fb:'声音都来自震动——这和《好听的声音》学的一样。'}];
 let qi=0; function startQuiz(){ document.getElementById('g-sort').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>把乐器的道理用起来</small>'; qi=0; renderQ(); }
 function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; shuffle(it.opts.slice()).forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }

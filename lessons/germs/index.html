@@ -151,7 +151,7 @@ seed();
 function scrub(){ // 每次洗掉一批
   const remove=Math.min(germs.length,4); for(let i=0;i<remove;i++){ const g=germs.pop(); if(g)for(let b=0;b<3;b++)bubbles.push({x:g.x+(Math.random()-.5)*20,y:g.y,r:4+Math.random()*6,life:40}); }
   document.getElementById('cnt').textContent=germs.length;
-  document.getElementById('wCap').innerHTML = germs.length>0 ? `🫧 泡泡搓起来，病菌被冲走一些！还剩 <b>${germs.length}</b> 个，继续搓～` : '✨ 病菌都洗光啦！手真干净～ 记住：<b>肥皂+流水+多搓几下</b>。';
+  document.getElementById('wCap').innerHTML = germs.length>0 ? `💨 泡泡搓起来，病菌被冲走一些！还剩 <b>${germs.length}</b> 个，继续搓～` : '✨ 病菌都洗光啦！手真干净～ 记住：<b>肥皂+流水+多搓几下</b>。';
   if(germs.length===0 && !doneOnce){ doneOnce=true; unlockGame(); document.getElementById('nextHint').innerHTML='✅ 洗干净啦！点下面去闯关～'; }
 }
 function resetW(){ seed(); bubbles=[]; document.getElementById('wCap').innerHTML='这只手上有好多看不见的<b>病菌</b>（红点）。点“<b>抹肥皂·搓一搓</b>”，把它们洗掉！'; }

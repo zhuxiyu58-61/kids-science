@@ -28,7 +28,7 @@
   .planet{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:10px 8px; width:96px; text-align:center; cursor:pointer; border:3px solid #e7e5fb; transition:.15s;}
   .planet:active{transform:scale(.94);} .planet.seen{border-color:#41c98a; background:#f0fbf4;}
   .planet .pe{font-size:34px;} .planet .pn{font-weight:800; font-size:13px; margin-top:2px;} .planet .po{font-size:10px; color:var(--ink2); font-weight:700;}
-  .factBox{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:14px 18px; max-width:560px; font-weight:800; font-size:15px; line-height:1.6; min-height:52px; display:flex; align-items:center; justify-content:center; text-align:center;} .factBox b{color:var(--accent);}
+  .factBox{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:14px 18px; max-width:560px; font-weight:800; font-size:15px; line-height:1.8; min-height:52px; text-align:center;} .factBox b{color:var(--accent);}
   .seqBox{background:var(--card); border-radius:20px; padding:18px 24px; box-shadow:var(--shadow); font-size:clamp(22px,5vw,34px); text-align:center; max-width:600px; font-weight:900;}
   .seqQ{color:var(--ink2); font-size:18px; font-weight:900;}
   .optRow{display:flex; gap:14px; flex-wrap:wrap; justify-content:center;}
@@ -72,14 +72,14 @@
   </div>
 
   <section class="scene active" id="s-intro">
-    <div class="kico">🪐</div>
+    <div class="kico">🌍</div>
     <div class="introCard">太阳是一个超级大的<b>大火球</b>，它带着 <b>8 个行星</b>一圈一圈地转，我们住的<b>地球</b>就是其中一个！离太阳越近越<b>热</b>，越远越<b>冷</b>。今天来当一次行星向导～</div>
     <button class="bigbtn" onclick="go('explore')">出发探索 ▶</button>
   </section>
 
   <section class="scene" id="s-explore">
     <div class="exTabs">
-      <button class="exTab on" id="tabA" onclick="switchEx('A')">🪐 八大行星</button>
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">🌍 八大行星</button>
       <button class="exTab" id="tabB" onclick="switchEx('B')">🔥❄️ 近热远冷</button>
     </div>
     <div class="exBody">
@@ -96,7 +96,7 @@
     <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 谁绕着太阳转<small>把下面的，拖到对的筐里</small></div>
     <div class="gsub on" id="g-round1">
       <div class="bins">
-        <div class="bin" data-k="planet"><div class="binIco">🪐</div><div class="binName">是行星</div><div class="binHint">绕着太阳转</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="planet"><div class="binIco">🌍</div><div class="binName">是行星</div><div class="binHint">绕着太阳转</div><div class="binDrop"></div></div>
         <div class="bin" data-k="no"><div class="binIco">🚫</div><div class="binName">不是行星</div><div class="binHint">太阳/月亮…</div><div class="binDrop"></div></div>
       </div>
       <div class="tray" id="tray"></div>
@@ -109,7 +109,7 @@
   </section>
 
   <section class="scene" id="s-finish">
-    <div class="finishCard"><div class="medal">🪐</div><h2>行星都被你认全啦！</h2><div class="medalName">🎖 行星向导</div>
+    <div class="finishCard"><div class="medal">🌍</div><h2>行星都被你认全啦！</h2><div class="medalName">🎖 行星向导</div>
       <p>你今天学到了：<br>• 太阳系里有 <b>1 个太阳</b> 和 <b>8 个行星</b>，地球是其中一个；<br>• 从近到远：<b>水金地火</b>、木土天海（水星、金星、地球、火星、木星、土星、天王星、海王星）；<br>• 离太阳越近越 <b>热</b>，越远越 <b>冷</b>；<b>木星</b>最大，能装下好多个地球；<br>• 🔤 英语：行星 <b>planet</b>。</p>
       <div class="finishBtns"><button class="fb2" onclick="location.reload()">再玩一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
     </div>
@@ -129,7 +129,7 @@ const PLANETS=[
  {e:'♀',n:'金星',o:'第2近·最热',f:'金星是<b>最热</b>的行星，比水星还热，因为它裹着厚厚的云！'},
  {e:'🌍',n:'地球',o:'第3近·我们家',f:'地球是<b>我们的家</b>，有空气有水，是目前唯一有生命的行星！'},
  {e:'🔴',n:'火星',o:'第4近·红色',f:'火星是<b>红色</b>的，像生锈了，人类想以后去那里看看！'},
- {e:'🪐',n:'木星',o:'第5近·最大',f:'木星<b>最大</b>，能装下 1000 多个地球，它有一个大红斑！'},
+ {e:'🌕',n:'木星',o:'第5近·最大',f:'木星<b>最大</b>，能装下 1000 多个地球，它有一个大红斑！'},
  {e:'💍',n:'土星',o:'第6近·带光环',f:'土星有漂亮的<b>光环</b>，是用冰和石头做的圈圈！'},
  {e:'🔵',n:'天王星',o:'第7近·躺着转',f:'天王星是<b>躺着</b>打滚转的，颜色淡蓝淡蓝的！'},
  {e:'🌀',n:'海王星',o:'第8近·最远',f:'海王星离太阳<b>最远</b>，又冷又蓝，风超级大！'},
@@ -139,7 +139,7 @@ function renderA(){ const box=document.getElementById('ex-A');
   const orbit=document.getElementById('orbit');
   PLANETS.forEach((p,i)=>{ const d=document.createElement('div'); d.className='planet'; d.dataset.i=i;
     d.innerHTML=`<div class="pe">${p.e}</div><div class="pn">${p.n}</div><div class="po">${p.o}</div>`;
-    d.onclick=()=>{ document.getElementById('factA').innerHTML='🪐 <b>'+p.n+'</b>：'+p.f;
+    d.onclick=()=>{ document.getElementById('factA').innerHTML='🌍 <b>'+p.n+'</b>：'+p.f;
       if(!d.dataset.seen){ d.dataset.seen='1'; d.classList.add('seen'); doneA++; document.getElementById('cntA').textContent=doneA;
         if(doneA>=8) document.getElementById('factA').innerHTML='🎉 八个行星都认识啦！去右边标签答几道题吧～';
         unlockGame(); } };
@@ -147,9 +147,9 @@ function renderA(){ const box=document.getElementById('ex-A');
 }
 /* ===== 探索B：近热远冷 3题 ===== */
 const ROUNDS_B=[
- {q:'离太阳<b>最近</b>的行星是哪个？',opts:['☿ 水星','🌀 海王星','🪐 木星'],ans:0,cap:'水星离太阳最近，排第一个！'},
+ {q:'离太阳<b>最近</b>的行星是哪个？',opts:['☿ 水星','🌀 海王星','🌕 木星'],ans:0,cap:'水星离太阳最近，排第一个！'},
  {q:'离太阳越远，天气会怎样？',opts:['越来越热','越来越冷','不冷不热'],ans:1,cap:'离太阳越远越冷——海王星最远最冷！'},
- {q:'八大行星里，个头<b>最大</b>的是？',opts:['🌍 地球','🪐 木星','☿ 水星'],ans:1,cap:'木星最大，能装下 1000 多个地球！'},
+ {q:'八大行星里，个头<b>最大</b>的是？',opts:['🌍 地球','🌕 木星','☿ 水星'],ans:1,cap:'木星最大，能装下 1000 多个地球！'},
 ];
 let idxB=0;
 function renderB(){ const box=document.getElementById('ex-B');
@@ -172,7 +172,7 @@ renderA(); renderB();
 
 /* ===== 闯关1 分类 ===== */
 const ITEMS=[
- {key:'planet',ico:'🌍',name:'地球'},{key:'planet',ico:'🔴',name:'火星'},{key:'planet',ico:'🪐',name:'木星'},
+ {key:'planet',ico:'🌍',name:'地球'},{key:'planet',ico:'🔴',name:'火星'},{key:'planet',ico:'🌕',name:'木星'},
  {key:'no',ico:'☀️',name:'太阳'},{key:'no',ico:'🌙',name:'月亮'},{key:'no',ico:'⭐',name:'星星'},
 ];
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
@@ -200,7 +200,7 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;
 /* ===== 闯关2 判断 ===== */
 const QUIZ=[
  {tag:'sci',tl:'科学',ico:'🌍',q:'我们住的地球，是绕着谁转的？',opts:[['太阳',1],['月亮',0],['星星',0]],fb:'地球和其它 7 个行星都绕着太阳转。'},
- {tag:'sci',tl:'科学',ico:'🪐',q:'八大行星里，最大的是哪个？',opts:[['木星',1],['地球',0],['水星',0]],fb:'木星最大，能装下 1000 多个地球。'},
+ {tag:'sci',tl:'科学',ico:'🌍',q:'八大行星里，最大的是哪个？',opts:[['木星',1],['地球',0],['水星',0]],fb:'木星最大，能装下 1000 多个地球。'},
  {tag:'logic',tl:'逻辑',ico:'🔥',q:'越靠近太阳的行星，会越怎么样？',opts:[['越热',1],['越冷',0],['一样',0]],fb:'越近越热，越远越冷。'},
  {tag:'en',tl:'英语',ico:'🔤',q:'英语角："行星"用英语怎么说？',opts:[['planet',1],['moon',0],['water',0]],fb:'planet 行星；moon 月亮。'},
 ];
@@ -209,7 +209,7 @@ function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.l
 function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想～'; } }
 
 function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
-function celebrate(){ saveBadge('solar','🪐','行星向导'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#6c5ce7','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+function celebrate(){ saveBadge('solar','🌍','行星向导'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#6c5ce7','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
   let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
 if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
 

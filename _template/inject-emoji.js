@@ -36,9 +36,13 @@ const MAP = {
   '🫗':'💧',  // 倒水→水滴
   '🪄':'✨',  // 魔法棒→闪光
   '🪓':'🔨',  // 斧头→锤子
+  '🫧':'🔵',  // 气泡(U14)→蓝圆
+  '🧎':'🙇',  // 跪姿人(U12)→弯腰的人
 };
-/* 检测用:Unicode 12.0+ 常见新增段 */
-const NEW_RE = /[\u{1FA70}-\u{1FAFF}\u{1F9CD}-\u{1F9DD}\u{1F90C}-\u{1F90E}\u{1F971}\u{1F972}\u{1F97A}\u{1F9A3}-\u{1F9AF}\u{1F9BB}-\u{1F9BF}]/gu;
+/* 检测用:Unicode 12.0+ 常见新增段。
+   注意 1F9CD-1F9CF(🧍🧎🧏)才是 Unicode 12 新增;
+   1F9D0(🧐)、1F9D1(🧑)、1F9D2(🧒) 是 Unicode 10 的老字,区间别划到那边去,否则误报。*/
+const NEW_RE = /[\u{1FA70}-\u{1FAFF}\u{1F9CD}-\u{1F9CF}\u{1F90C}-\u{1F90E}\u{1F971}\u{1F972}\u{1F97A}\u{1F9A3}-\u{1F9AF}\u{1F9BB}-\u{1F9BF}]/gu;
 
 const files = [];
 files.push(path.join(ROOT, 'index.html'));

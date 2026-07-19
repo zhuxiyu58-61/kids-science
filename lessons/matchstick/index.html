@@ -64,6 +64,8 @@
 
 /* ===== 手机端排版修正 start ===== */
 .finishBtns button{white-space:nowrap;}
+/* 知识卡全看完的提示,接在知识点下面而不是盖掉它 */
+.factDone{margin-top:9px; padding-top:8px; border-top:1px dashed rgba(0,0,0,.13); font-size:13.5px; opacity:.85;}
 /* 课名长的时候(如"望远镜看到的是过去")标题会把「回乐园」挤成两行 */
 .back{white-space:nowrap;}
 .title{min-width:0;}
@@ -147,7 +149,7 @@ function renderA(){ const box=document.getElementById('ex-A');
     d.innerHTML=`<div class="pe">${p.e}</div><div class="pn">${p.n}</div>`;
     d.onclick=()=>{ document.getElementById('factA').innerHTML=p.e+' <b>'+p.n+'</b>：'+p.f;
       if(!d.dataset.seen){ d.dataset.seen='1'; d.classList.add('seen'); doneA++; document.getElementById('cntA').textContent=doneA;
-        if(doneA>=4) document.getElementById('factA').innerHTML='🎉 4 张知识卡都看完啦！去右边答题吧！'; unlockGame(); } };
+        if(doneA>=4) document.getElementById('factA').innerHTML+='<div class="factDone">🎉 4 张知识卡都看完啦！去右边答题吧！</div>'; unlockGame(); } };
     orbit.appendChild(d); });
 }
 const ROUNDS_B=[{"q":"拼一个三角形要几根小棒？","opts":["3 根","4 根","5 根"],"ans":0,"cap":"三条边3根。"},{"q":"两个三角形共用一条边，一共要几根？","opts":["5 根","6 根","4 根"],"ans":0,"cap":"3+3−1=5，共用的省一根。"},{"q":"\"移动一根小棒\"以后，总根数？","opts":["不变","变少","变多"],"ans":0,"cap":"移动只是换位置，不是拿走。"}];

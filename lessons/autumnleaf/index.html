@@ -64,6 +64,8 @@
 
 /* ===== 手机端排版修正 start ===== */
 .finishBtns button{white-space:nowrap;}
+/* 知识卡全看完的提示,接在知识点下面而不是盖掉它 */
+.factDone{margin-top:9px; padding-top:8px; border-top:1px dashed rgba(0,0,0,.13); font-size:13.5px; opacity:.85;}
 /* 课名长的时候(如"望远镜看到的是过去")标题会把「回乐园」挤成两行 */
 .back{white-space:nowrap;}
 .title{min-width:0;}
@@ -147,7 +149,7 @@ function renderA(){ const box=document.getElementById('ex-A');
     d.innerHTML=`<div class="pe">${p.e}</div><div class="pn">${p.n}</div>`;
     d.onclick=()=>{ document.getElementById('factA').innerHTML=p.e+' <b>'+p.n+'</b>：'+p.f;
       if(!d.dataset.seen){ d.dataset.seen='1'; d.classList.add('seen'); doneA++; document.getElementById('cntA').textContent=doneA;
-        if(doneA>=4) document.getElementById('factA').innerHTML='🎉 4 张知识卡都看完啦！去右边答题吧！'; unlockGame(); } };
+        if(doneA>=4) document.getElementById('factA').innerHTML+='<div class="factDone">🎉 4 张知识卡都看完啦！去右边答题吧！</div>'; unlockGame(); } };
     orbit.appendChild(d); });
 }
 const ROUNDS_B=[{"q":"秋天叶子变黄，是因为叶子里？","opts":["叶绿素退了黄色素露出来","被太阳晒黄了","刷了黄油漆"],"ans":0,"cap":"黄色素本来就在，只是被绿色盖住了。"},{"q":"树到冬天落叶，是为了？","opts":["省能量好过冬","换新发型","吓唬虫子"],"ans":0,"cap":"落叶是树的过冬妙招。"},{"q":"秋天叶子的\"厨房\"开不了工，因为？","opts":["阳光变少天变冷","厨师放假","没有锅"],"ans":0,"cap":"光合作用需要充足阳光。"}];

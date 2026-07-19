@@ -64,6 +64,8 @@
 
 /* ===== 手机端排版修正 start ===== */
 .finishBtns button{white-space:nowrap;}
+/* 知识卡全看完的提示,接在知识点下面而不是盖掉它 */
+.factDone{margin-top:9px; padding-top:8px; border-top:1px dashed rgba(0,0,0,.13); font-size:13.5px; opacity:.85;}
 /* 课名长的时候(如"望远镜看到的是过去")标题会把「回乐园」挤成两行 */
 .back{white-space:nowrap;}
 .title{min-width:0;}
@@ -147,7 +149,7 @@ function renderA(){ const box=document.getElementById('ex-A');
     d.innerHTML=`<div class="pe">${p.e}</div><div class="pn">${p.n}</div>`;
     d.onclick=()=>{ document.getElementById('factA').innerHTML=p.e+' <b>'+p.n+'</b>：'+p.f;
       if(!d.dataset.seen){ d.dataset.seen='1'; d.classList.add('seen'); doneA++; document.getElementById('cntA').textContent=doneA;
-        if(doneA>=4) document.getElementById('factA').innerHTML='🎉 4 张知识卡都看完啦！去右边答题吧！'; unlockGame(); } };
+        if(doneA>=4) document.getElementById('factA').innerHTML+='<div class="factDone">🎉 4 张知识卡都看完啦！去右边答题吧！</div>'; unlockGame(); } };
     orbit.appendChild(d); });
 }
 const ROUNDS_B=[{"q":"所有人唱同一条旋律，叫？","opts":["齐唱","合唱","轮唱"],"ans":0,"cap":"齐唱只有一层。"},{"q":"分成几组同时唱不同的音，叫？","opts":["合唱","齐唱","独唱"],"ans":0,"cap":"合唱能叠出层次。"},{"q":"合唱最重要的是？","opts":["听着别人唱","唱得最大声","唱得最快"],"ans":0,"cap":"融进整体才好听。"}];

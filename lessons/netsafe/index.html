@@ -64,6 +64,8 @@
 
 /* ===== 手机端排版修正 start ===== */
 .finishBtns button{white-space:nowrap;}
+/* 知识卡全看完的提示,接在知识点下面而不是盖掉它 */
+.factDone{margin-top:9px; padding-top:8px; border-top:1px dashed rgba(0,0,0,.13); font-size:13.5px; opacity:.85;}
 /* 课名长的时候(如"望远镜看到的是过去")标题会把「回乐园」挤成两行 */
 .back{white-space:nowrap;}
 .title{min-width:0;}
@@ -147,7 +149,7 @@ function renderA(){ const box=document.getElementById('ex-A');
     d.innerHTML=`<div class="pe">${p.e}</div><div class="pn">${p.n}</div>`;
     d.onclick=()=>{ document.getElementById('factA').innerHTML=p.e+' <b>'+p.n+'</b>：'+p.f;
       if(!d.dataset.seen){ d.dataset.seen='1'; d.classList.add('seen'); doneA++; document.getElementById('cntA').textContent=doneA;
-        if(doneA>=4) document.getElementById('factA').innerHTML='🎉 4 张知识卡都看完啦！去右边答题吧！'; unlockGame(); } };
+        if(doneA>=4) document.getElementById('factA').innerHTML+='<div class="factDone">🎉 4 张知识卡都看完啦！去右边答题吧！</div>'; unlockGame(); } };
     orbit.appendChild(d); });
 }
 const ROUNDS_B=[{"q":"网上有人问你家住哪，应该？","opts":["不说，并告诉爸妈","告诉他","只说小区名字"],"ans":0,"cap":"个人信息谁问都不说。"},{"q":"网友约你单独见面，应该？","opts":["拒绝，并马上告诉大人","偷偷去","带同学一起去"],"ans":0,"cap":"绝不单独见网友。"},{"q":"看到\"免费领皮肤，点这里\"，应该？","opts":["不点，多半是骗子","马上点","拿妈妈手机去付钱"],"ans":0,"cap":"天上不会掉馅饼。"}];

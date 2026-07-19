@@ -64,6 +64,8 @@
 
 /* ===== 手机端排版修正 start ===== */
 .finishBtns button{white-space:nowrap;}
+/* 知识卡全看完的提示,接在知识点下面而不是盖掉它 */
+.factDone{margin-top:9px; padding-top:8px; border-top:1px dashed rgba(0,0,0,.13); font-size:13.5px; opacity:.85;}
 /* 课名长的时候(如"望远镜看到的是过去")标题会把「回乐园」挤成两行 */
 .back{white-space:nowrap;}
 .title{min-width:0;}
@@ -147,7 +149,7 @@ function renderA(){ const box=document.getElementById('ex-A');
     d.innerHTML=`<div class="pe">${p.e}</div><div class="pn">${p.n}</div>`;
     d.onclick=()=>{ document.getElementById('factA').innerHTML=p.e+' <b>'+p.n+'</b>：'+p.f;
       if(!d.dataset.seen){ d.dataset.seen='1'; d.classList.add('seen'); doneA++; document.getElementById('cntA').textContent=doneA;
-        if(doneA>=4) document.getElementById('factA').innerHTML='🎉 4 张知识卡都看完啦！去右边答题吧！'; unlockGame(); } };
+        if(doneA>=4) document.getElementById('factA').innerHTML+='<div class="factDone">🎉 4 张知识卡都看完啦！去右边答题吧！</div>'; unlockGame(); } };
     orbit.appendChild(d); });
 }
 const ROUNDS_B=[{"q":"羡慕和嫉妒最大的区别是？","opts":["一个想自己变好,一个想别人变差","没区别","嫉妒更礼貌"],"ans":0,"cap":"看眼睛盯着谁。"},{"q":"心里泛酸，其实说明？","opts":["你很在乎这件事","你是坏孩子","你要生病了"],"ans":0,"cap":"酸的地方就是在乎的地方。"},{"q":"处理这种感觉最好的办法是？","opts":["翻译成自己的具体目标","假装没有","去说别人坏话"],"ans":0,"cap":"把它变成燃料。"}];

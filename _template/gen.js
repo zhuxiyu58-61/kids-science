@@ -139,7 +139,8 @@ function renderA(){ const box=document.getElementById('ex-A');
     d.innerHTML=\`<div class="pe">\${p.e}</div><div class="pn">\${p.n}</div>\`;
     d.onclick=()=>{ document.getElementById('factA').innerHTML=p.e+' <b>'+p.n+'</b>：'+p.f;
       if(!d.dataset.seen){ d.dataset.seen='1'; d.classList.add('seen'); doneA++; document.getElementById('cntA').textContent=doneA;
-        if(doneA>=4) document.getElementById('factA').innerHTML='🎉 4 张知识卡都看完啦！去右边答题吧！'; unlockGame(); } };
+        /* 这里必须是 += 追加。写成 = 会把刚显示的第 4 张知识点覆盖掉，那张就永远看不到了 */
+        if(doneA>=4) document.getElementById('factA').innerHTML+='<div class="factDone">🎉 4 张知识卡都看完啦！去右边答题吧！</div>'; unlockGame(); } };
     orbit.appendChild(d); });
 }
 const ROUNDS_B=${JSON.stringify(L.qb.map(r=>({q:r.q,opts:r.opts,ans:0,cap:r.cap})))};
@@ -316,7 +317,7 @@ console.log('生成完成: '+made+' 个页面');
    三个注入脚本都有标记位、重复跑安全,生成后无脑跑一遍即可。 */
 if(made){
   const ids=[...LESSONS.map(l=>l.id), ...BOSSES.map(b=>b.id)];
-  for(const s of ['inject-mastery.js','inject-explore.js','inject-intro.js','inject-mobile.js']){
+  for(const s of ['inject-mastery.js','inject-explore.js','inject-intro.js','inject-mobile.js','inject-fact.js']){
     try{ require('child_process').execFileSync(process.execPath, [path.join(__dirname,s), ...ids], {stdio:'inherit'}); }
     catch(e){ console.error('⚠️ '+s+' 注入失败,新课会退回可试错的老规则:', e.message); }
   }

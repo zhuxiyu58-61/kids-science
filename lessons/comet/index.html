@@ -146,7 +146,7 @@ function unlockGame(){ if(doneA>=4 && doneB>=3){ nextHint.style.display='none'; 
 const CARDS=[
  {e:'🌠',n:'流星',f:'小石头冲进大气层，<b>摩擦烧起来</b>，就是一道划过的光！'},
  {e:'💫',n:'流星雨',f:'好多好多流星一起划过天空，就叫<b>流星雨</b>，超级壮观！'},
- {e:'🪨',n:'陨石',f:'没烧完、<b>落到地上</b>的太空石头，叫陨石。'},
+ {e:'🗿',n:'陨石',f:'没烧完、<b>落到地上</b>的太空石头，叫陨石。'},
  {e:'☄️',n:'彗星',f:'彗星是拖着长尾巴的<b>「脏雪球」</b>，靠近太阳才拖出大尾巴！'},
 ];
 function renderA(){ const box=document.getElementById('ex-A');
@@ -183,7 +183,7 @@ renderA(); renderB();
 
 const ITEMS=[
  {key:'sky',ico:'🌠',name:'流星'},{key:'sky',ico:'💫',name:'流星雨'},{key:'sky',ico:'☄️',name:'彗星'},
- {key:'ground',ico:'🪨',name:'陨石'},{key:'ground',ico:'🕳️',name:'陨石坑'},
+ {key:'ground',ico:'🗿',name:'陨石'},{key:'ground',ico:'🕳️',name:'陨石坑'},
 ];
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
 (function buildSort(){
@@ -210,7 +210,7 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;
 const QUIZ=[
  {tag:'sci',tl:'科学',ico:'🌠',q:'流星是怎么发光的？',opts:[['冲进大气摩擦烧起来',1],['自己会亮',0],['被太阳照亮',0]],fb:'小石头摩擦生热烧起来发光。'},
  {tag:'sci',tl:'科学',ico:'☄️',q:'拖着长尾巴的是？',opts:[['彗星',1],['流星',0],['陨石',0]],fb:'彗星拖着长长的尾巴。'},
- {tag:'logic',tl:'逻辑',ico:'🪨',q:'没烧完、掉到地上的石头叫？',opts:[['陨石',1],['流星',0],['彗星',0]],fb:'落到地上的叫陨石。'},
+ {tag:'logic',tl:'逻辑',ico:'🗿',q:'没烧完、掉到地上的石头叫？',opts:[['陨石',1],['流星',0],['彗星',0]],fb:'落到地上的叫陨石。'},
  {tag:'en',tl:'英语',ico:'🔤',q:'英语角："星星"用英语怎么说？',opts:[['star',1],['moon',0],['sun',0]],fb:'star 星星。'},
 ];
 let qi=0; function startQuiz(){ document.getElementById('g-round1').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>科学 + 逻辑 + 英语</small>'; qi=0; renderQ(); }

@@ -141,7 +141,7 @@ function switchEx(v){ document.getElementById('ex-A').classList.toggle('on',v===
 let doneA=0, doneB=0;
 function unlockGame(){ if(doneA>=4 && doneB>=3){ nextHint.style.display='none'; nextBtn.style.display='block'; } }
 
-const CARDS=[{"e":"❓","n":"先问一个是非题","f":"条件判断先问一句<b>只能答\"是\"或\"否\"</b>的话，比如\"血量小于 10 吗？\""},{"e":"✅","n":"是 → 走这条路","f":"答\"是\"就执行<b>这一支</b>：血量低了 → 屏幕变红、播报警音。"},{"e":"❌","n":"否 → 走另一条","f":"答\"否\"就走<b>另一支</b>（否则）：血量正常 → 什么都不做，继续玩。"},{"e":"🪜","n":"还能一层层套","f":"\"如果金牌…否则如果银牌…否则铜牌\"——可以<b>接着往下问</b>，分出很多条路。"}];
+const CARDS=[{"e":"❓","n":"先问一个是非题","f":"条件判断先问一句<b>只能答\"是\"或\"否\"</b>的话，比如\"血量小于 10 吗？\""},{"e":"✅","n":"是 → 走这条路","f":"答\"是\"就执行<b>这一支</b>：血量低了 → 屏幕变红、播报警音。"},{"e":"❌","n":"否 → 走另一条","f":"答\"否\"就走<b>另一支</b>（否则）：血量正常 → 什么都不做，继续玩。"},{"e":"📶","n":"还能一层层套","f":"\"如果金牌…否则如果银牌…否则铜牌\"——可以<b>接着往下问</b>，分出很多条路。"}];
 function renderA(){ const box=document.getElementById('ex-A');
   box.innerHTML='<div class="bigEmo">🔀</div><div class="orbit" id="orbit"></div><div class="factBox" id="factA">👆 点点这 4 张知识卡，看看里面的秘密～</div>';
   const orbit=document.getElementById('orbit');
@@ -193,7 +193,7 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;
     else { rst(); document.getElementById('tray').appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
 })();
 
-const QUIZ=[{"tag":"sci","tl":"编程","ico":"🪙","q":"\"如果分数≥100 就通关,否则继续\"。分数 99 会怎样？","opts":[["继续玩",1],["通关",0],["游戏结束",0]],"fb":"99 不满足 ≥100,走\"否则\"。"},{"tag":"logic","tl":"逻辑","ico":"🌧️","q":"\"如果下雨就带伞\"。今天没下雨,按这条规则应该？","opts":[["不用带伞",1],["必须带伞",0],["带两把伞",0]],"fb":"条件不成立,就不执行那一支。"},{"tag":"logic","tl":"逻辑","ico":"🪜","q":"游戏要分金银铜三种奖牌,最少要判断几次？","opts":[["2 次",1],["1 次",0],["5 次",0]],"fb":"先问是不是金,再问是不是银,剩下就是铜。"},{"tag":"en","tl":"英语","ico":"🔤","q":"英语角：\"如果\"用英语怎么说？","opts":[["if",1],["is",0],["in",0]],"fb":"if 如果。"}];
+const QUIZ=[{"tag":"sci","tl":"编程","ico":"💰","q":"\"如果分数≥100 就通关,否则继续\"。分数 99 会怎样？","opts":[["继续玩",1],["通关",0],["游戏结束",0]],"fb":"99 不满足 ≥100,走\"否则\"。"},{"tag":"logic","tl":"逻辑","ico":"🌧️","q":"\"如果下雨就带伞\"。今天没下雨,按这条规则应该？","opts":[["不用带伞",1],["必须带伞",0],["带两把伞",0]],"fb":"条件不成立,就不执行那一支。"},{"tag":"logic","tl":"逻辑","ico":"📶","q":"游戏要分金银铜三种奖牌,最少要判断几次？","opts":[["2 次",1],["1 次",0],["5 次",0]],"fb":"先问是不是金,再问是不是银,剩下就是铜。"},{"tag":"en","tl":"英语","ico":"🔤","q":"英语角：\"如果\"用英语怎么说？","opts":[["if",1],["is",0],["in",0]],"fb":"if 如果。"}];
 let qi=0; function startQuiz(){ document.getElementById('g-round1').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>知识 + 逻辑 + 英语</small>'; qi=0; renderQ(); }
 function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; const tag=document.getElementById('qtag'); tag.className='qtag '+it.tag; tag.textContent=it.tl; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; shuffle(it.opts.slice()).forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
 function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想～'; } }

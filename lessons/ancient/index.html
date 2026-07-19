@@ -111,7 +111,7 @@
       </div>
       <div class="subview" id="ex-B">
         <div class="evoRow" id="evoRow">
-          <div class="evo on" data-i="0"><div class="ei">🪢</div><div class="en">结绳记事</div><div class="step">最早</div></div>
+          <div class="evo on" data-i="0"><div class="ei">🧶</div><div class="en">结绳记事</div><div class="step">最早</div></div>
           <div class="evo" data-i="1"><div class="ei">🐢</div><div class="en">刻在龟甲</div><div class="step">甲骨文</div></div>
           <div class="evo" data-i="2"><div class="ei">🎋</div><div class="en">写在竹简</div><div class="step">后来</div></div>
           <div class="evo" data-i="3"><div class="ei">📜</div><div class="en">写在纸上</div><div class="step">再后来</div></div>
@@ -166,7 +166,7 @@ const EVO=['最早的人不会写字，就在绳子上<b>打结</b>记事——�
 document.querySelectorAll('#evoRow .evo').forEach(c=>c.addEventListener('click',()=>{ document.querySelectorAll('#evoRow .evo').forEach(x=>x.classList.remove('on')); c.classList.add('on'); document.getElementById('evoCap').innerHTML=EVO[+c.dataset.i]; }));
 
 /* 闯关1 排序 */
-const ORDER=[{ico:'🪢',n:'结绳'},{ico:'🐢',n:'龟甲'},{ico:'🎋',n:'竹简'},{ico:'📜',n:'纸'}];
+const ORDER=[{ico:'🧶',n:'结绳'},{ico:'🐢',n:'龟甲'},{ico:'🎋',n:'竹简'},{ico:'📜',n:'纸'}];
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
 let expect=0;
 shuffle(ORDER.map((o,idx)=>({...o,idx}))).forEach(o=>{ const d=document.createElement('div'); d.className='ocard'; d.dataset.idx=o.idx; d.innerHTML=`<div class="onum"></div><div class="oico">${o.ico}</div><div class="oname">${o.n}</div>`;

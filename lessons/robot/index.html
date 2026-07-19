@@ -146,7 +146,7 @@ function unlockGame(){ if(doneA>=4 && doneB>=3){ nextHint.style.display='none'; 
 const CARDS=[
  {e:'👁️',n:'传感器',f:'机器人的<b>眼睛和耳朵</b>——用它来「看」有没有东西、「听」有没有声音。'},
  {e:'🧠',n:'程序',f:'机器人的<b>大脑指令</b>，一步一步告诉它先做什么、再做什么。'},
- {e:'🦾',n:'马达',f:'让机器人的<b>手脚动起来</b>，能转、能抓、能走路。'},
+ {e:'💪',n:'马达',f:'让机器人的<b>手脚动起来</b>，能转、能抓、能走路。'},
  {e:'🔋',n:'电池',f:'给机器人<b>能量</b>，没电了它就不动了，要充电或换电池。'},
 ];
 function renderA(){ const box=document.getElementById('ex-A');
@@ -182,8 +182,8 @@ function renderB(){ const box=document.getElementById('ex-B');
 renderA(); renderB();
 
 const ITEMS=[
- {key:'robot',ico:'🤖',name:'扫地机器人'},{key:'robot',ico:'🦾',name:'机械臂'},{key:'robot',ico:'🚁',name:'无人机'},
- {key:'living',ico:'🧒',name:'小朋友'},{key:'living',ico:'🐶',name:'小狗'},{key:'living',ico:'🌳',name:'大树'},
+ {key:'robot',ico:'🤖',name:'扫地机器人'},{key:'robot',ico:'💪',name:'机械臂'},{key:'robot',ico:'🚁',name:'无人机'},
+ {key:'living',ico:'👦',name:'小朋友'},{key:'living',ico:'🐶',name:'小狗'},{key:'living',ico:'🌳',name:'大树'},
 ];
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
 (function buildSort(){

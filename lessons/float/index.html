@@ -135,9 +135,9 @@
         <div class="item" data-k="float"><div class="itIco">🌳</div><div class="itName">木块</div></div>
         <div class="item" data-k="float"><div class="itIco">🍎</div><div class="itName">苹果</div></div>
         <div class="item" data-k="float"><div class="itIco">🍶</div><div class="itName">空瓶</div></div>
-        <div class="item" data-k="sink"><div class="itIco">🪨</div><div class="itName">石头</div></div>
+        <div class="item" data-k="sink"><div class="itIco">🗿</div><div class="itName">石头</div></div>
         <div class="item" data-k="sink"><div class="itIco">🔩</div><div class="itName">铁钉</div></div>
-        <div class="item" data-k="sink"><div class="itIco">🪙</div><div class="itName">硬币</div></div>
+        <div class="item" data-k="sink"><div class="itIco">💰</div><div class="itName">硬币</div></div>
       </div>
       <div class="roundNext" id="sortNext"><div class="ok">全部答对！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
     </div>
@@ -164,11 +164,11 @@ function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='blo
 
 /* 沉浮实验 */
 const OBJ=[{e:'🌳',n:'木块',f:true,why:'木头比同样大小的水<b>轻</b>，所以浮在水面。'},
- {e:'🪨',n:'石头',f:false,why:'石头比同样大小的水<b>重</b>，所以沉到水底。'},
+ {e:'🗿',n:'石头',f:false,why:'石头比同样大小的水<b>重</b>，所以沉到水底。'},
  {e:'🍶',n:'空瓶',f:true,why:'瓶里装的是<b>空气</b>，非常轻，所以整体能浮。'},
  {e:'🔩',n:'铁钉',f:false,why:'铁很重，一枚实心铁钉比水重，会沉下去。'},
  {e:'🍎',n:'苹果',f:true,why:'苹果里有不少水分和空隙，比水略轻，会浮。'},
- {e:'🪙',n:'硬币',f:false,why:'硬币是金属做的，比水重，会沉。'}];
+ {e:'💰',n:'硬币',f:false,why:'硬币是金属做的，比水重，会沉。'}];
 const shelf=document.getElementById('shelf'); let cur=null, done=0; const sawF={f:false,s:false};
 OBJ.forEach((o,i)=>{ const d=document.createElement('div'); d.className='obj'; d.dataset.i=i; d.innerHTML=`<div class="oe">${o.e}</div><div class="on">${o.n}</div>`;
   d.onclick=()=>{ if(d.dataset.used) return; document.querySelectorAll('.obj').forEach(x=>x.classList.remove('sel')); d.classList.add('sel'); cur=i; document.getElementById('guessBar').style.display='flex'; document.getElementById('fBubble').innerHTML=`你猜 <b>${o.n}</b> 会浮，还是会沉？`; };

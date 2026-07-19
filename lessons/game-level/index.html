@@ -101,7 +101,7 @@
         <div class="tBtns">
           <button class="ba" onclick="add('obs')">🚧 加障碍</button>
           <button class="bb" onclick="add('spring')">🟢 加弹板</button>
-          <button class="bc" onclick="add('coin')">🪙 加金币</button>
+          <button class="bc" onclick="add('coin')">💰 加金币</button>
           <button class="be" onclick="clearT()">🗑️ 清空</button>
           <button class="bd" onclick="play()">▶ 试玩</button>
         </div>
@@ -111,7 +111,7 @@
         <div class="tipRow" id="tipRow">
           <div class="tc on" data-i="0"><div class="ti">🎯</div><div class="tn">有主题</div></div>
           <div class="tc" data-i="1"><div class="ti">📈</div><div class="tn">先易后难</div></div>
-          <div class="tc" data-i="2"><div class="ti">🪙</div><div class="tn">有奖励</div></div>
+          <div class="tc" data-i="2"><div class="ti">💰</div><div class="tn">有奖励</div></div>
           <div class="tc" data-i="3"><div class="ti">🔁</div><div class="tn">多测试</div></div>
         </div>
         <div class="tipCap" id="tipCap"><b>有主题</b>：一关最好有个样子，比如“糖果乐园”“太空基地”，玩起来更有感觉。</div>
@@ -134,7 +134,7 @@
         <div class="item" data-k="obs"><div class="itIco">🧱</div><div class="itName">墙</div></div>
         <div class="item" data-k="obs"><div class="itIco">🕳️</div><div class="itName">陷阱坑</div></div>
         <div class="item" data-k="obs"><div class="itIco">🔥</div><div class="itName">火焰</div></div>
-        <div class="item" data-k="rew"><div class="itIco">🪙</div><div class="itName">金币</div></div>
+        <div class="item" data-k="rew"><div class="itIco">💰</div><div class="itName">金币</div></div>
         <div class="item" data-k="rew"><div class="itIco">⭐</div><div class="itName">星星</div></div>
         <div class="item" data-k="rew"><div class="itIco">❤️</div><div class="itName">血包</div></div>
       </div>
@@ -164,7 +164,7 @@ function unlockGame(){ nextHint.style.display='none'; nextBtn.style.display='blo
 /* 搭赛道 */
 const cvT=document.getElementById('cvT'), tc=cvT.getContext('2d'); const TW=cvT.width, TH=cvT.height, gy=TH-56;
 let pieces=[], added=0, playing=false, ex=0, hop=0, tested=false;
-const EMO={obs:'🚧',spring:'🟢',coin:'🪙'};
+const EMO={obs:'🚧',spring:'🟢',coin:'💰'};
 function add(type){ if(pieces.length>=6){document.getElementById('tCap').innerHTML='赛道摆满啦～ 点“<b>试玩</b>”跑一遍，或“清空”重来。';return;} pieces.push(type); added++; document.getElementById('cnt').textContent=Math.min(added,3); document.getElementById('tCap').innerHTML='摆上了一个 '+EMO[type]+'。可以继续摆，或点“<b>试玩</b>”。'; }
 function clearT(){ pieces=[]; playing=false; ex=0; document.getElementById('tCap').innerHTML='赛道清空啦，重新设计一条吧！'; }
 function play(){ if(pieces.length===0){document.getElementById('tCap').innerHTML='先摆点东西，再试玩呀～';return;} playing=true; ex=0; tested=true; document.getElementById('tCap').innerHTML='🎮 试玩中……看看蛋仔跑得顺不顺！'; if(added>=3) unlockGame(); }
@@ -206,7 +206,7 @@ addEventListener('pointerup',e=>{ if(!active)return; const el=active; active=nul
 /* 闯关2 判断 */
 const QUIZ=[{ico:'🗺️',q:'游戏的关卡地图，是怎么来的？',opts:[['设计师精心设计出来的',1],['随机乱摆的',0],['玩家自己长出来的',0]],fb:'关卡是关卡设计师一格格设计出来的。'},
  {ico:'📈',q:'好的闯关关卡，难度一般应该怎样？',opts:[['先简单，后面慢慢变难',1],['一上来就超级难',0],['完全没有难度',0]],fb:'先易后难，玩家才玩得下去又有挑战。'},
- {ico:'🪙',q:'关卡里的金币、星星，主要是用来？',opts:[['奖励、鼓励玩家',1],['挡住去路',0],['吓唬玩家',0]],fb:'奖励能鼓励玩家往前闯。'},
+ {ico:'💰',q:'关卡里的金币、星星，主要是用来？',opts:[['奖励、鼓励玩家',1],['挡住去路',0],['吓唬玩家',0]],fb:'奖励能鼓励玩家往前闯。'},
  {ico:'🔁',q:'关卡设计师做完一关，最重要的一步是？',opts:[['反复试玩，测试好不好玩',1],['马上上线不管了',0],['直接删掉重做',0]],fb:'一定要多次试玩，才能发现问题再改好。'}];
 let qi=0; function startQuiz(){ document.getElementById('g-sort').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>把关卡设计的道理用起来</small>'; qi=0; renderQ(); }
 function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; shuffle(it.opts.slice()).forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }

@@ -141,7 +141,7 @@ function switchEx(v){ document.getElementById('ex-A').classList.toggle('on',v===
 let doneA=0, doneB=0;
 function unlockGame(){ if(doneA>=4 && doneB>=3){ nextHint.style.display='none'; nextBtn.style.display='block'; } }
 
-const CARDS=[{"e":"🪜","n":"七个音像台阶","f":"do re mi fa sol la si，<b>一级比一级高</b>，唱到 si 再往上又回到 do（高一个八度）。"},{"e":"⚡","n":"音高由振动快慢定","f":"物体<b>振动得越快，音就越高</b>。琴弦绷得越紧、越短，声音就越尖。"},{"e":"🎹","n":"钢琴上黑白键","f":"白键就是这七个音，黑键是<b>夹在中间的半音</b>——所以钢琴上一组是 <b>7 白 5 黑</b>。"},{"e":"🎵","n":"唱名不等于音高","f":"同一首歌可以唱高一点也可以唱低一点，只要<b>音和音之间的距离不变</b>，听着还是那首歌。"}];
+const CARDS=[{"e":"📶","n":"七个音像台阶","f":"do re mi fa sol la si，<b>一级比一级高</b>，唱到 si 再往上又回到 do（高一个八度）。"},{"e":"⚡","n":"音高由振动快慢定","f":"物体<b>振动得越快，音就越高</b>。琴弦绷得越紧、越短，声音就越尖。"},{"e":"🎹","n":"钢琴上黑白键","f":"白键就是这七个音，黑键是<b>夹在中间的半音</b>——所以钢琴上一组是 <b>7 白 5 黑</b>。"},{"e":"🎵","n":"唱名不等于音高","f":"同一首歌可以唱高一点也可以唱低一点，只要<b>音和音之间的距离不变</b>，听着还是那首歌。"}];
 function renderA(){ const box=document.getElementById('ex-A');
   box.innerHTML='<div class="bigEmo">🎼</div><div class="orbit" id="orbit"></div><div class="factBox" id="factA">👆 点点这 4 张知识卡，看看里面的秘密～</div>';
   const orbit=document.getElementById('orbit');

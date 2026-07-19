@@ -176,7 +176,7 @@ const SFX={
 const cvA=document.getElementById('cvA'), ac=cvA.getContext('2d'); const AW=cvA.width, AH=cvA.height, gx=AW/2, gy=150;
 const SFXDEF=[
   {key:'jump',ico:'🦘',name:'跳跃',cap:'跳跃音效：音调<b>快速向上扬</b>，听起来轻盈、往上冲！'},
-  {key:'coin',ico:'🪙',name:'金币',cap:'金币音效：两个清脆的高音连着响，听起来「叮！」很开心！'},
+  {key:'coin',ico:'💰',name:'金币',cap:'金币音效：两个清脆的高音连着响，听起来「叮！」很开心！'},
   {key:'hit',ico:'💥',name:'撞墙',cap:'撞墙音效：短促低沉的一声「哐」，听起来有分量、被撞到了！'},
   {key:'win',ico:'🏆',name:'胜利',cap:'胜利音效：一串音符<b>依次升高</b>，像小喇叭一样，听起来超有成就感！'},
 ];
@@ -201,7 +201,7 @@ function drawA(){ ac.clearRect(0,0,AW,AH); ac.fillStyle='#241a40'; ac.fillRect(0
     else if(anim.key==='win'){ extra='win'; if(p>70)anim=null; }
   }
   if(extra==='coin'){ ac.save(); ac.globalAlpha=Math.max(0,1-(anim?anim.t/40:1)); ac.font='26px system-ui'; ac.textAlign='center';
-    ac.fillText('🪙', gx, gy-40-(anim?anim.t*1.5:0)); ac.restore(); }
+    ac.fillText('💰', gx, gy-40-(anim?anim.t*1.5:0)); ac.restore(); }
   if(extra==='win'){ for(let k=0;k<3;k++){ const a=(anim?anim.t:0)*0.15+k*2.1; ac.font='20px system-ui'; ac.textAlign='center'; ac.globalAlpha=0.8; ac.fillText('✨', gx+Math.cos(a)*60, gy-30+Math.sin(a)*20); ac.globalAlpha=1; } }
   ac.save(); ac.translate(ex,ey); ac.scale(scale,scale); ac.font='54px system-ui'; ac.textAlign='center'; ac.textBaseline='middle'; ac.fillText('🥚',0,0); ac.restore();
   ac.fillStyle='rgba(180,140,255,.6)'; ac.font='bold 13px system-ui'; ac.textAlign='center'; ac.fillText('点下方按钮，让蛋仔动起来 →', gx, AH-14);
@@ -220,7 +220,7 @@ document.querySelectorAll('#tipRow .tc').forEach(c=>c.addEventListener('click',(
 /* ===== 闯关1 拖拽分类 ===== */
 const ITEMS=[
  {key:'sfx',ico:'🦘',name:'跳跃「咻」一声'},
- {key:'sfx',ico:'🪙',name:'捡金币「叮」一声'},
+ {key:'sfx',ico:'💰',name:'捡金币「叮」一声'},
  {key:'sfx',ico:'🏆',name:'胜利时的庆祝声'},
  {key:'bgm',ico:'🎶',name:'关卡里循环的欢快旋律'},
  {key:'bgm',ico:'🌙',name:'开始界面神秘的音乐'},

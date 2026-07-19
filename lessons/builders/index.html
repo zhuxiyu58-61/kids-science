@@ -141,7 +141,7 @@ function switchEx(v){ document.getElementById('ex-A').classList.toggle('on',v===
 let doneA=0, doneB=0;
 function unlockGame(){ if(doneA>=4 && doneB>=3){ nextHint.style.display='none'; nextBtn.style.display='block'; } }
 
-const CARDS=[{"e":"🐝","n":"蜂巢：六边形最省","f":"蜂巢全是<b>六边形</b>——同样大的房间，六边形<b>用蜡最少、还特别结实</b>，拼起来一条缝都不浪费。"},{"e":"🐦","n":"鸟窝：一根根编的","f":"小鸟用嘴叼来草和树枝，<b>一根一根编成碗形</b>，里面铺上羽毛，又软又暖。"},{"e":"🦫","n":"海狸：会造水坝","f":"海狸啃倒树，在河里<b>垒成水坝</b>拦出一个池塘，把家门口泡在水里，敌人就进不来。"},{"e":"🕷️","n":"蜘蛛：会织网","f":"蜘蛛肚子里吐丝，织成<b>又黏又有弹性</b>的网——那既是陷阱也是家。"}];
+const CARDS=[{"e":"🐝","n":"蜂巢：六边形最省","f":"蜂巢全是<b>六边形</b>——同样大的房间，六边形<b>用蜡最少、还特别结实</b>，拼起来一条缝都不浪费。"},{"e":"🐦","n":"鸟窝：一根根编的","f":"小鸟用嘴叼来草和树枝，<b>一根一根编成碗形</b>，里面铺上羽毛，又软又暖。"},{"e":"🐿️","n":"海狸：会造水坝","f":"海狸啃倒树，在河里<b>垒成水坝</b>拦出一个池塘，把家门口泡在水里，敌人就进不来。"},{"e":"🕷️","n":"蜘蛛：会织网","f":"蜘蛛肚子里吐丝，织成<b>又黏又有弹性</b>的网——那既是陷阱也是家。"}];
 function renderA(){ const box=document.getElementById('ex-A');
   box.innerHTML='<div class="bigEmo">🏗️</div><div class="orbit" id="orbit"></div><div class="factBox" id="factA">👆 点点这 4 张知识卡，看看里面的秘密～</div>';
   const orbit=document.getElementById('orbit');
@@ -193,7 +193,7 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;
     else { rst(); document.getElementById('tray').appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
 })();
 
-const QUIZ=[{"tag":"sci","tl":"科学","ico":"🐝","q":"为什么蜂巢用六边形而不用圆形？","opts":[["六边形拼起来没缝隙，不浪费",1],["圆形太丑",0],["六边形好数",0]],"fb":"圆形之间会留缝，六边形严丝合缝。"},{"tag":"logic","tl":"逻辑","ico":"🦫","q":"河里突然多了个池塘，旁边全是啃断的树，最可能是谁干的？","opts":[["海狸",1],["鱼",0],["青蛙",0]],"fb":"啃树垒坝是海狸的招牌。"},{"tag":"sci","tl":"科学","ico":"🕸️","q":"蜘蛛网那么黏，蜘蛛自己怎么不粘住？","opts":[["它只踩不黏的那几根丝",1],["它跑得快",0],["它不怕黏",0]],"fb":"网上有黏丝也有不黏的丝。"},{"tag":"en","tl":"英语","ico":"🔤","q":"英语角：\"房子\"用英语怎么说？","opts":[["house",1],["horse",0],["mouse",0]],"fb":"house 房子。"}];
+const QUIZ=[{"tag":"sci","tl":"科学","ico":"🐝","q":"为什么蜂巢用六边形而不用圆形？","opts":[["六边形拼起来没缝隙，不浪费",1],["圆形太丑",0],["六边形好数",0]],"fb":"圆形之间会留缝，六边形严丝合缝。"},{"tag":"logic","tl":"逻辑","ico":"🐿️","q":"河里突然多了个池塘，旁边全是啃断的树，最可能是谁干的？","opts":[["海狸",1],["鱼",0],["青蛙",0]],"fb":"啃树垒坝是海狸的招牌。"},{"tag":"sci","tl":"科学","ico":"🕸️","q":"蜘蛛网那么黏，蜘蛛自己怎么不粘住？","opts":[["它只踩不黏的那几根丝",1],["它跑得快",0],["它不怕黏",0]],"fb":"网上有黏丝也有不黏的丝。"},{"tag":"en","tl":"英语","ico":"🔤","q":"英语角：\"房子\"用英语怎么说？","opts":[["house",1],["horse",0],["mouse",0]],"fb":"house 房子。"}];
 let qi=0; function startQuiz(){ document.getElementById('g-round1').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>知识 + 逻辑 + 英语</small>'; qi=0; renderQ(); }
 function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; const tag=document.getElementById('qtag'); tag.className='qtag '+it.tag; tag.textContent=it.tl; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; shuffle(it.opts.slice()).forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
 function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想～'; } }

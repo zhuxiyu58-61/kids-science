@@ -92,14 +92,14 @@
   </div>
 
   <section class="scene active" id="s-intro">
-    <div class="kico">🫀</div>
+    <div class="kico">❤️</div>
     <div class="introCard">紧张的时候肚子会疼、生气的时候拳头会攥紧、害怕的时候手心出汗——情绪从来不只在脑子里，它<b>住在身体里</b>。学会读身体的信号，你能<b>在情绪爆炸前就发现它</b>。</div>
     <button class="bigbtn" onclick="go('explore')">出发探索 ▶</button>
   </section>
 
   <section class="scene" id="s-explore">
     <div class="exTabs">
-      <button class="exTab on" id="tabA" onclick="switchEx('A')">🫀 身体在报信</button>
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">❤️ 身体在报信</button>
       <button class="exTab" id="tabB" onclick="switchEx('B')">💡 想一想</button>
     </div>
     <div class="exBody">
@@ -127,7 +127,7 @@
   </section>
 
   <section class="scene" id="s-finish">
-    <div class="finishCard"><div class="medal">🫀</div><h2>闯关成功！</h2><div class="medalName">🎖 身体信号侦探</div>
+    <div class="finishCard"><div class="medal">❤️</div><h2>闯关成功！</h2><div class="medalName">🎖 身体信号侦探</div>
       <p>要记住的：<br>• 情绪<b>住在身体里</b>：心跳、肚子、拳头、手心都在报信；<br>• 紧张=身体在<b>调集力气</b>，不是要垮了；<br>• 害怕手脚凉=血液去了大肌肉，是<b>保护</b>；<br>• 一察觉身体信号就是<b>最好的喊停时机</b>；<br>• 🔤 英语：身体 <b>body</b>。</p>
       <div class="finishBtns"><button class="fb2" onclick="location.reload()">再玩一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
     </div>
@@ -143,7 +143,7 @@ function unlockGame(){ if(doneA>=4 && doneB>=3){ nextHint.style.display='none'; 
 
 const CARDS=[{"e":"💓","n":"紧张：心跳快、肚子紧","f":"上台前心怦怦跳、肚子发紧——身体在<b>调集力气</b>准备应对，不是你要生病了。"},{"e":"✊","n":"生气：拳头攥、脸发烫","f":"肌肉绷紧、脸发热、呼吸变粗，这是生气<b>最早的信号</b>，比\"我很生气\"这个念头还早。"},{"e":"🥶","n":"害怕：手脚发凉、发抖","f":"血液集中到大肌肉准备逃跑，手脚就凉了。这是身体在<b>保护你</b>。"},{"e":"⏰","n":"早发现就好办","f":"一察觉拳头开始攥紧，就是<b>最好的喊停时机</b>——这时候深呼吸还来得及。"}];
 function renderA(){ const box=document.getElementById('ex-A');
-  box.innerHTML='<div class="bigEmo">🫀</div><div class="orbit" id="orbit"></div><div class="factBox" id="factA">👆 点点这 4 张知识卡，看看里面的秘密～</div>';
+  box.innerHTML='<div class="bigEmo">❤️</div><div class="orbit" id="orbit"></div><div class="factBox" id="factA">👆 点点这 4 张知识卡，看看里面的秘密～</div>';
   const orbit=document.getElementById('orbit');
   CARDS.forEach((p,i)=>{ const d=document.createElement('div'); d.className='planet'; d.dataset.i=i;
     d.innerHTML=`<div class="pe">${p.e}</div><div class="pn">${p.n}</div>`;
@@ -199,7 +199,7 @@ function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.l
 function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想～'; } }
 
 function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
-function celebrate(){ saveBadge('hbody','🫀','身体信号侦探'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#ec7aa4','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+function celebrate(){ saveBadge('hbody','❤️','身体信号侦探'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#ec7aa4','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
   let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
 if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
 

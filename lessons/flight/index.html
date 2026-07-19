@@ -146,7 +146,7 @@ function unlockGame(){ if(doneA>=4 && doneB>=3){ nextHint.style.display='none'; 
 const CARDS=[
  {e:'🛩️',n:'机翼',f:'飞机飞得快时，空气从机翼上下流过，把飞机<b>往上托</b>——这股力叫升力。'},
  {e:'🎈',n:'热气球',f:'球里的空气被<b>烧热变轻</b>，比周围轻，就带着篮子往上飘。'},
- {e:'🪂',n:'降落伞',f:'撑开一大片，被<b>空气托住</b>，人就能慢慢地、稳稳地往下落。'},
+ {e:'☂️',n:'降落伞',f:'撑开一大片，被<b>空气托住</b>，人就能慢慢地、稳稳地往下落。'},
  {e:'🕊️',n:'鸟翅膀',f:'小鸟用力<b>扇翅膀</b>，往下拍空气，就把自己送上了天。'},
 ];
 function renderA(){ const box=document.getElementById('ex-A');
@@ -182,7 +182,7 @@ function renderB(){ const box=document.getElementById('ex-B');
 renderA(); renderB();
 
 const ITEMS=[
- {key:'fly',ico:'✈️',name:'飞机'},{key:'fly',ico:'🎈',name:'热气球'},{key:'fly',ico:'🪁',name:'风筝'},{key:'fly',ico:'🕊️',name:'小鸟'},
+ {key:'fly',ico:'✈️',name:'飞机'},{key:'fly',ico:'🎈',name:'热气球'},{key:'fly',ico:'🎈',name:'风筝'},{key:'fly',ico:'🕊️',name:'小鸟'},
  {key:'no',ico:'🚗',name:'汽车'},{key:'no',ico:'⛵',name:'船'},
 ];
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}

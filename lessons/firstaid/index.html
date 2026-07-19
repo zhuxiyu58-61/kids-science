@@ -92,14 +92,14 @@
   </div>
 
   <section class="scene active" id="s-intro">
-    <div class="kico">🩹</div>
+    <div class="kico">💊</div>
     <div class="introCard">摔破了皮、流了点血，别慌也别乱抹东西——记住<b>三步</b>：<b>冲干净、按住、贴上</b>。学会照顾自己的小伤口，你就是自己的小护士！</div>
     <button class="bigbtn" onclick="go('explore')">出发探索 ▶</button>
   </section>
 
   <section class="scene" id="s-explore">
     <div class="exTabs">
-      <button class="exTab on" id="tabA" onclick="switchEx('A')">🩹 处理三步</button>
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">💊 处理三步</button>
       <button class="exTab" id="tabB" onclick="switchEx('B')">💡 想一想</button>
     </div>
     <div class="exBody">
@@ -127,7 +127,7 @@
   </section>
 
   <section class="scene" id="s-finish">
-    <div class="finishCard"><div class="medal">🩹</div><h2>闯关成功！</h2><div class="medalName">🎖 急救小护士</div>
+    <div class="finishCard"><div class="medal">💊</div><h2>闯关成功！</h2><div class="medalName">🎖 急救小护士</div>
       <p>要记住的：<br>• 三步：<b>清水冲干净 → 纱布按住几分钟 → 贴创可贴</b>；<br>• 别用嘴吹、别涂牙膏酱油、别抠；<br>• 伤口深/血止不住/生锈钉子/动物咬 → <b>马上找大人</b>；<br>• 🔤 英语：帮助 <b>help</b>。</p>
       <div class="finishBtns"><button class="fb2" onclick="location.reload()">再玩一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
     </div>
@@ -141,9 +141,9 @@ function switchEx(v){ document.getElementById('ex-A').classList.toggle('on',v===
 let doneA=0, doneB=0;
 function unlockGame(){ if(doneA>=4 && doneB>=3){ nextHint.style.display='none'; nextBtn.style.display='block'; } }
 
-const CARDS=[{"e":"💧","n":"第 1 步：冲干净","f":"先用<b>干净的清水</b>把伤口冲一冲，把沙子灰尘冲走——脏东西留在里面会<b>发炎</b>。"},{"e":"✋","n":"第 2 步：按住止血","f":"用<b>干净纱布或纸巾按住</b>几分钟，<b>别老松开看</b>——一松血就又流出来了。"},{"e":"🩹","n":"第 3 步：贴创可贴","f":"擦干周围，贴上<b>创可贴</b>护住伤口；千万<b>别用嘴吹、别涂牙膏酱油</b>！"},{"e":"🚑","n":"什么时候必须找大人","f":"伤口<b>很深很大、血止不住</b>，或被<b>生锈铁钉、动物咬伤</b>——<b>马上找大人去医院</b>，别自己扛。"}];
+const CARDS=[{"e":"💧","n":"第 1 步：冲干净","f":"先用<b>干净的清水</b>把伤口冲一冲，把沙子灰尘冲走——脏东西留在里面会<b>发炎</b>。"},{"e":"✋","n":"第 2 步：按住止血","f":"用<b>干净纱布或纸巾按住</b>几分钟，<b>别老松开看</b>——一松血就又流出来了。"},{"e":"💊","n":"第 3 步：贴创可贴","f":"擦干周围，贴上<b>创可贴</b>护住伤口；千万<b>别用嘴吹、别涂牙膏酱油</b>！"},{"e":"🚑","n":"什么时候必须找大人","f":"伤口<b>很深很大、血止不住</b>，或被<b>生锈铁钉、动物咬伤</b>——<b>马上找大人去医院</b>，别自己扛。"}];
 function renderA(){ const box=document.getElementById('ex-A');
-  box.innerHTML='<div class="bigEmo">🩹</div><div class="orbit" id="orbit"></div><div class="factBox" id="factA">👆 点点这 4 张知识卡，看看里面的秘密～</div>';
+  box.innerHTML='<div class="bigEmo">💊</div><div class="orbit" id="orbit"></div><div class="factBox" id="factA">👆 点点这 4 张知识卡，看看里面的秘密～</div>';
   const orbit=document.getElementById('orbit');
   CARDS.forEach((p,i)=>{ const d=document.createElement('div'); d.className='planet'; d.dataset.i=i;
     d.innerHTML=`<div class="pe">${p.e}</div><div class="pn">${p.n}</div>`;
@@ -199,7 +199,7 @@ function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.l
 function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想～'; } }
 
 function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
-function celebrate(){ saveBadge('firstaid','🩹','急救小护士'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#ef8c3c','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+function celebrate(){ saveBadge('firstaid','💊','急救小护士'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#ef8c3c','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
   let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
 if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
 

@@ -105,7 +105,7 @@
           <div class="boneArea" id="boneArea">
             <canvas id="cvS" width="260" height="420"></canvas>
             <button class="mk" data-i="0" style="left:50%;top:9%">💀</button>
-            <button class="mk" data-i="1" style="left:50%;top:31%">🫁</button>
+            <button class="mk" data-i="1" style="left:50%;top:31%">💨</button>
             <button class="mk" data-i="2" style="left:61%;top:47%">🦴</button>
             <button class="mk" data-i="3" style="left:23%;top:40%">💪</button>
             <button class="mk" data-i="4" style="left:41%;top:80%">🦵</button>
@@ -143,9 +143,9 @@
         <div class="item" data-k="hold"><div class="itIco">🦴</div><div class="itName">脊柱撑身体</div></div>
         <div class="item" data-k="hold"><div class="itIco">🦵</div><div class="itName">腿骨站立</div></div>
         <div class="item" data-k="guard"><div class="itIco">💀</div><div class="itName">头骨护大脑</div></div>
-        <div class="item" data-k="guard"><div class="itIco">🫁</div><div class="itName">肋骨护心肺</div></div>
+        <div class="item" data-k="guard"><div class="itIco">💨</div><div class="itName">肋骨护心肺</div></div>
         <div class="item" data-k="move"><div class="itIco">💪</div><div class="itName">手肘弯胳膊</div></div>
-        <div class="item" data-k="move"><div class="itIco">🦿</div><div class="itName">膝盖弯腿</div></div>
+        <div class="item" data-k="move"><div class="itIco">🦵</div><div class="itName">膝盖弯腿</div></div>
       </div>
       <div class="roundNext" id="sortNext"><div class="ok">全部答对！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
     </div>
@@ -195,7 +195,7 @@ const cvS=document.getElementById('cvS'), sc=cvS.getContext('2d');
 
 const BONES=[
  {f:'💀',n:'头骨',t:'<b>头骨</b>（头盖骨）像一顶硬帽子，牢牢<b>保护里面的大脑</b>。'},
- {f:'🫁',n:'肋骨',t:'胸口一根根<b>肋骨</b>围成“笼子”，<b>保护心脏和肺</b>。'},
+ {f:'💨',n:'肋骨',t:'胸口一根根<b>肋骨</b>围成“笼子”，<b>保护心脏和肺</b>。'},
  {f:'🦴',n:'脊柱',t:'背上的<b>脊柱</b>由很多小骨头串成，像柱子一样<b>撑起上半身</b>，让我们能站直。'},
  {f:'💪',n:'手臂骨和关节',t:'胳膊里的骨头靠<b>关节</b>连接，所以能弯、能伸、能拿东西。'},
  {f:'🦵',n:'腿骨',t:'<b>腿骨</b>是身体里又长又结实的骨头，<b>支撑体重</b>，让我们能站、能走、能跑。'},

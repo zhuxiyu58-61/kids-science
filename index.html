@@ -449,6 +449,54 @@ const REGIONS=[
      {id:'sumdiff',    e:'➕', n:'和差问题',   bn:'和差小勇士'},
      {id:'ch-math2', e:'🏆', n:'勇士大挑战', bn:'数学勇士王', boss:true},
    ]},
+  {name:'世界之窗', ico:'🌏', color:'#0d9488', chest:'🧳', gift:{e:'🌐', name:'环球徽记'},
+   lessons:[
+     {id:'continents', e:'🌍', n:'七大洲四大洋',   bn:'环球小领队'},
+     {id:'pyramid',    e:'🔻', n:'金字塔的秘密',   bn:'金字塔探险家'},
+     {id:'wonders',    e:'🏛️', n:'世界大奇迹',     bn:'奇迹小向导'},
+     {id:'rainforest', e:'🌴', n:'亚马逊雨林',     bn:'雨林探险家'},
+     {id:'desert',     e:'🐪', n:'沙漠里的生活',   bn:'沙漠小向导'},
+     {id:'greeting',   e:'👋', n:'各国怎么打招呼', bn:'世界小使者'},
+     {id:'flags',      e:'🚩', n:'国旗的秘密',     bn:'国旗小专家'},
+     {id:'timezone',   e:'🕰️', n:'地球两头不同时', bn:'时区小达人'},
+     {id:'ch-globe', e:'🏆', n:'世界大挑战', bn:'世界挑战王', boss:true},
+   ]},
+  {name:'节日与历法', ico:'🏮', color:'#d99a0b', chest:'🧧', gift:{e:'🏮', name:'团圆金灯笼'},
+   lessons:[
+     {id:'springfest', e:'🧧', n:'春节为什么放鞭炮', bn:'年味小达人'},
+     {id:'midautumn',  e:'🥮', n:'中秋和月饼',       bn:'中秋小博士'},
+     {id:'dragonboat', e:'🐉', n:'端午和粽子',       bn:'端午小勇士'},
+     {id:'zodiac',     e:'🐭', n:'十二生肖排排队',   bn:'生肖小专家'},
+     {id:'jieqi',      e:'🌾', n:'二十四节气',       bn:'节气小农夫'},
+     {id:'calendar',   e:'📅', n:'年月日和日历',     bn:'日历小管家'},
+     {id:'qingming',   e:'🌿', n:'清明和重阳',       bn:'节俗小达人'},
+     {id:'worldfest',  e:'🎃', n:'世界的节日',       bn:'环球过节达人'},
+     {id:'ch-festival', e:'🏆', n:'节日大挑战', bn:'节日挑战王', boss:true},
+   ]},
+  {name:'材料变变变', ico:'🧪', color:'#c2185b', chest:'⚗️', gift:{e:'🔮', name:'变色水晶瓶'},
+   lessons:[
+     {id:'paper',        e:'📄', n:'纸是怎么来的',   bn:'造纸小工匠'},
+     {id:'plasticglass', e:'🥤', n:'塑料和玻璃',     bn:'材料小行家'},
+     {id:'rust',         e:'🔩', n:'金属会生锈',     bn:'防锈小卫士'},
+     {id:'dissolve',     e:'🧂', n:'谁能溶解在水里', bn:'溶解小实验家'},
+     {id:'acidbase',     e:'🍇', n:'紫甘蓝变色魔法', bn:'酸碱小魔术师'},
+     {id:'separate',     e:'🥄', n:'混合物怎么分开', bn:'分离小能手'},
+     {id:'absorb',       e:'🧽', n:'谁最能吸水',     bn:'吸水小实验家'},
+     {id:'newmaterial',  e:'🧵', n:'神奇新材料',     bn:'未来材料师'},
+     {id:'ch-material', e:'🏆', n:'材料大挑战', bn:'材料挑战王', boss:true},
+   ]},
+  {name:'地球奥秘', ico:'🌋', color:'#c1440e', chest:'⛏️', gift:{e:'💠', name:'地心晶石'},
+   lessons:[
+     {id:'rocks',      e:'🪨', n:'岩石和矿物',     bn:'岩石小猎人'},
+     {id:'fossil',     e:'🐚', n:'化石会说话',     bn:'化石猎人'},
+     {id:'earthquake', e:'🏚️', n:'地震来了怎么办', bn:'地震小卫士'},
+     {id:'soil',       e:'🪱', n:'土壤里的世界',   bn:'土壤小博士'},
+     {id:'tide',       e:'🌊', n:'潮起潮落',       bn:'潮汐观察员'},
+     {id:'inside',     e:'🥚', n:'地球里面长啥样', bn:'地心探险家'},
+     {id:'cave',       e:'💎', n:'溶洞和钟乳石',   bn:'溶洞探险家'},
+     {id:'drift',      e:'🌎', n:'大陆会漂移',     bn:'漂移小博士'},
+     {id:'ch-earth', e:'🏆', n:'地球大挑战', bn:'地球挑战王', boss:true},
+   ]},
 ];
 
 /* ===== 读进度 ===== */
@@ -484,7 +532,7 @@ let currentId=null;
 for(const l of ALL){ if(!isDone(l.id)){ currentId=l.id; break; } }
 
 /* 课程 → 主题key（给今日大挑战按当天涉及的主题出题）*/
-const REGION_KEYS=['nature','art','world','bio','game','logic','space','math','animal','tech','life','heart','plant','chinese','food','math2'];
+const REGION_KEYS=['nature','art','world','bio','game','logic','space','math','animal','tech','life','heart','plant','chinese','food','math2','globe','festival','material','earth'];
 const L2R={}; REGIONS.forEach((r,k)=> r.lessons.forEach(l=> L2R[l.id]=REGION_KEYS[k]||'x'));
 
 /* ===== 布局：枢纽式 —— 一个起点 → 各主题从主干分叉（鱼骨图）===== */

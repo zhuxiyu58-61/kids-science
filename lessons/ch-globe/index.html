@@ -32,6 +32,27 @@
   .resTxt{color:var(--ink2); font-weight:700; font-size:15px; margin:6px 0 16px;}
   .fbtns{display:flex; gap:12px; justify-content:center;} .fbtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--acc); color:#fff;} .fb2{background:#dcf4ef; color:var(--ink);}
   .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+
+/* ===== 手机端排版修正 start ===== */
+.finishBtns button{white-space:nowrap;}
+/* 知识卡全看完的提示,接在知识点下面而不是盖掉它 */
+.factDone{margin-top:9px; padding-top:8px; border-top:1px dashed rgba(0,0,0,.13); font-size:13.5px; opacity:.85;}
+/* 课名长的时候(如"望远镜看到的是过去")标题会把「回乐园」挤成两行 */
+.back{white-space:nowrap;}
+.title{min-width:0;}
+@media (max-width:430px){
+  /* 4 张知识卡排成 2×2,卡名不再从词中间断 */
+  .orbit{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; width:100%; max-width:340px;}
+  .planet{width:auto;}
+  /* 内容顶到上面,别垂直居中留一大片空白 */
+  .subview{justify-content:flex-start; padding-top:4px;}
+  /* 通关页两个按钮各占一行宽度的一半,不断行 */
+  .finishBtns button{padding:13px 14px; font-size:15px;}
+  /* 长课名缩一号字,尽量不换行 */
+  .topbar .title{font-size:16px;}
+  .back{font-size:17px; padding:8px 11px;}
+}
+/* ===== 手机端排版修正 end ===== */
 </style>
 </head>
 <body>
@@ -42,7 +63,7 @@
 
   <section class="scene active" id="s-intro">
     <div class="kico">🏆</div>
-    <div class="card"><div class="introTxt">这是<b>世界之窗</b>的大挑战！把你学过的<b>七大洲四大洋、金字塔、世界奇迹、雨林、沙漠、各国礼节、国旗、时差…</b>都用上。答对 <b>8 道</b>就能拿下【<b>世界挑战王</b>】徽章。<br>第一次就答对才得 ⭐，看看你能拿几颗星！</div>
+    <div class="card"><div class="introTxt">这是<b>世界之窗</b>的大挑战！把你学过的<b>七大洲四大洋、金字塔、世界奇迹、雨林、沙漠、各国礼节、国旗、世界的语言…</b>都用上。答对 <b>8 道</b>就能拿下【<b>世界挑战王</b>】徽章。<br>第一次就答对才得 ⭐，看看你能拿几颗星！</div>
       <button class="bigbtn" onclick="startQuiz()">接受挑战 ▶</button></div>
   </section>
 
@@ -63,7 +84,7 @@
 <script>
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
 const BADGE={id:'ch-globe', emoji:'🏆', name:'世界挑战王'};
-const QUIZ=[{"ico":"🌏","q":"中国在哪个洲？","opts":[["亚洲",1],["非洲",0],["欧洲",0]],"fb":"亚洲，还是最大的洲。"},{"ico":"🌊","q":"四大洋里最大的是？","opts":[["太平洋",1],["北冰洋",0],["印度洋",0]],"fb":"太平洋最大。"},{"ico":"🔻","q":"金字塔在哪个国家？","opts":[["埃及",1],["印度",0],["意大利",0]],"fb":"埃及，是法老的陵墓。"},{"ico":"🗼","q":"比萨斜塔会斜，是因为？","opts":[["一边地基太软",1],["被风吹歪",0],["故意造歪",0]],"fb":"地基一边软，慢慢沉下去就歪了。"},{"ico":"🌴","q":"亚马逊雨林被称为？","opts":[["地球之肺",1],["地球之心",0],["地球之眼",0]],"fb":"树多氧气多，叫地球之肺。"},{"ico":"🐪","q":"骆驼驼峰里装的是？","opts":[["脂肪",1],["水",0],["沙子",0]],"fb":"脂肪，能慢慢变成能量和水。"},{"ico":"🇨🇳","q":"五星红旗上四颗小星朝着？","opts":[["中间的大星",1],["四个方向",0],["旗杆",0]],"fb":"都朝大星，表示团结。"},{"ico":"🕰️","q":"地球两边时间不同，是因为地球在？","opts":[["自转",1],["停着不动",0],["忽大忽小",0]],"fb":"自转让各地天亮的时刻不同。"}];
+const QUIZ=[{"ico":"🌏","q":"中国在哪个洲？","opts":[["亚洲",1],["非洲",0],["欧洲",0]],"fb":"亚洲，还是最大的洲。"},{"ico":"🌊","q":"四大洋里最大的是？","opts":[["太平洋",1],["北冰洋",0],["印度洋",0]],"fb":"太平洋最大。"},{"ico":"🔻","q":"金字塔在哪个国家？","opts":[["埃及",1],["印度",0],["意大利",0]],"fb":"埃及，是法老的陵墓。"},{"ico":"🗼","q":"比萨斜塔会斜，是因为？","opts":[["一边地基太软",1],["被风吹歪",0],["故意造歪",0]],"fb":"地基一边软，慢慢沉下去就歪了。"},{"ico":"🌴","q":"亚马逊雨林被称为？","opts":[["地球之肺",1],["地球之心",0],["地球之眼",0]],"fb":"树多氧气多，叫地球之肺。"},{"ico":"🐪","q":"骆驼驼峰里装的是？","opts":[["脂肪",1],["水",0],["沙子",0]],"fb":"脂肪，能慢慢变成能量和水。"},{"ico":"🇨🇳","q":"五星红旗上四颗小星朝着？","opts":[["中间的大星",1],["四个方向",0],["旗杆",0]],"fb":"都朝大星，表示团结。"},{"ico":"🗣️","q":"全世界说的人最多的语言是？","opts":[["汉语",1],["法语",0],["俄语",0]],"fb":"汉语说的人最多，英语用得最广。"}];
 
 let qi=0, wrongThis=0, stars=0;
 function show(n){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+n).classList.add('active'); }

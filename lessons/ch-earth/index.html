@@ -32,6 +32,27 @@
   .resTxt{color:var(--ink2); font-weight:700; font-size:15px; margin:6px 0 16px;}
   .fbtns{display:flex; gap:12px; justify-content:center;} .fbtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--acc); color:#fff;} .fb2{background:#ffe5d5; color:var(--ink);}
   .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+
+/* ===== 手机端排版修正 start ===== */
+.finishBtns button{white-space:nowrap;}
+/* 知识卡全看完的提示,接在知识点下面而不是盖掉它 */
+.factDone{margin-top:9px; padding-top:8px; border-top:1px dashed rgba(0,0,0,.13); font-size:13.5px; opacity:.85;}
+/* 课名长的时候(如"望远镜看到的是过去")标题会把「回乐园」挤成两行 */
+.back{white-space:nowrap;}
+.title{min-width:0;}
+@media (max-width:430px){
+  /* 4 张知识卡排成 2×2,卡名不再从词中间断 */
+  .orbit{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; width:100%; max-width:340px;}
+  .planet{width:auto;}
+  /* 内容顶到上面,别垂直居中留一大片空白 */
+  .subview{justify-content:flex-start; padding-top:4px;}
+  /* 通关页两个按钮各占一行宽度的一半,不断行 */
+  .finishBtns button{padding:13px 14px; font-size:15px;}
+  /* 长课名缩一号字,尽量不换行 */
+  .topbar .title{font-size:16px;}
+  .back{font-size:17px; padding:8px 11px;}
+}
+/* ===== 手机端排版修正 end ===== */
 </style>
 </head>
 <body>
@@ -63,7 +84,7 @@
 <script>
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
 const BADGE={id:'ch-earth', emoji:'🏆', name:'地球挑战王'};
-const QUIZ=[{"ico":"🪨","q":"化石最常藏在哪种岩石里？","opts":[["沉积岩",1],["岩浆岩",0],["变质岩",0]],"fb":"泥沙一层层埋住才留得下化石。"},{"ico":"🏔️","q":"高山上发现海贝化石，说明那里？","opts":[["曾经是海底",1],["有人放上去的",0],["贝壳会爬山",0]],"fb":"地壳抬升把海底顶成了高山。"},{"ico":"🛡️","q":"地震时在室内最正确的做法是？","opts":[["伏地、遮挡、躲桌下手抓牢",1],["马上坐电梯下楼",0],["站到窗边看",0]],"fb":"绝不能坐电梯。"},{"ico":"🪱","q":"蚯蚓对土壤的作用是？","opts":[["松土，让水和空气进得去",1],["把土吃光",0],["没有作用",0]],"fb":"蚯蚓是天然松土工。"},{"ico":"🌕","q":"海水涨潮落潮主要是谁在拉？","opts":[["月亮",1],["风",0],["船",0]],"fb":"月亮引力为主，太阳也帮忙。"},{"ico":"🥚","q":"我们住在地球的哪一层？","opts":[["地壳",1],["地幔",0],["地核",0]],"fb":"最外面薄薄的一层。"},{"ico":"💎","q":"从洞顶往下长的是？","opts":[["钟乳石",1],["石笋",0],["石柱",0]],"fb":"石笋是从地上往上长的。"},{"ico":"🌎","q":"南美洲和非洲海岸线能拼上，说明？","opts":[["它们从前连在一起",1],["纯属巧合",0],["地图画错了",0]],"fb":"这是大陆漂移的证据之一。"}];
+const QUIZ=[{"ico":"🗿","q":"化石最常藏在哪种岩石里？","opts":[["沉积岩",1],["岩浆岩",0],["变质岩",0]],"fb":"泥沙一层层埋住才留得下化石。"},{"ico":"🏔️","q":"高山上发现海贝化石，说明那里？","opts":[["曾经是海底",1],["有人放上去的",0],["贝壳会爬山",0]],"fb":"地壳抬升把海底顶成了高山。"},{"ico":"🛡️","q":"地震时在室内最正确的做法是？","opts":[["伏地、遮挡、躲桌下手抓牢",1],["马上坐电梯下楼",0],["站到窗边看",0]],"fb":"绝不能坐电梯。"},{"ico":"🐛","q":"蚯蚓对土壤的作用是？","opts":[["松土，让水和空气进得去",1],["把土吃光",0],["没有作用",0]],"fb":"蚯蚓是天然松土工。"},{"ico":"🌕","q":"海水涨潮落潮主要是谁在拉？","opts":[["月亮",1],["风",0],["船",0]],"fb":"月亮引力为主，太阳也帮忙。"},{"ico":"🥚","q":"我们住在地球的哪一层？","opts":[["地壳",1],["地幔",0],["地核",0]],"fb":"最外面薄薄的一层。"},{"ico":"💎","q":"从洞顶往下长的是？","opts":[["钟乳石",1],["石笋",0],["石柱",0]],"fb":"石笋是从地上往上长的。"},{"ico":"🌎","q":"南美洲和非洲海岸线能拼上，说明？","opts":[["它们从前连在一起",1],["纯属巧合",0],["地图画错了",0]],"fb":"这是大陆漂移的证据之一。"}];
 
 let qi=0, wrongThis=0, stars=0;
 function show(n){ document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+n).classList.add('active'); }

@@ -62,6 +62,27 @@
   .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
   .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#efe9fc; color:var(--ink);}
   .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+
+/* ===== 手机端排版修正 start ===== */
+.finishBtns button{white-space:nowrap;}
+/* 知识卡全看完的提示,接在知识点下面而不是盖掉它 */
+.factDone{margin-top:9px; padding-top:8px; border-top:1px dashed rgba(0,0,0,.13); font-size:13.5px; opacity:.85;}
+/* 课名长的时候(如"望远镜看到的是过去")标题会把「回乐园」挤成两行 */
+.back{white-space:nowrap;}
+.title{min-width:0;}
+@media (max-width:430px){
+  /* 4 张知识卡排成 2×2,卡名不再从词中间断 */
+  .orbit{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; width:100%; max-width:340px;}
+  .planet{width:auto;}
+  /* 内容顶到上面,别垂直居中留一大片空白 */
+  .subview{justify-content:flex-start; padding-top:4px;}
+  /* 通关页两个按钮各占一行宽度的一半,不断行 */
+  .finishBtns button{padding:13px 14px; font-size:15px;}
+  /* 长课名缩一号字,尽量不换行 */
+  .topbar .title{font-size:16px;}
+  .back{font-size:17px; padding:8px 11px;}
+}
+/* ===== 手机端排版修正 end ===== */
 </style>
 </head>
 <body>
@@ -155,7 +176,7 @@ const SFX={
 const cvA=document.getElementById('cvA'), ac=cvA.getContext('2d'); const AW=cvA.width, AH=cvA.height, gx=AW/2, gy=150;
 const SFXDEF=[
   {key:'jump',ico:'🦘',name:'跳跃',cap:'跳跃音效：音调<b>快速向上扬</b>，听起来轻盈、往上冲！'},
-  {key:'coin',ico:'🪙',name:'金币',cap:'金币音效：两个清脆的高音连着响，听起来「叮！」很开心！'},
+  {key:'coin',ico:'💰',name:'金币',cap:'金币音效：两个清脆的高音连着响，听起来「叮！」很开心！'},
   {key:'hit',ico:'💥',name:'撞墙',cap:'撞墙音效：短促低沉的一声「哐」，听起来有分量、被撞到了！'},
   {key:'win',ico:'🏆',name:'胜利',cap:'胜利音效：一串音符<b>依次升高</b>，像小喇叭一样，听起来超有成就感！'},
 ];
@@ -180,7 +201,7 @@ function drawA(){ ac.clearRect(0,0,AW,AH); ac.fillStyle='#241a40'; ac.fillRect(0
     else if(anim.key==='win'){ extra='win'; if(p>70)anim=null; }
   }
   if(extra==='coin'){ ac.save(); ac.globalAlpha=Math.max(0,1-(anim?anim.t/40:1)); ac.font='26px system-ui'; ac.textAlign='center';
-    ac.fillText('🪙', gx, gy-40-(anim?anim.t*1.5:0)); ac.restore(); }
+    ac.fillText('💰', gx, gy-40-(anim?anim.t*1.5:0)); ac.restore(); }
   if(extra==='win'){ for(let k=0;k<3;k++){ const a=(anim?anim.t:0)*0.15+k*2.1; ac.font='20px system-ui'; ac.textAlign='center'; ac.globalAlpha=0.8; ac.fillText('✨', gx+Math.cos(a)*60, gy-30+Math.sin(a)*20); ac.globalAlpha=1; } }
   ac.save(); ac.translate(ex,ey); ac.scale(scale,scale); ac.font='54px system-ui'; ac.textAlign='center'; ac.textBaseline='middle'; ac.fillText('🥚',0,0); ac.restore();
   ac.fillStyle='rgba(180,140,255,.6)'; ac.font='bold 13px system-ui'; ac.textAlign='center'; ac.fillText('点下方按钮，让蛋仔动起来 →', gx, AH-14);
@@ -199,7 +220,7 @@ document.querySelectorAll('#tipRow .tc').forEach(c=>c.addEventListener('click',(
 /* ===== 闯关1 拖拽分类 ===== */
 const ITEMS=[
  {key:'sfx',ico:'🦘',name:'跳跃「咻」一声'},
- {key:'sfx',ico:'🪙',name:'捡金币「叮」一声'},
+ {key:'sfx',ico:'💰',name:'捡金币「叮」一声'},
  {key:'sfx',ico:'🏆',name:'胜利时的庆祝声'},
  {key:'bgm',ico:'🎶',name:'关卡里循环的欢快旋律'},
  {key:'bgm',ico:'🌙',name:'开始界面神秘的音乐'},

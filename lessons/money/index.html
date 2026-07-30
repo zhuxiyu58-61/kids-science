@@ -27,7 +27,7 @@
   .planet{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:10px 8px; width:108px; text-align:center; cursor:pointer; border:3px solid #f7e2c6; transition:.15s;}
   .planet:active{transform:scale(.94);} .planet.seen{border-color:#41c98a; background:#f0fbf4;}
   .planet .pe{font-size:34px;} .planet .pn{font-weight:800; font-size:13px; margin-top:2px;}
-  .factBox{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:14px 18px; max-width:560px; font-weight:800; font-size:15px; line-height:1.6; min-height:52px; display:flex; align-items:center; justify-content:center; text-align:center;} .factBox b{color:var(--accent);}
+  .factBox{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:14px 18px; max-width:560px; font-weight:800; font-size:15px; line-height:1.8; min-height:52px; text-align:center;} .factBox b{color:var(--accent);}
   .seqBox{background:var(--card); border-radius:20px; padding:18px 24px; box-shadow:var(--shadow); font-size:20px; text-align:center; max-width:600px; font-weight:900;}
   .seqQ{color:var(--ink2); font-size:18px; font-weight:900;}
   .optRow{display:flex; gap:14px; flex-wrap:wrap; justify-content:center;}
@@ -61,6 +61,27 @@
   .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
   .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#f7ecdd; color:var(--ink);}
   .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+
+/* ===== 手机端排版修正 start ===== */
+.finishBtns button{white-space:nowrap;}
+/* 知识卡全看完的提示,接在知识点下面而不是盖掉它 */
+.factDone{margin-top:9px; padding-top:8px; border-top:1px dashed rgba(0,0,0,.13); font-size:13.5px; opacity:.85;}
+/* 课名长的时候(如"望远镜看到的是过去")标题会把「回乐园」挤成两行 */
+.back{white-space:nowrap;}
+.title{min-width:0;}
+@media (max-width:430px){
+  /* 4 张知识卡排成 2×2,卡名不再从词中间断 */
+  .orbit{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; width:100%; max-width:340px;}
+  .planet{width:auto;}
+  /* 内容顶到上面,别垂直居中留一大片空白 */
+  .subview{justify-content:flex-start; padding-top:4px;}
+  /* 通关页两个按钮各占一行宽度的一半,不断行 */
+  .finishBtns button{padding:13px 14px; font-size:15px;}
+  /* 长课名缩一号字,尽量不换行 */
+  .topbar .title{font-size:16px;}
+  .back{font-size:17px; padding:8px 11px;}
+}
+/* ===== 手机端排版修正 end ===== */
 </style>
 </head>
 <body>
@@ -124,7 +145,7 @@ function unlockGame(){ if(doneA>=4 && doneB>=3){ nextHint.style.display='none'; 
 
 const CARDS=[
  {e:'💴',n:'纸币',f:'纸做的钱，有 <b>1 元、5 元、10 元、20 元…</b> 上面印着数字，就是它的价值。'},
- {e:'🪙',n:'硬币',f:'金属做的钱，有 <b>1 角、5 角、1 元</b>，圆圆的、叮当响。'},
+ {e:'💰',n:'硬币',f:'金属做的钱，有 <b>1 角、5 角、1 元</b>，圆圆的、叮当响。'},
  {e:'💳',n:'银行卡',f:'一张卡就能付钱，或者用<b>手机扫一扫</b>，不用带很多现金。'},
  {e:'🐷',n:'存钱罐',f:'把零花钱<b>一点点存进去</b>，攒多了就能买想要的大东西啦！'},
 ];
@@ -135,7 +156,7 @@ function renderA(){ const box=document.getElementById('ex-A');
     d.innerHTML=`<div class="pe">${p.e}</div><div class="pn">${p.n}</div>`;
     d.onclick=()=>{ document.getElementById('factA').innerHTML=p.e+' <b>'+p.n+'</b>：'+p.f;
       if(!d.dataset.seen){ d.dataset.seen='1'; d.classList.add('seen'); doneA++; document.getElementById('cntA').textContent=doneA;
-        if(doneA>=4) document.getElementById('factA').innerHTML='🎉 钱的样子都认识啦！去右边算算钱～'; unlockGame(); } };
+        if(doneA>=4) document.getElementById('factA').innerHTML+='<div class="factDone">🎉 钱的样子都认识啦！去右边算算钱～</div>'; unlockGame(); } };
     orbit.appendChild(d); });
 }
 const ROUNDS_B=[
@@ -187,7 +208,7 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;
 })();
 
 const QUIZ=[
- {tag:'math',tl:'数学',ico:'🪙',q:'1 元可以换几个 5 角？',opts:[['2 个',1],['5 个',0],['10 个',0]],fb:'1 元 = 10 角 = 两个 5 角。'},
+ {tag:'math',tl:'数学',ico:'💰',q:'1 元可以换几个 5 角？',opts:[['2 个',1],['5 个',0],['10 个',0]],fb:'1 元 = 10 角 = 两个 5 角。'},
  {tag:'math',tl:'数学',ico:'💵',q:'一个 4 元、一个 3 元，一共几元？',opts:[['7 元',1],['1 元',0],['12 元',0]],fb:'4 + 3 = 7 元。'},
  {tag:'logic',tl:'逻辑',ico:'💖',q:'下面哪个用钱买不到？',opts:[['健康',1],['铅笔',0],['苹果',0]],fb:'健康买不到，要靠好好吃饭运动。'},
  {tag:'en',tl:'英语',ico:'🔤',q:'英语角："钱"用英语怎么说？',opts:[['money',1],['book',0],['water',0]],fb:'money 钱。'},

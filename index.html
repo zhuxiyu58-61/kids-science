@@ -43,7 +43,7 @@
   .node:active .disc{transform:scale(.92);}
   .node .nm{margin-top:6px; font-weight:900; font-size:13px; color:#5a4118; line-height:1.25;
     max-width:120px; text-shadow:0 1px 0 #fff8e6;}
-  .node .nsub{font-size:11px; color:#a07c3e; font-weight:700;}
+  .node .nsub{font-size:12px; color:#a07c3e; font-weight:700;}
 
   /* 完成态：金环 + 对勾 */
   .node.done .disc{box-shadow:0 8px 20px rgba(230,170,30,.5), inset 0 0 0 5px var(--gold);
@@ -82,8 +82,30 @@
   .medal .m{width:56px; height:56px; border-radius:50%; margin:0 auto; display:flex; align-items:center; justify-content:center; font-size:28px;
     background:linear-gradient(160deg,#fff6df,#ffe09f); box-shadow:inset 0 0 0 3px #ffcf6b, 0 5px 12px rgba(240,180,60,.3);}
   .medal.locked .m{background:#f0ece2; box-shadow:none; filter:grayscale(1); opacity:.45;}
-  .medal .mn{font-size:11px; font-weight:800; margin-top:4px; line-height:1.25; color:#6a5327;}
+  .medal .mn{font-size:12px; font-weight:800; margin-top:4px; line-height:1.3; color:#6a5327;}
   .medal.locked .mn{color:#b3a789;}
+  /* 战利品架：150 个全平铺会刷屏，改成「最新 + 按区折叠」 */
+  .shelfCount{margin-left:auto; background:#fff3d9; color:#c9781f; font-size:13px; font-weight:900; padding:4px 11px; border-radius:12px;}
+  .shSub{font-size:12.5px; font-weight:900; color:#a07c3e; margin:2px 0 8px;}
+  .shNew{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:6px;}
+  .shEmpty{color:#a07c3e; font-weight:700; font-size:13.5px; text-align:center; padding:12px 0 16px; line-height:1.6;}
+  .shDiv{height:1px; background:#f0e7d5; margin:12px 0 12px;}
+  .shRow{display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:16px;
+    background:#fff8ec; margin-bottom:8px; cursor:pointer; transition:transform .1s;}
+  .shRow:active{transform:scale(.99);}
+  .shRow.full{background:linear-gradient(135deg,#fff6df,#ffe9b8);}
+  .shRow .sIco{width:38px; height:38px; border-radius:50%; background:#fff; flex:none;
+    display:flex; align-items:center; justify-content:center; font-size:21px; box-shadow:0 3px 8px rgba(150,100,30,.15);}
+  .shRow .sB{flex:1; min-width:0;}
+  .shRow .sN{font-weight:900; font-size:14px; color:#5a4118;}
+  .shRow .sBar{height:7px; border-radius:4px; background:#ece2cd; margin-top:5px; overflow:hidden;}
+  .shRow .sBar i{display:block; height:100%; border-radius:4px; background:linear-gradient(90deg,#ffc65c,#ff9f43);}
+  .shRow.full .sBar i{background:linear-gradient(90deg,#ffd36b,#f5b731);}
+  .shRow .sNum{font-weight:900; font-size:13px; color:#b6842b; flex:none;}
+  .shRow .sAr{color:#c9b48a; font-weight:900; font-size:13px; flex:none; transition:transform .2s;}
+  .shRow.open .sAr{transform:rotate(90deg);}
+  .shGrid{display:none; flex-wrap:wrap; gap:10px; padding:2px 4px 14px;}
+  .shGrid.open{display:flex;}
 
   footer{max-width:720px; margin:18px auto 40px; text-align:center; color:#a07c3e; font-size:13px; font-weight:700;}
 
@@ -179,7 +201,7 @@
   .lrow.done .lst{color:#2fa869;}
   .lrow .lgo{background:linear-gradient(135deg,#ff9f43,#ff6a3d); color:#fff; font-weight:900; padding:9px 15px; border-radius:12px; font-size:14px; white-space:nowrap; flex:none;}
   .lrow.done .lgo{background:#dff2e5; color:#2fa869;}
-  .dayclose{display:block; width:100%; margin-top:8px; border:none; background:#efe7d6; color:#7a4d17; font-weight:900; padding:13px; border-radius:14px; font-size:15px; cursor:pointer;}
+  .dayclose{display:block; width:100%; margin-top:8px; border:none; background:#efe7d6; color:#7a4d17; font-weight:900; padding:13px 10px; border-radius:14px; font-size:15px; cursor:pointer; white-space:nowrap;}
 </style>
 </head>
 <body>
@@ -241,15 +263,17 @@
       <div class="dsub" id="daySub"></div>
       <div id="dayList"></div>
       <div style="display:flex; gap:10px; margin-top:8px;">
-        <button class="dayclose" style="flex:1; background:#fff0d6; color:#c9781f;" onclick="calFromDay()">📅 看日历（选其它天）</button>
+        <button class="dayclose" style="flex:1; background:#fff0d6; color:#c9781f;" onclick="calFromDay()">📅 看其它天</button>
         <button class="dayclose" style="flex:1;" onclick="closeDay()">收起</button>
       </div>
     </div>
   </div>
 
   <div class="shelf">
-    <h3>🎖 我的战利品架</h3>
-    <div class="shelf-grid" id="shelf"></div>
+    <h3>🎖 我的战利品架 <span class="shelfCount" id="shelfCount"></span></h3>
+    <div id="shelfNew"></div>
+    <div class="shDiv"></div>
+    <div id="shelf"></div>
   </div>
 
   <footer>为小探险家设计 · 每天闯一关约 15–20 分钟 · 边玩边学</footer>
@@ -257,7 +281,7 @@
 <script>
 /* ===== 探险路线（顺序=闯关顺序；分 5 个探险区，每区尾部一个宝箱）===== */
 const REGIONS=[
-  {name:'自然探索岛', ico:'🌊', color:'#2ea7ef', chest:'🐚', gift:{e:'🦪', name:'深海珍珠'},
+  {name:'自然探索岛', ico:'🌊', color:'#2ea7ef', chest:'🐚', gift:{e:'💎', name:'深海珍珠'},
    lessons:[
      {id:'water',    e:'💧', n:'水的三个样子', bn:'水的研究员'},
      {id:'seed',     e:'🌱', n:'种子的旅行',   bn:'小小园丁'},
@@ -271,6 +295,9 @@ const REGIONS=[
      {id:'stars',    e:'✨', n:'星空星座',     bn:'星空观察员'},
      {id:'static',   e:'⚡', n:'静电',         bn:'静电小博士'},
      {id:'shadow',   e:'🌑', n:'光和影子',     bn:'影子小侦探'},
+     {id:'nfriction', e:'👟', n:'摩擦力的用处', bn:'摩擦力小专家'},
+     {id:'nrock',     e:'🗿', n:'石头会说话',   bn:'岩石小侦探'},
+     {id:'nwind',     e:'🌬️', n:'风从哪里来',   bn:'风的小观察员'},
      {id:'ch-nature', e:'🏆', n:'自然大挑战', bn:'自然挑战王', boss:true},
    ]},
   {name:'艺术城堡', ico:'🎨', color:'#b58bff', chest:'🎭', gift:{e:'🎼', name:'魔法乐谱'},
@@ -281,6 +308,15 @@ const REGIONS=[
      {id:'masterpiece',e:'🖼️', n:'名画里的故事',   bn:'小小艺术侦探'},
      {id:'rhythm',     e:'🥁', n:'节奏和拍子',     bn:'节奏小达人'},
      {id:'shapes',     e:'🔺', n:'形状和线条的心情', bn:'形状小侦探'},
+     {id:'symmetry',   e:'🦋', n:'对称的美',         bn:'对称小设计师'},
+     {id:'acool',      e:'🎨', n:'冷色和暖色',     bn:'色彩小调音师'},
+     {id:'aperspect',  e:'🏞️', n:'近大远小',       bn:'透视小画家'},
+     {id:'alight',     e:'💡', n:'光影画立体',     bn:'明暗小画师'},
+     {id:'apattern',   e:'🔷', n:'图案会重复',     bn:'纹样小设计师'},
+     {id:'ascale',     e:'🎼', n:'音阶七个音',     bn:'音阶小歌手'},
+     {id:'avolume',    e:'🔊', n:'强弱和快慢',     bn:'表情小指挥'},
+     {id:'achorus',    e:'🎵', n:'齐唱和合唱',     bn:'合唱小指挥'},
+     {id:'aemotion',   e:'🖌️', n:'画出心情',       bn:'心情小画家'},
      {id:'ch-art', e:'🏆', n:'艺术大挑战', bn:'艺术挑战王', boss:true},
    ]},
   {name:'环球探险区', ico:'🧭', color:'#ff9f43', chest:'🧳', gift:{e:'🗺️', name:'古老藏宝图'},
@@ -292,17 +328,33 @@ const REGIONS=[
      {id:'volcano',   e:'🌋', n:'火山喷发',     bn:'火山探险家'},
      {id:'seasons',   e:'🍂', n:'四季怎么来',   bn:'四季小博士'},
      {id:'invention', e:'🏮', n:'四大发明',     bn:'发明小达人'},
+     {id:'timezone',  e:'🌐', n:'地球上的时间差', bn:'时区小向导'},
+     {id:'wmap',      e:'📍', n:'地图怎么看',   bn:'看图小向导'},
+     {id:'wclimate',  e:'☀️', n:'冷热怎么来的', bn:'气候小向导'},
+     {id:'wfestival', e:'🧧', n:'中国的节日',   bn:'节日小讲解员'},
+     {id:'wcity',     e:'🏙️', n:'人住在哪里',   bn:'聚落小侦探'},
+     {id:'wriver',    e:'🌊', n:'大河和文明',   bn:'文明小向导'},
+     {id:'wsilk',     e:'🐫', n:'丝绸之路',     bn:'丝路小商队'},
+     {id:'wzheng',    e:'🚢', n:'郑和下西洋',   bn:'航海小船长'},
      {id:'ch-world', e:'🏆', n:'环球大挑战', bn:'环球挑战王', boss:true},
    ]},
   {name:'生命实验室', ico:'🧬', color:'#35c98a', chest:'🔬', gift:{e:'🧪', name:'生命结晶'},
    lessons:[
-     {id:'body',     e:'🫀', n:'身体的秘密', bn:'人体小医生'},
+     {id:'body',     e:'❤️', n:'身体的秘密', bn:'人体小医生'},
      {id:'bug',      e:'🐛', n:'虫子变蝴蝶', bn:'昆虫小专家'},
      {id:'foodchain',e:'🦁', n:'谁吃谁',     bn:'食物链小侦探'},
      {id:'bones',    e:'🦴', n:'我们的骨头', bn:'骨骼小卫士'},
      {id:'dino',     e:'🦕', n:'恐龙时代',   bn:'恐龙探险家'},
      {id:'germs',    e:'🦠', n:'细菌和病毒', bn:'健康小卫士'},
      {id:'teeth',    e:'🦷', n:'牙齿的秘密', bn:'牙齿小卫士'},
+     {id:'lheart',   e:'💓', n:'心脏是个泵',   bn:'心脏小医生'},
+     {id:'lbreath',  e:'💨', n:'呼吸换什么',   bn:'呼吸小博士'},
+     {id:'ldigest',  e:'🍽️', n:'食物的旅行',   bn:'消化小向导'},
+     {id:'lsleep',   e:'😴', n:'为什么要睡觉', bn:'睡眠小卫士'},
+     {id:'lbrain',   e:'🧠', n:'大脑总指挥',   bn:'大脑小研究员'},
+     {id:'lcell',    e:'🔬', n:'身体是细胞盖的', bn:'细胞小观察员'},
+     {id:'linherit', e:'👪', n:'为什么像爸妈', bn:'遗传小侦探'},
+     {id:'limmune',  e:'🛡️', n:'身体的防御军', bn:'免疫小卫士'},
      {id:'ch-bio', e:'🏆', n:'生命大挑战', bn:'生命挑战王', boss:true},
    ]},
   {name:'游戏工坊', ico:'🎮', color:'#e05bb5', chest:'👾', gift:{e:'🕹️', name:'黄金手柄'},
@@ -313,6 +365,15 @@ const REGIONS=[
      {id:'game-level',    e:'🗺️', n:'关卡怎么设计', bn:'关卡设计师'},
      {id:'game-ai',       e:'🤖', n:'电脑敌人',     bn:'AI训练师'},
      {id:'game-audio',    e:'🎧', n:'游戏音效',     bn:'音效设计师'},
+     {id:'gloop',         e:'🔁', n:'循环不用重复写', bn:'循环小程序员'},
+     {id:'gif',           e:'🔀', n:'会拐弯的程序', bn:'条件小判官'},
+     {id:'gvar',          e:'📦', n:'变量是小盒子', bn:'变量小管家'},
+     {id:'gcoord',        e:'📍', n:'屏幕上的坐标', bn:'坐标小向导'},
+     {id:'gframe',        e:'🎞️', n:'动画在骗眼睛', bn:'动画小工程师'},
+     {id:'gbug',          e:'🐞', n:'捉虫大作战',   bn:'调试小侦探'},
+     {id:'grandom',       e:'🎲', n:'电脑怎么随机', bn:'随机小行家'},
+     {id:'gbalance',      e:'⚖️', n:'游戏难度平衡', bn:'关卡平衡师'},
+     {id:'gtime',         e:'⏰', n:'为什么停不下来', bn:'游戏时间管理员'},
      {id:'ch-game', e:'🏆', n:'游戏大挑战', bn:'游戏挑战王', boss:true},
    ]},
   {name:'智慧森林', ico:'🦉', color:'#a97c3a', chest:'🧩', gift:{e:'🔑', name:'智慧钥匙'},
@@ -321,22 +382,36 @@ const REGIONS=[
      {id:'venn',        e:'🟣', n:'圈圈里的秘密',   bn:'交集小专家'},
      {id:'deduce',      e:'🕵️', n:'逻辑小侦探',     bn:'逻辑小侦探'},
      {id:'countshapes', e:'🔺', n:'数图形',         bn:'数图形高手'},
-     {id:'queue',       e:'🧍', n:'排队问题',       bn:'排队小专家'},
+     {id:'queue',       e:'👤', n:'排队问题',       bn:'排队小专家'},
      {id:'maze',        e:'🗺️', n:'走迷宫和一笔画', bn:'迷宫探险家'},
      {id:'drawer',      e:'🧦', n:'抽屉原理',     bn:'抽屉小博士'},
      {id:'weigh',       e:'⚖️', n:'天平找次品',   bn:'称重小神探'},
      {id:'magic',       e:'🔯', n:'幻方九宫格',   bn:'幻方小天才'},
      {id:'cross',       e:'🛶', n:'过河问题',     bn:'过河小军师'},
+     {id:'lbinary',     e:'🔍', n:'猜数字最快法', bn:'二分小神探'},
+     {id:'ltruth',      e:'🎭', n:'谁在说谎',     bn:'真话小判官'},
+     {id:'lsort',       e:'📚', n:'怎么排最省事', bn:'排序小管家'},
+     {id:'lmap4',       e:'🎨', n:'地图涂几种色', bn:'涂色小规划师'},
+     {id:'lwin',        e:'♟️', n:'找到必胜法',   bn:'博弈小军师'},
      {id:'ch-logic', e:'🏆', n:'智慧大挑战', bn:'智慧挑战王', boss:true},
    ]},
   {name:'太空宇宙站', ico:'🚀', color:'#6c5ce7', chest:'🛸', gift:{e:'🌌', name:'星河宝石'},
    lessons:[
-     {id:'solar',     e:'🪐', n:'太阳系大家庭',   bn:'行星向导'},
+     {id:'solar',     e:'🌍', n:'太阳系大家庭',   bn:'行星向导'},
      {id:'rocket',    e:'🚀', n:'火箭怎么飞上天', bn:'火箭工程师'},
      {id:'astronaut', e:'👨‍🚀', n:'宇航员的一天', bn:'太空生活家'},
      {id:'lunar',     e:'🌕', n:'月球探秘',       bn:'月球探险家'},
      {id:'blackhole', e:'🕳️', n:'神秘的黑洞',     bn:'黑洞探险家'},
      {id:'comet',     e:'☄️', n:'流星和彗星',     bn:'追星达人'},
+     {id:'gravity',   e:'🍎', n:'重力是怎么回事', bn:'引力小博士'},
+     {id:'orbit',     e:'🛰️', n:'卫星为什么不掉', bn:'轨道小工程师'},
+     {id:'eclipse',   e:'🌑', n:'日食和月食',     bn:'日月食观察员'},
+     {id:'spacesuit', e:'👨‍🚀', n:'宇航服为什么厚', bn:'宇航服工程师'},
+     {id:'spacelife', e:'🍚', n:'太空怎么吃和睡', bn:'太空生活家'},
+     {id:'lightyear', e:'🔭', n:'望远镜看见过去', bn:'光年小行家'},
+     {id:'starlife',  e:'⭐', n:'恒星的一生',     bn:'恒星观察家'},
+     {id:'galaxy',    e:'🌌', n:'银河系有多大',   bn:'银河向导'},
+     {id:'marstrip',  e:'🚩', n:'人类怎么去火星', bn:'火星任务规划师'},
      {id:'ch-space', e:'🏆', n:'太空大挑战', bn:'太空挑战王', boss:true},
    ]},
   {name:'数学奇兵', ico:'🔢', color:'#2b7de9', chest:'🧮', gift:{e:'🏅', name:'奥数金牌'},
@@ -351,6 +426,11 @@ const REGIONS=[
      {id:'square',        e:'🔲', n:'方阵问题',   bn:'方阵小将军'},
      {id:'multiple',      e:'✖️', n:'和倍问题',   bn:'和倍小勇士'},
      {id:'average',       e:'📊', n:'平均数问题', bn:'平均数小能手'},
+     {id:'unit',          e:'🍎', n:'归一问题',   bn:'归一小神算'},
+     {id:'mstair',        e:'📶', n:'上楼梯问题', bn:'间隔小神算'},
+     {id:'mmeet',         e:'🚶', n:'相遇问题',   bn:'相遇小神算'},
+     {id:'mchase',        e:'🏃', n:'追及问题',   bn:'追及小神算'},
+     {id:'mwork',         e:'🔧', n:'工程问题',   bn:'工程小神算'},
      {id:'ch-math', e:'🏆', n:'奥数大挑战', bn:'奥数挑战王', boss:true},
    ]},
   {name:'动物王国', ico:'🦁', color:'#0ea5a5', chest:'🦁', gift:{e:'👑', name:'百兽之冠'},
@@ -365,6 +445,11 @@ const REGIONS=[
      {id:'babies',      e:'🐣', n:'动物宝宝哪来的', bn:'动物保姆'},
      {id:'builders',    e:'🏗️', n:'动物建筑师',   bn:'动物建筑师'},
      {id:'night',       e:'🌃', n:'夜行动物',     bn:'夜探小达人'},
+     {id:'tail',        e:'🐒', n:'尾巴有什么用', bn:'尾巴小专家'},
+     {id:'acomm',       e:'📢', n:'动物怎么说话', bn:'动物语言学家'},
+     {id:'atooth',      e:'🦷', n:'看牙知吃什么', bn:'牙齿小侦探'},
+     {id:'agroup',      e:'🐜', n:'群居的好处',   bn:'群居观察员'},
+     {id:'aextinct',    e:'🐼', n:'濒危动物',     bn:'动物保护小卫士'},
      {id:'ch-animal', e:'🏆', n:'动物大挑战', bn:'动物挑战王', boss:true},
    ]},
   {name:'科技发明馆', ico:'🔧', color:'#4b6cb7', chest:'🤖', gift:{e:'⚙️', name:'黄金齿轮'},
@@ -379,6 +464,11 @@ const REGIONS=[
      {id:'printer3d',   e:'🖨️', n:'3D 打印',      bn:'3D设计师'},
      {id:'satellite',   e:'🛰️', n:'卫星和导航',   bn:'导航小工程师'},
      {id:'thermometer', e:'🌡️', n:'温度计的秘密', bn:'测温小专家'},
+     {id:'tsound',      e:'🔊', n:'声音怎么传',   bn:'声波小工程师'},
+     {id:'tlamp',       e:'💡', n:'灯泡怎么亮',   bn:'照明小工程师'},
+     {id:'tmagnet',     e:'🧲', n:'电和磁是一家', bn:'电磁小工程师'},
+     {id:'tsignal',     e:'📶', n:'信息怎么传远', bn:'通信小工程师'},
+     {id:'tai',         e:'🧠', n:'AI是怎么学的', bn:'AI小训练师'},
      {id:'ch-tech', e:'🏆', n:'科技大挑战', bn:'科技挑战王', boss:true},
    ]},
   {name:'生活小达人', ico:'🍎', color:'#ef8c3c', chest:'🎒', gift:{e:'🌟', name:'生活达人勋章'},
@@ -390,9 +480,14 @@ const REGIONS=[
      {id:'manners',   e:'🤝', n:'礼貌待人',   bn:'文明小天使'},
      {id:'emotion',   e:'😊', n:'认识情绪',   bn:'情绪小主人'},
      {id:'clock',     e:'🕐', n:'认识钟表',   bn:'时间小管家'},
-     {id:'firstaid',  e:'🩹', n:'小伤口怎么办', bn:'急救小护士'},
+     {id:'firstaid',  e:'💊', n:'小伤口怎么办', bn:'急救小护士'},
      {id:'netsafe',   e:'📱', n:'上网安全',   bn:'网络小卫士'},
      {id:'shopping',  e:'🛒', n:'学会看标签', bn:'购物小行家'},
+     {id:'vtime',     e:'⏰', n:'时间怎么安排', bn:'时间小管家'},
+     {id:'vneed',     e:'🐷', n:'需要还是想要', bn:'花钱小当家'},
+     {id:'vfire',     e:'🔥', n:'着火了怎么办', bn:'消防小卫士'},
+     {id:'vlost',     e:'🧭', n:'走丢了怎么办', bn:'安全小卫士'},
+     {id:'vtidy',     e:'🧹', n:'东西怎么归位', bn:'整理小达人'},
      {id:'ch-life', e:'🏆', n:'生活大挑战', bn:'生活挑战王', boss:true},
    ]},
   {name:'情绪成长屋', ico:'💗', color:'#ec7aa4', chest:'🌈', gift:{e:'🌟', name:'平静宝石'},
@@ -403,16 +498,34 @@ const REGIONS=[
      {id:'bravethink', e:'💪', n:'勇敢的想法',   bn:'勇气小骑士'},
      {id:'calmdown',   e:'😤', n:'生气灭火器',   bn:'冷静小超人'},
      {id:'askhelp',    e:'🤗', n:'说出来会好受', bn:'暖心小天使'},
+     {id:'hname',      e:'🏷️', n:'给情绪起名字', bn:'情绪命名家'},
+     {id:'hbody',      e:'❤️', n:'情绪住在身体里', bn:'身体信号侦探'},
+     {id:'hfail',      e:'📉', n:'失败了怎么办', bn:'重来小勇士'},
+     {id:'hjealous',   e:'😒', n:'羡慕和嫉妒',   bn:'心态小主人'},
+     {id:'hfriend',    e:'🤝', n:'和朋友吵架了', bn:'关系修补匠'},
+     {id:'hnervous',   e:'🎤', n:'上台前的紧张', bn:'登台小勇士'},
+     {id:'hnosay',     e:'🙅', n:'学会说不',     bn:'边界小卫士'},
+     {id:'hlonely',    e:'😔', n:'一个人待着',   bn:'独处小达人'},
+     {id:'hempathy',   e:'💞', n:'换位想一想',   bn:'同理心大师'},
      {id:'ch-heart', e:'🏆', n:'情绪大挑战', bn:'情绪挑战王', boss:true},
    ]},
   {name:'植物花园', ico:'🌷', color:'#3fa34d', chest:'🌼', gift:{e:'🌻', name:'向日葵金花'},
    lessons:[
      {id:'sunshine',   e:'🌞', n:'阳光做饭',     bn:'光合小厨师'},
      {id:'flower',     e:'🌸', n:'花和蜜蜂',     bn:'传粉小蜜蜂'},
-     {id:'rings',      e:'🪵', n:'树的年轮',     bn:'年轮小侦探'},
+     {id:'rings',      e:'🌳', n:'树的年轮',     bn:'年轮小侦探'},
      {id:'mushroom',   e:'🍄', n:'蘑菇不是植物', bn:'真菌小专家'},
-     {id:'trap',       e:'🪤', n:'会吃虫的植物', bn:'食虫植物观察员'},
+     {id:'trap',       e:'🌿', n:'会吃虫的植物', bn:'食虫植物观察员'},
      {id:'autumnleaf', e:'🍂', n:'叶子为什么变黄', bn:'落叶小博士'},
+     {id:'root',       e:'🌱', n:'根的大本领',   bn:'根系小专家'},
+     {id:'pfruit',     e:'🍓', n:'果实和种子',   bn:'果实小行家'},
+     {id:'psprout',    e:'🌰', n:'发芽要什么',   bn:'发芽小实验家'},
+     {id:'pstem',      e:'🎋', n:'茎是运输管',   bn:'茎脉小工程师'},
+     {id:'pgrass',     e:'🌾', n:'草为什么割不死', bn:'草坪小专家'},
+     {id:'pyear',      e:'📅', n:'一年生和多年生', bn:'花期小管家'},
+     {id:'pdesert',    e:'🌵', n:'沙漠植物的本事', bn:'沙漠植物观察员'},
+     {id:'pmedicine',  e:'💊', n:'植物做的药',   bn:'本草小行家'},
+     {id:'pwater',     e:'💧', n:'水怎么到树顶', bn:'蒸腾小博士'},
      {id:'ch-plant', e:'🏆', n:'植物大挑战', bn:'植物挑战王', boss:true},
    ]},
   {name:'语文诗词园', ico:'📜', color:'#d24a43', chest:'🏮', gift:{e:'🖌️', name:'神笔小毛笔'},
@@ -427,6 +540,11 @@ const REGIONS=[
      {id:'synonym',  e:'🤝', n:'近义词朋友',   bn:'近义词高手'},
      {id:'xiehouyu', e:'🎯', n:'歇后语',       bn:'歇后语小达人'},
      {id:'personify', e:'🌼', n:'拟人句魔法',  bn:'拟人小作家'},
+     {id:'cradical', e:'🈚', n:'偏旁的秘密',   bn:'偏旁小神探'},
+     {id:'cclear',   e:'📖', n:'把事说清楚',   bn:'表达小能手'},
+     {id:'cpoet',    e:'🌊', n:'李白和杜甫',   bn:'诗人小知音'},
+     {id:'cexagg',   e:'🎈', n:'夸张句魔法',   bn:'夸张小作家'},
+     {id:'cletter',  e:'✉️', n:'写一封信',     bn:'书信小行家'},
      {id:'ch-chinese', e:'🏆', n:'语文大挑战', bn:'语文挑战王', boss:true},
    ]},
   {name:'美食科学厨房', ico:'🍳', color:'#e8842c', chest:'🍱', gift:{e:'🍯', name:'魔法蜂蜜罐'},
@@ -436,7 +554,16 @@ const REGIONS=[
      {id:'fridge',   e:'🧊', n:'冰箱为什么保鲜', bn:'保鲜小管家'},
      {id:'taste',    e:'👅', n:'酸甜苦辣咸',     bn:'味觉小美食家'},
      {id:'eggmagic', e:'🥚', n:'鸡蛋变魔术',     bn:'鸡蛋魔术师'},
-     {id:'preserve', e:'🫙', n:'食物保存的智慧', bn:'保存小能手'},
+     {id:'preserve', e:'🥫', n:'食物保存的智慧', bn:'保存小能手'},
+     {id:'onion',    e:'🧅', n:'切洋葱为什么流泪', bn:'洋葱小厨师'},
+     {id:'fboil',    e:'🌡️', n:'水开是100度',   bn:'沸点小博士'},
+     {id:'foil',     e:'🍳', n:'油和水不相融', bn:'油水小实验家'},
+     {id:'fmilk',    e:'🥛', n:'牛奶变酸奶',   bn:'发酵小厨师'},
+     {id:'fsalt',    e:'🧂', n:'盐为什么防腐', bn:'腌制小行家'},
+     {id:'fbrown',   e:'🍖', n:'烤出来为什么香', bn:'焦香小厨师'},
+     {id:'facid',    e:'🍋', n:'酸和碱小实验', bn:'酸碱小实验家'},
+     {id:'fnutri',   e:'🥗', n:'三大营养素',   bn:'营养小行家'},
+     {id:'fsafe',    e:'🦠', n:'怎么防食物中毒', bn:'食品安全小卫士'},
      {id:'ch-food', e:'🏆', n:'美食大挑战', bn:'美食挑战王', boss:true},
    ]},
   {name:'数学勇士营', ico:'⚖️', color:'#2b7de9', chest:'🎖️', gift:{e:'💎', name:'智慧蓝宝石'},
@@ -447,6 +574,15 @@ const REGIONS=[
      {id:'evenup',     e:'🤝', n:'移多补少',   bn:'匀一匀小能手'},
      {id:'matchstick', e:'🥢', n:'火柴棒游戏', bn:'火柴棒魔术师'},
      {id:'sumdiff',    e:'➕', n:'和差问题',   bn:'和差小勇士'},
+     {id:'mfrac',      e:'🍰', n:'认识分数',     bn:'分数小行家'},
+     {id:'mtime',      e:'⏱️', n:'时间的计算',   bn:'时间小算师'},
+     {id:'mperim',     e:'📐', n:'周长和面积',   bn:'周长面积小能手'},
+     {id:'mseq',       e:'🔢', n:'找规律填数',   bn:'规律小神算'},
+     {id:'mdiff',      e:'🍬', n:'差倍问题',     bn:'差倍小勇士'},
+     {id:'mtrick',     e:'✖️', n:'巧算乘除',     bn:'速算小勇士'},
+     {id:'mcount',     e:'🧮', n:'加法乘法原理', bn:'计数小军师'},
+     {id:'mpuzzle',    e:'🔍', n:'数字谜竖式',   bn:'数字谜神探'},
+     {id:'mroute',     e:'🗺️', n:'最短路线有几条', bn:'路线小军师'},
      {id:'ch-math2', e:'🏆', n:'勇士大挑战', bn:'数学勇士王', boss:true},
    ]},
   {name:'世界之窗', ico:'🌏', color:'#0d9488', chest:'🧳', gift:{e:'🌐', name:'环球徽记'},
@@ -458,7 +594,7 @@ const REGIONS=[
      {id:'desert',     e:'🐪', n:'沙漠里的生活',   bn:'沙漠小向导'},
      {id:'greeting',   e:'👋', n:'各国怎么打招呼', bn:'世界小使者'},
      {id:'flags',      e:'🚩', n:'国旗的秘密',     bn:'国旗小专家'},
-     {id:'timezone',   e:'🕰️', n:'地球两头不同时', bn:'时区小达人'},
+     {id:'worldlang',  e:'🗣️', n:'世界的语言',     bn:'语言小达人'},
      {id:'ch-globe', e:'🏆', n:'世界大挑战', bn:'世界挑战王', boss:true},
    ]},
   {name:'节日与历法', ico:'🏮', color:'#d99a0b', chest:'🧧', gift:{e:'🏮', name:'团圆金灯笼'},
@@ -479,7 +615,7 @@ const REGIONS=[
      {id:'plasticglass', e:'🥤', n:'塑料和玻璃',     bn:'材料小行家'},
      {id:'rust',         e:'🔩', n:'金属会生锈',     bn:'防锈小卫士'},
      {id:'dissolve',     e:'🧂', n:'谁能溶解在水里', bn:'溶解小实验家'},
-     {id:'acidbase',     e:'🍇', n:'紫甘蓝变色魔法', bn:'酸碱小魔术师'},
+     {id:'cloth',        e:'👕', n:'布是怎么来的',   bn:'织布小行家'},
      {id:'separate',     e:'🥄', n:'混合物怎么分开', bn:'分离小能手'},
      {id:'absorb',       e:'🧽', n:'谁最能吸水',     bn:'吸水小实验家'},
      {id:'newmaterial',  e:'🧵', n:'神奇新材料',     bn:'未来材料师'},
@@ -487,10 +623,10 @@ const REGIONS=[
    ]},
   {name:'地球奥秘', ico:'🌋', color:'#c1440e', chest:'⛏️', gift:{e:'💠', name:'地心晶石'},
    lessons:[
-     {id:'rocks',      e:'🪨', n:'岩石和矿物',     bn:'岩石小猎人'},
+     {id:'rocks',      e:'🗿', n:'岩石和矿物',     bn:'岩石小猎人'},
      {id:'fossil',     e:'🐚', n:'化石会说话',     bn:'化石猎人'},
      {id:'earthquake', e:'🏚️', n:'地震来了怎么办', bn:'地震小卫士'},
-     {id:'soil',       e:'🪱', n:'土壤里的世界',   bn:'土壤小博士'},
+     {id:'soil',       e:'🐛', n:'土壤里的世界',   bn:'土壤小博士'},
      {id:'tide',       e:'🌊', n:'潮起潮落',       bn:'潮汐观察员'},
      {id:'inside',     e:'🥚', n:'地球里面长啥样', bn:'地心探险家'},
      {id:'cave',       e:'💎', n:'溶洞和钟乳石',   bn:'溶洞探险家'},
@@ -512,7 +648,7 @@ function loadData(){
   try{ return JSON.parse(localStorage.getItem('kidspark_v1')||'{"badges":{},"days":[]}'); }
   catch(e){ return {badges:{},days:[]}; }
 }
-const data=loadData(), badges=data.badges||{}, days=data.days||[];
+const data=loadData(), badges=data.badges||{}, days=data.days||[], daily=data.daily||{};
 const isDone=id=>!!badges[id];
 
 /* ===== 组装线性站点序列 ===== */
@@ -639,7 +775,24 @@ const bucket={}; const put=(ds,l)=>{(bucket[ds]||(bucket[ds]=[])).push(l);};
 ALL.forEach(l=>{ if(l.boss) return; if(isDone(l.id)) put((badges[l.id]&&badges[l.id].date)||todayStr, l); });
 /* 未来：未完成的课 → 今天起每天 PER_DAY 课（弹性：想多做可点明天的格子提前上） */
 /* 今天的额度要先扣掉今天已完成的，不然做完一批又补一批，越做越多 */
-const undoneList=ALL.filter(l=>!isDone(l.id) && !l.boss);
+/* 顺序随机：按课程id做稳定哈希打乱，让奥数等同类不扎堆、每天混着不同主题；
+   用哈希而非Math.random()，保证每次刷新顺序不变、日历不乱跳 */
+function _seed(s){let x=2166136261>>>0;for(let i=0;i<s.length;i++){x^=s.charCodeAt(i);x=Math.imul(x,16777619);}return x>>>0;}
+/* 光按 id 哈希排会碰巧把同一个区的课排到同一天（出现过一天全是数学勇士营）。
+   改成「按区轮流发牌」：先把未完成的课按区分组，每组内部哈希打乱，
+   然后第 1 轮每个区各出 1 课、第 2 轮再各出 1 课……
+   这样连着的课必定来自不同区，一天 PER_DAY 课自然覆盖 PER_DAY 个不同主题（≥5）。*/
+const _undone=ALL.filter(l=>!isDone(l.id) && !l.boss);
+const _byRegion=new Map();
+_undone.forEach(l=>{ const r=L2R[l.id]||'x'; if(!_byRegion.has(r)) _byRegion.set(r,[]); _byRegion.get(r).push(l); });
+_byRegion.forEach(g=> g.sort((a,b)=>_seed(a.id)-_seed(b.id)));           // 区内顺序随机
+const _regions=[..._byRegion.keys()].sort((a,b)=>_seed(a)-_seed(b));     // 区的出场顺序也随机
+const undoneList=[];
+for(let round=0; ; round++){
+  let picked=false;
+  for(const r of _regions){ const g=_byRegion.get(r); if(round<g.length){ undoneList.push(g[round]); picked=true; } }
+  if(!picked) break;
+}
 const capToday=Math.max(0, PER_DAY-(bucket[todayStr]||[]).length);
 undoneList.forEach((l,i)=> put(addDays(todayStr, i<capToday ? 0 : 1+Math.floor((i-capToday)/PER_DAY)), l));
 const todayGroup=bucket[todayStr]||[];               // 今天这一天的所有课
@@ -656,14 +809,20 @@ function openDay(ds){ const L=bucket[ds]; if(!L||!L.length) return; curDay=ds;
       : isPast ? `这天上了 ${L.length} 节课，全部完成 ✓`
       : `这天安排了 ${L.length} 节课（做完前面的就轮到这天）`;
   const allDayDone=L.every(l=>isDone(l.id));
-  let head='';
+  /* 大挑战做没做过、拿了几颗星，都要看得出来；做过了就跟课程一样沉到底部 */
+  let head='', tailRow='';
   if(allDayDone){ const regs=[...new Set(L.map(l=>L2R[l.id]).filter(Boolean))].join(',');
-    head=`<div class="lrow" style="background:#fff0dd" onclick="location.href='lessons/daily/index.html?r=${regs}'"><div class="le">🏆</div><div class="lb"><div class="ln">今日大挑战<span style="font-size:11px;color:#e0692c"> 综合</span></div><div class="lst">这天的课都上完啦，来复习闯关拿星星！</div></div><div class="lgo">挑战 ▶</div></div>`; }
-  document.getElementById('dayList').innerHTML = head + L.map(l=>{ const done=isDone(l.id);
+    const go=`location.href='lessons/daily/index.html?r=${regs}&d=${ds}'`;
+    const dc=daily[ds];
+    if(dc) tailRow=`<div class="lrow done" onclick="${go}"><div class="le">🏆</div><div class="lb"><div class="ln">今日大挑战<span style="font-size:11px;color:#e0692c"> 综合</span></div><div class="lst">✓ 已挑战 · ${'⭐'.repeat(dc.s)}${'☆'.repeat(Math.max(0,dc.t-dc.s))} ${dc.s}/${dc.t} 星${dc.s<dc.t?' · 再战能拿满星':''}</div></div><div class="lgo">再战</div></div>`;
+    else head=`<div class="lrow" style="background:#fff0dd" onclick="${go}"><div class="le">🏆</div><div class="lb"><div class="ln">今日大挑战<span style="font-size:11px;color:#e0692c"> 综合</span></div><div class="lst">这天的课都上完啦，来复习闯关拿星星！</div></div><div class="lgo">挑战 ▶</div></div>`; }
+  /* 没上的排前面、已完成的沉到底部（各自内部保持原顺序），娃一打开就看到该做哪节 */
+  const rows=[...L].sort((a,b)=>(isDone(a.id)?1:0)-(isDone(b.id)?1:0));
+  document.getElementById('dayList').innerHTML = head + rows.map(l=>{ const done=isDone(l.id);
     return `<div class="lrow ${done?'done':''}" onclick="goLesson('${l.id}')">`
       +`<div class="le">${l.e}</div><div class="lb"><div class="ln">${l.n}</div>`
       +`<div class="lst">${done?'✓ 已完成 · 点开可复习':'点这里去上这一课'}</div></div>`
-      +`<div class="lgo">${done?'复习':'开始 ▶'}</div></div>`; }).join('');
+      +`<div class="lgo">${done?'复习':'开始 ▶'}</div></div>`; }).join('') + tailRow;
   document.getElementById('daysheet').classList.add('on');
 }
 /* 进课前记住在看哪天，做完回来自动弹回这天清单 */
@@ -703,10 +862,21 @@ if(todayTodo.length){
   calToday.onclick=()=>openDay(todayStr);
   today.onclick=()=>openDay(todayStr);
 }else{
-  today.innerHTML=`<div class="te">📅</div><div class="tb"><div class="tk">📅 今日任务</div><div class="tt">今天的都做完啦！🎉</div><div class="td">看看日历上的打卡，或回地图回味任意一关～</div></div><div class="tgo">打开日历 ▶</div>`;
-  calToday.innerHTML=`<div class="cte">🎉</div><div class="ctb"><div class="ctk">✨ 全部完成</div><div class="ctt">今天没有新课啦</div><div class="ctd">新的一批马上就来，明天再见～</div></div>`;
-  calToday.style.cursor='default';
-  today.onclick=openCal;
+  /* 课上完了不等于今天完事了——大挑战可能还没做，别急着说"全部完成"，
+     而且这时候要能直接点进当天清单（原来跳日历，娃根本看不到大挑战）*/
+  const dc=daily[todayStr], hasDay=todayGroup.length>0;
+  if(hasDay && !dc){
+    today.innerHTML=`<div class="te">🏆</div><div class="tb"><div class="tk">📅 今日任务</div><div class="tt">课都上完啦，还差最后一关！</div><div class="td">今日大挑战还没做，去拿星星～</div></div><div class="tgo">去挑战 ▶</div>`;
+    calToday.innerHTML=`<div class="cte">🏆</div><div class="ctb"><div class="ctk">🎯 今天 ${todayGroup.length} 节课全上完</div><div class="ctt">还差今日大挑战</div><div class="ctd">点这里去挑战 →</div></div><div class="ctgo">挑战 ▶</div>`;
+    calToday.onclick=()=>openDay(todayStr);
+    today.onclick=()=>openDay(todayStr);
+  }else{
+    const st=dc?` · 大挑战 ${'⭐'.repeat(dc.s)}${'☆'.repeat(Math.max(0,dc.t-dc.s))} ${dc.s}/${dc.t} 星`:'';
+    today.innerHTML=`<div class="te">🎉</div><div class="tb"><div class="tk">📅 今日任务</div><div class="tt">今天全部完成啦！🎉</div><div class="td">${dc?'大挑战拿了 '+dc.s+'/'+dc.t+' 星，':''}点这里回看今天的课～</div></div><div class="tgo">${hasDay?'今天的课 ▶':'打开日历 ▶'}</div>`;
+    calToday.innerHTML=`<div class="cte">🎉</div><div class="ctb"><div class="ctk">✨ 全部完成${st}</div><div class="ctt">今天没有新课啦</div><div class="ctd">新的一批马上就来，明天再见～</div></div>`;
+    calToday.style.cursor='default';
+    today.onclick=()=>hasDay?openDay(todayStr):openCal();
+  }
 }
 /* 做完一节课回来 → 自动弹回刚才在看的清单（日历那天 / 或某主题） */
 try{ const ret=localStorage.getItem('kidspark_ret'), retR=localStorage.getItem('kidspark_retR');
@@ -721,11 +891,31 @@ function openChest(s){
   document.getElementById('rDesc').textContent = `你集齐了「${s.region}」的全部徽章，赢得区域宝物：${s.gift? s.gift.name : ''}！`;
   document.getElementById('reward').classList.add('on'); burst();
 }
-document.getElementById('shelf').innerHTML=ALL.map(l=>{ const b=badges[l.id];
-  return b
-    ? `<div class="medal"><div class="m">${l.e}</div><div class="mn">${l.bn}</div></div>`
-    : `<div class="medal locked"><div class="m">🔒</div><div class="mn">${l.bn}</div></div>`;
+/* 战利品架：150 枚全平铺会刷屏（实测 3251px，占首页一大半，且 138 枚是灰锁），
+   改成「最新赢到的 + 按区折叠」：默认只露最近 6 枚和 16 行进度条，想看细节再点开。*/
+function medalH(l,on){ return on
+  ? `<div class="medal"><div class="m">${l.e}</div><div class="mn">${l.bn}</div></div>`
+  : `<div class="medal locked"><div class="m">🔒</div><div class="mn">${l.bn}</div></div>`; }
+const earned=ALL.filter(l=>badges[l.id]);
+document.getElementById('shelfCount').textContent=earned.length+' / '+ALL.length;
+/* 最近赢到的排前面（按徽章上记的完成日期倒序） */
+const recent=[...earned].sort((a,b)=>((badges[b.id]||{}).date||'').localeCompare((badges[a.id]||{}).date||'')).slice(0,6);
+document.getElementById('shelfNew').innerHTML = earned.length
+  ? `<div class="shSub">✨ 最新赢到的${earned.length>6?'（近 6 枚）':''}</div>
+     <div class="shNew">${recent.map(l=>medalH(l,true)).join('')}</div>`
+  : `<div class="shEmpty">还没有战利品～<br>上完一课就能赢到第一枚徽章！</div>`;
+document.getElementById('shelf').innerHTML=REGIONS.map((r,k)=>{
+  const got=r.lessons.filter(l=>badges[l.id]).length, tot=r.lessons.length, full=got===tot;
+  return `<div class="shRow ${full?'full':''}" onclick="toggleShelf(${k},this)">
+      <div class="sIco">${full?'🏅':r.ico}</div>
+      <div class="sB"><div class="sN">${r.name}${full?' · 全收齐！':''}</div>
+        <div class="sBar"><i style="width:${Math.round(got/tot*100)}%"></i></div></div>
+      <div class="sNum">${got}/${tot}</div><div class="sAr">▶</div>
+    </div>
+    <div class="shGrid" id="sg${k}">${r.lessons.map(l=>medalH(l,!!badges[l.id])).join('')}</div>`;
 }).join('');
+function toggleShelf(k,row){ const g=document.getElementById('sg'+k);
+  row.classList.toggle('open', g.classList.toggle('open')); }
 
 /* 继续探险 → 滚到当前站点 */
 document.getElementById('goBtn').onclick=()=>{

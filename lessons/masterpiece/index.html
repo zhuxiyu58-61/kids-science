@@ -64,6 +64,27 @@
   .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
   .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#f5e7ea; color:var(--ink);}
   .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+
+/* ===== 手机端排版修正 start ===== */
+.finishBtns button{white-space:nowrap;}
+/* 知识卡全看完的提示,接在知识点下面而不是盖掉它 */
+.factDone{margin-top:9px; padding-top:8px; border-top:1px dashed rgba(0,0,0,.13); font-size:13.5px; opacity:.85;}
+/* 课名长的时候(如"望远镜看到的是过去")标题会把「回乐园」挤成两行 */
+.back{white-space:nowrap;}
+.title{min-width:0;}
+@media (max-width:430px){
+  /* 4 张知识卡排成 2×2,卡名不再从词中间断 */
+  .orbit{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; width:100%; max-width:340px;}
+  .planet{width:auto;}
+  /* 内容顶到上面,别垂直居中留一大片空白 */
+  .subview{justify-content:flex-start; padding-top:4px;}
+  /* 通关页两个按钮各占一行宽度的一半,不断行 */
+  .finishBtns button{padding:13px 14px; font-size:15px;}
+  /* 长课名缩一号字,尽量不换行 */
+  .topbar .title{font-size:16px;}
+  .back{font-size:17px; padding:8px 11px;}
+}
+/* ===== 手机端排版修正 end ===== */
 </style>
 </head>
 <body>
@@ -88,7 +109,7 @@
       <div class="subview on" id="ex-gallery">
         <div class="pickRow" id="pickRow">
           <div class="pickBtn on" data-i="0"><div class="pi">🌌</div><div class="pn">星夜</div></div>
-          <div class="pickBtn" data-i="1"><div class="pi">🪷</div><div class="pn">睡莲</div></div>
+          <div class="pickBtn" data-i="1"><div class="pi">🌺</div><div class="pn">睡莲</div></div>
           <div class="pickBtn" data-i="2"><div class="pi">⛰️</div><div class="pn">水墨山水</div></div>
         </div>
         <canvas id="gallery" width="560" height="230"></canvas>
@@ -99,7 +120,7 @@
           <div class="tc on" data-i="0"><div class="ti">🇳🇱</div><div class="tn">梵高</div></div>
           <div class="tc" data-i="1"><div class="ti">🌀</div><div class="tn">星夜的故事</div></div>
           <div class="tc" data-i="2"><div class="ti">⬜</div><div class="tn">留白</div></div>
-          <div class="tc" data-i="3"><div class="ti">🪷</div><div class="tn">画了181次</div></div>
+          <div class="tc" data-i="3"><div class="ti">🌺</div><div class="tn">画了181次</div></div>
           <div class="tc subj" data-i="4"><div class="ti">🔤</div><div class="tn">英语角</div></div>
         </div>
         <div class="tipCap" id="tipCap"></div>
@@ -208,7 +229,7 @@ document.getElementById('tipCap').innerHTML=TIP[0];
 /* ===== 闯关1 拖拽分类 ===== */
 const ITEMS=[
  {key:'loud',ico:'🌪️',name:'龙卷风'},{key:'loud',ico:'🎆',name:'烟花'},{key:'loud',ico:'🥁',name:'咚咚鼓声'},
- {key:'calm',ico:'🪶',name:'飘落的羽毛'},{key:'calm',ico:'☁️',name:'白云'},{key:'calm',ico:'🌙',name:'安静的月夜'},
+ {key:'calm',ico:'🕊️',name:'飘落的羽毛'},{key:'calm',ico:'☁️',name:'白云'},{key:'calm',ico:'🌙',name:'安静的月夜'},
 ];
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
 (function buildSort(){
@@ -236,7 +257,7 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;
 const QUIZ=[
  {tag:'art',tl:'艺术',ico:'🌌',q:'梵高的《星夜》，天空为什么让人觉得热闹、有力量？',opts:[['用了很多打旋的粗线条',1],['因为画得很小',0],['因为只用了黑色',0]],fb:'一圈圈打旋的粗线条，让天空看起来在流动、呼吸。'},
  {tag:'art',tl:'艺术',ico:'⛰️',q:'中国水墨山水画里，大片留白（不画东西的空白）是为了？',opts:[['让人感觉安静，留出想象的空间',1],['因为墨用完了',0],['画错了没擦掉',0]],fb:'留白是故意的，把云雾和远方留给你自己去想象。'},
- {tag:'art',tl:'艺术',ico:'🪷',q:'莫奈画《睡莲》时，用了很多细小的色点而不是涂得很平整，这样看起来会？',opts:[['朦胧、柔和',1],['特别锐利',0],['像照片一样清楚',0]],fb:'一点一点的色块，让整幅画显得柔和、有点朦胧。'},
+ {tag:'art',tl:'艺术',ico:'🌺',q:'莫奈画《睡莲》时，用了很多细小的色点而不是涂得很平整，这样看起来会？',opts:[['朦胧、柔和',1],['特别锐利',0],['像照片一样清楚',0]],fb:'一点一点的色块，让整幅画显得柔和、有点朦胧。'},
  {tag:'en',tl:'英语',ico:'🔤',q:'英语角：会画画的人叫 artist，那"博物馆"用英语怎么说？',opts:[['museum',1],['restaurant',0],['hospital',0]],fb:'museum 博物馆，是收藏名画和文物的地方。'},
 ];
 let qi=0; function startQuiz(){ document.getElementById('g-round1').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>艺术 + 英语</small>'; qi=0; renderQ(); }

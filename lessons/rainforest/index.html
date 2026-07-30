@@ -28,7 +28,7 @@
   .planet{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:10px 8px; width:112px; text-align:center; cursor:pointer; border:3px solid #bce5dd; transition:.15s;}
   .planet:active{transform:scale(.94);} .planet.seen{border-color:#41c98a; background:#f0fbf4;}
   .planet .pe{font-size:34px;} .planet .pn{font-weight:800; font-size:13px; margin-top:2px;}
-  .factBox{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:14px 18px; max-width:560px; font-weight:800; font-size:15px; line-height:1.6; min-height:52px; display:flex; align-items:center; justify-content:center; text-align:center;} .factBox b{color:var(--accent);}
+  .factBox{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:14px 18px; max-width:560px; font-weight:800; font-size:15px; line-height:1.8; min-height:52px; text-align:center;} .factBox b{color:var(--accent);}
   .seqBox{background:var(--card); border-radius:20px; padding:18px 24px; box-shadow:var(--shadow); font-size:19px; text-align:center; max-width:600px; font-weight:900;}
   .seqQ{color:var(--ink2); font-size:18px; font-weight:900;}
   .optRow{display:flex; gap:14px; flex-wrap:wrap; justify-content:center;}
@@ -61,6 +61,27 @@
   .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
   .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#dcf4ef; color:var(--ink);}
   .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+
+/* ===== 手机端排版修正 start ===== */
+.finishBtns button{white-space:nowrap;}
+/* 知识卡全看完的提示,接在知识点下面而不是盖掉它 */
+.factDone{margin-top:9px; padding-top:8px; border-top:1px dashed rgba(0,0,0,.13); font-size:13.5px; opacity:.85;}
+/* 课名长的时候(如"望远镜看到的是过去")标题会把「回乐园」挤成两行 */
+.back{white-space:nowrap;}
+.title{min-width:0;}
+@media (max-width:430px){
+  /* 4 张知识卡排成 2×2,卡名不再从词中间断 */
+  .orbit{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; width:100%; max-width:340px;}
+  .planet{width:auto;}
+  /* 内容顶到上面,别垂直居中留一大片空白 */
+  .subview{justify-content:flex-start; padding-top:4px;}
+  /* 通关页两个按钮各占一行宽度的一半,不断行 */
+  .finishBtns button{padding:13px 14px; font-size:15px;}
+  /* 长课名缩一号字,尽量不换行 */
+  .topbar .title{font-size:16px;}
+  .back{font-size:17px; padding:8px 11px;}
+}
+/* ===== 手机端排版修正 end ===== */
 </style>
 </head>
 <body>
@@ -120,7 +141,7 @@ function switchEx(v){ document.getElementById('ex-A').classList.toggle('on',v===
 let doneA=0, doneB=0;
 function unlockGame(){ if(doneA>=4 && doneB>=3){ nextHint.style.display='none'; nextBtn.style.display='block'; } }
 
-const CARDS=[{"e":"☔","n":"天天下雨","f":"雨林<b>又热又湿</b>，几乎每天下一场雨，所以树长得飞快。"},{"e":"🪜","n":"森林分四层","f":"从上到下分<b>树冠层、中间层、灌木层、地面层</b>，住着不同的动物。"},{"e":"🌑","n":"地面很黑","f":"上面的树叶挡住了阳光，<b>只有很少的光</b>能漏到地面。"},{"e":"🐒","n":"住满了生命","f":"地球上<b>每十种动植物就有一种</b>住在这片雨林里。"}];
+const CARDS=[{"e":"☔","n":"天天下雨","f":"雨林<b>又热又湿</b>，几乎每天下一场雨，所以树长得飞快。"},{"e":"📶","n":"森林分四层","f":"从上到下分<b>树冠层、中间层、灌木层、地面层</b>，住着不同的动物。"},{"e":"🌑","n":"地面很黑","f":"上面的树叶挡住了阳光，<b>只有很少的光</b>能漏到地面。"},{"e":"🐒","n":"住满了生命","f":"地球上<b>每十种动植物就有一种</b>住在这片雨林里。"}];
 function renderA(){ const box=document.getElementById('ex-A');
   box.innerHTML='<div class="bigEmo">🌴</div><div class="orbit" id="orbit"></div><div class="factBox" id="factA">👆 点点这 4 张知识卡，看看里面的秘密～</div>';
   const orbit=document.getElementById('orbit');
@@ -128,7 +149,8 @@ function renderA(){ const box=document.getElementById('ex-A');
     d.innerHTML=`<div class="pe">${p.e}</div><div class="pn">${p.n}</div>`;
     d.onclick=()=>{ document.getElementById('factA').innerHTML=p.e+' <b>'+p.n+'</b>：'+p.f;
       if(!d.dataset.seen){ d.dataset.seen='1'; d.classList.add('seen'); doneA++; document.getElementById('cntA').textContent=doneA;
-        if(doneA>=4) document.getElementById('factA').innerHTML='🎉 4 张知识卡都看完啦！去右边答题吧！'; unlockGame(); } };
+        /* 这里必须是 += 追加。写成 = 会把刚显示的第 4 张知识点覆盖掉，那张就永远看不到了 */
+        if(doneA>=4) document.getElementById('factA').innerHTML+='<div class="factDone">🎉 4 张知识卡都看完啦！去右边答题吧！</div>'; unlockGame(); } };
     orbit.appendChild(d); });
 }
 const ROUNDS_B=[{"q":"亚马逊雨林被叫做地球的什么？","opts":["地球之肺","地球之脚","地球之帽"],"ans":0,"cap":"树太多、放出的氧气太多，所以叫地球之肺。"},{"q":"雨林地面为什么很黑？","opts":["上面的树叶把阳光挡住了","那里没有太阳","有人关了灯"],"ans":0,"cap":"树冠像一把大伞，光漏不下来。"},{"q":"雨林里的树为什么长得特别快？","opts":["又热又湿，水和阳光都够","土里埋了电池","有人天天施肥"],"ans":0,"cap":"高温加充足雨水，植物疯长。"}];
@@ -172,7 +194,7 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;
     else { rst(); document.getElementById('tray').appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
 })();
 
-const QUIZ=[{"tag":"sci","tl":"地理","ico":"🌍","q":"亚马逊雨林在哪个洲？","opts":[["南美洲",1],["非洲",0],["欧洲",0]],"fb":"在南美洲，那条大河也叫亚马逊河。"},{"tag":"sci","tl":"科学","ico":"🫁","q":"说雨林是地球之肺，是因为它？","opts":[["放出很多氧气",1],["会呼吸出声音",0],["长得像肺",0]],"fb":"满林子的树都在光合作用放氧气。"},{"tag":"logic","tl":"逻辑","ico":"🌑","q":"雨林地面很黑，所以地上的植物大多？","opts":[["叶子特别大，好多抢一点光",1],["长得比树还高",0],["不需要光",0]],"fb":"叶子大才能接住漏下来的一点点光。"},{"tag":"en","tl":"英语","ico":"🔤","q":"英语角：雨用英语怎么说？","opts":[["rain",1],["sun",0],["snow",0]],"fb":"rain 雨，rainforest 就是雨林。"}];
+const QUIZ=[{"tag":"sci","tl":"地理","ico":"🌍","q":"亚马逊雨林在哪个洲？","opts":[["南美洲",1],["非洲",0],["欧洲",0]],"fb":"在南美洲，那条大河也叫亚马逊河。"},{"tag":"sci","tl":"科学","ico":"💨","q":"说雨林是地球之肺，是因为它？","opts":[["放出很多氧气",1],["会呼吸出声音",0],["长得像肺",0]],"fb":"满林子的树都在光合作用放氧气。"},{"tag":"logic","tl":"逻辑","ico":"🌑","q":"雨林地面很黑，所以地上的植物大多？","opts":[["叶子特别大，好多抢一点光",1],["长得比树还高",0],["不需要光",0]],"fb":"叶子大才能接住漏下来的一点点光。"},{"tag":"en","tl":"英语","ico":"🔤","q":"英语角：雨用英语怎么说？","opts":[["rain",1],["sun",0],["snow",0]],"fb":"rain 雨，rainforest 就是雨林。"}];
 let qi=0; function startQuiz(){ document.getElementById('g-round1').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>知识 + 逻辑 + 英语</small>'; qi=0; renderQ(); }
 function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; const tag=document.getElementById('qtag'); tag.className='qtag '+it.tag; tag.textContent=it.tl; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; shuffle(it.opts.slice()).forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
 function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想～'; } }

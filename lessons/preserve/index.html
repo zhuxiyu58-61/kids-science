@@ -28,7 +28,7 @@
   .planet{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:10px 8px; width:112px; text-align:center; cursor:pointer; border:3px solid #f4d6ac; transition:.15s;}
   .planet:active{transform:scale(.94);} .planet.seen{border-color:#41c98a; background:#f0fbf4;}
   .planet .pe{font-size:34px;} .planet .pn{font-weight:800; font-size:13px; margin-top:2px;}
-  .factBox{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:14px 18px; max-width:560px; font-weight:800; font-size:15px; line-height:1.6; min-height:52px; display:flex; align-items:center; justify-content:center; text-align:center;} .factBox b{color:var(--accent);}
+  .factBox{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:14px 18px; max-width:560px; font-weight:800; font-size:15px; line-height:1.8; min-height:52px; text-align:center;} .factBox b{color:var(--accent);}
   .seqBox{background:var(--card); border-radius:20px; padding:18px 24px; box-shadow:var(--shadow); font-size:19px; text-align:center; max-width:600px; font-weight:900;}
   .seqQ{color:var(--ink2); font-size:18px; font-weight:900;}
   .optRow{display:flex; gap:14px; flex-wrap:wrap; justify-content:center;}
@@ -61,6 +61,27 @@
   .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
   .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#ffedd2; color:var(--ink);}
   .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+
+/* ===== 手机端排版修正 start ===== */
+.finishBtns button{white-space:nowrap;}
+/* 知识卡全看完的提示,接在知识点下面而不是盖掉它 */
+.factDone{margin-top:9px; padding-top:8px; border-top:1px dashed rgba(0,0,0,.13); font-size:13.5px; opacity:.85;}
+/* 课名长的时候(如"望远镜看到的是过去")标题会把「回乐园」挤成两行 */
+.back{white-space:nowrap;}
+.title{min-width:0;}
+@media (max-width:430px){
+  /* 4 张知识卡排成 2×2,卡名不再从词中间断 */
+  .orbit{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; width:100%; max-width:340px;}
+  .planet{width:auto;}
+  /* 内容顶到上面,别垂直居中留一大片空白 */
+  .subview{justify-content:flex-start; padding-top:4px;}
+  /* 通关页两个按钮各占一行宽度的一半,不断行 */
+  .finishBtns button{padding:13px 14px; font-size:15px;}
+  /* 长课名缩一号字,尽量不换行 */
+  .topbar .title{font-size:16px;}
+  .back{font-size:17px; padding:8px 11px;}
+}
+/* ===== 手机端排版修正 end ===== */
 </style>
 </head>
 <body>
@@ -71,7 +92,7 @@
   </div>
 
   <section class="scene active" id="s-intro">
-    <div class="kico">🫙</div>
+    <div class="kico">🥫</div>
     <div class="introCard">很久以前没有冰箱，古人的鱼和菜怎么放一整个冬天都不坏？他们发明了好多妙招：<b>晒、腌、封</b>……招招都在对付同一个敌人——细菌！</div>
     <button class="bigbtn" onclick="go('explore')">出发探索 ▶</button>
   </section>
@@ -106,7 +127,7 @@
   </section>
 
   <section class="scene" id="s-finish">
-    <div class="finishCard"><div class="medal">🫙</div><h2>闯关成功！</h2><div class="medalName">🎖 保存小能手</div>
+    <div class="finishCard"><div class="medal">🥫</div><h2>闯关成功！</h2><div class="medalName">🎖 保存小能手</div>
       <p>要记住的：<br>• 保存食物=对付<b>细菌</b>；<br>• <b>晒干</b>抽走水，<b>腌制</b>用盐齁，<b>罐头</b>先烫再封；<br>• 糖渍也行；古人的地窖是天然冰箱；<br>• 🔤 英语：食物 <b>food</b>。</p>
       <div class="finishBtns"><button class="fb2" onclick="location.reload()">再玩一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
     </div>
@@ -120,15 +141,15 @@ function switchEx(v){ document.getElementById('ex-A').classList.toggle('on',v===
 let doneA=0, doneB=0;
 function unlockGame(){ if(doneA>=4 && doneB>=3){ nextHint.style.display='none'; nextBtn.style.display='block'; } }
 
-const CARDS=[{"e":"☀️","n":"晒干：抽走水分","f":"细菌<b>没有水就活不了</b>！葡萄晒成葡萄干、鱼晒成鱼干，放好久都不坏。"},{"e":"🧂","n":"腌制：齁住细菌","f":"很多的盐把细菌<b>\"腌\"得没法干活</b>——咸菜、咸鸭蛋就是这么来的。"},{"e":"🫙","n":"罐头：封死+烫死","f":"把食物<b>加热赶跑细菌再密封</b>，新细菌进不来，能放很久很久。"},{"e":"🕳️","n":"地窖：天然冰箱","f":"古人把菜放进<b>凉凉的地窖</b>，冬天还会藏冰进去——天然大冰箱！"}];
+const CARDS=[{"e":"☀️","n":"晒干：抽走水分","f":"细菌<b>没有水就活不了</b>！葡萄晒成葡萄干、鱼晒成鱼干，放好久都不坏。"},{"e":"🧂","n":"腌制：齁住细菌","f":"很多的盐把细菌<b>\"腌\"得没法干活</b>——咸菜、咸鸭蛋就是这么来的。"},{"e":"🥫","n":"罐头：封死+烫死","f":"把食物<b>加热赶跑细菌再密封</b>，新细菌进不来，能放很久很久。"},{"e":"🕳️","n":"地窖：天然冰箱","f":"古人把菜放进<b>凉凉的地窖</b>，冬天还会藏冰进去——天然大冰箱！"}];
 function renderA(){ const box=document.getElementById('ex-A');
-  box.innerHTML='<div class="bigEmo">🫙</div><div class="orbit" id="orbit"></div><div class="factBox" id="factA">👆 点点这 4 张知识卡，看看里面的秘密～</div>';
+  box.innerHTML='<div class="bigEmo">🥫</div><div class="orbit" id="orbit"></div><div class="factBox" id="factA">👆 点点这 4 张知识卡，看看里面的秘密～</div>';
   const orbit=document.getElementById('orbit');
   CARDS.forEach((p,i)=>{ const d=document.createElement('div'); d.className='planet'; d.dataset.i=i;
     d.innerHTML=`<div class="pe">${p.e}</div><div class="pn">${p.n}</div>`;
     d.onclick=()=>{ document.getElementById('factA').innerHTML=p.e+' <b>'+p.n+'</b>：'+p.f;
       if(!d.dataset.seen){ d.dataset.seen='1'; d.classList.add('seen'); doneA++; document.getElementById('cntA').textContent=doneA;
-        if(doneA>=4) document.getElementById('factA').innerHTML='🎉 4 张知识卡都看完啦！去右边答题吧！'; unlockGame(); } };
+        if(doneA>=4) document.getElementById('factA').innerHTML+='<div class="factDone">🎉 4 张知识卡都看完啦！去右边答题吧！</div>'; unlockGame(); } };
     orbit.appendChild(d); });
 }
 const ROUNDS_B=[{"q":"晒干的食物不容易坏，因为细菌？","opts":["没有水活不了","怕太阳晒黑","搬家了"],"ans":0,"cap":"抽走水分，细菌就没法生活。"},{"q":"咸菜用什么\"齁住\"细菌？","opts":["很多的盐","很多的糖?再想想","辣椒"],"ans":0,"cap":"大量盐让细菌没法干活。"},{"q":"罐头能放很久的秘密是？","opts":["加热赶跑细菌再密封","里面有防腐魔法","铁皮很厚"],"ans":0,"cap":"先烫死再封死，细菌进不来。"}];
@@ -178,7 +199,7 @@ function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.l
 function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想～'; } }
 
 function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
-function celebrate(){ saveBadge('preserve','🫙','保存小能手'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#e8842c','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+function celebrate(){ saveBadge('preserve','🥫','保存小能手'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#e8842c','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
   let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
 if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
 

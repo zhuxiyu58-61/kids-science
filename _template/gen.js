@@ -1,8 +1,11 @@
 // 按 breathe 课骨架生成课程页 + 按 ch-heart 骨架生成区挑战页
 const fs = require('fs');
 const path = require('path');
-const {THEMES, REGION_META, LESSONS, BOSSES} = require('./gen-data.js');
-const OUT = 'D:/IdeProject/kids-science/lessons';
+/* 数据文件可用参数指定，便于每天一批：node _template/gen.js _template/data-2026-07-18.js
+   不带参数=沿用老的 gen-data.js */
+const DATA = process.argv[2] ? path.resolve(process.argv[2]) : path.join(__dirname, 'gen-data.js');
+const {THEMES, REGION_META, LESSONS, BOSSES} = require(DATA);
+const OUT = path.join(__dirname, '..', 'lessons');   // 跟着仓库走，别写死绝对路径
 
 function lessonPage(L){
   const T = THEMES[L.region], R = REGION_META[L.region];
@@ -37,7 +40,7 @@ function lessonPage(L){
   .planet{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:10px 8px; width:112px; text-align:center; cursor:pointer; border:3px solid ${T.opb}; transition:.15s;}
   .planet:active{transform:scale(.94);} .planet.seen{border-color:#41c98a; background:#f0fbf4;}
   .planet .pe{font-size:34px;} .planet .pn{font-weight:800; font-size:13px; margin-top:2px;}
-  .factBox{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:14px 18px; max-width:560px; font-weight:800; font-size:15px; line-height:1.6; min-height:52px; display:flex; align-items:center; justify-content:center; text-align:center;} .factBox b{color:var(--accent);}
+  .factBox{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:14px 18px; max-width:560px; font-weight:800; font-size:15px; line-height:1.8; min-height:52px; text-align:center;} .factBox b{color:var(--accent);}
   .seqBox{background:var(--card); border-radius:20px; padding:18px 24px; box-shadow:var(--shadow); font-size:19px; text-align:center; max-width:600px; font-weight:900;}
   .seqQ{color:var(--ink2); font-size:18px; font-weight:900;}
   .optRow{display:flex; gap:14px; flex-wrap:wrap; justify-content:center;}
@@ -136,7 +139,8 @@ function renderA(){ const box=document.getElementById('ex-A');
     d.innerHTML=\`<div class="pe">\${p.e}</div><div class="pn">\${p.n}</div>\`;
     d.onclick=()=>{ document.getElementById('factA').innerHTML=p.e+' <b>'+p.n+'</b>：'+p.f;
       if(!d.dataset.seen){ d.dataset.seen='1'; d.classList.add('seen'); doneA++; document.getElementById('cntA').textContent=doneA;
-        if(doneA>=4) document.getElementById('factA').innerHTML='🎉 4 张知识卡都看完啦！去右边答题吧！'; unlockGame(); } };
+        /* 这里必须是 += 追加。写成 = 会把刚显示的第 4 张知识点覆盖掉，那张就永远看不到了 */
+        if(doneA>=4) document.getElementById('factA').innerHTML+='<div class="factDone">🎉 4 张知识卡都看完啦！去右边答题吧！</div>'; unlockGame(); } };
     orbit.appendChild(d); });
 }
 const ROUNDS_B=${JSON.stringify(L.qb.map(r=>({q:r.q,opts:r.opts,ans:0,cap:r.cap})))};
@@ -313,7 +317,7 @@ console.log('生成完成: '+made+' 个页面');
    三个注入脚本都有标记位、重复跑安全,生成后无脑跑一遍即可。 */
 if(made){
   const ids=[...LESSONS.map(l=>l.id), ...BOSSES.map(b=>b.id)];
-  for(const s of ['inject-mastery.js','inject-explore.js','inject-intro.js']){
+  for(const s of ['inject-mastery.js','inject-explore.js','inject-intro.js','inject-mobile.js','inject-fact.js','inject-emoji.js']){
     try{ require('child_process').execFileSync(process.execPath, [path.join(__dirname,s), ...ids], {stdio:'inherit'}); }
     catch(e){ console.error('⚠️ '+s+' 注入失败,新课会退回可试错的老规则:', e.message); }
   }

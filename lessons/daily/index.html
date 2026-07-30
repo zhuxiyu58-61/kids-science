@@ -32,6 +32,27 @@
   .resTxt{color:var(--ink2); font-weight:700; font-size:15px; margin:6px 0 16px;}
   .fbtns{display:flex; gap:12px; justify-content:center;} .fbtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--acc); color:#fff;} .fb2{background:#eef0f6; color:var(--ink);}
   .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+
+/* ===== 手机端排版修正 start ===== */
+.finishBtns button{white-space:nowrap;}
+/* 知识卡全看完的提示,接在知识点下面而不是盖掉它 */
+.factDone{margin-top:9px; padding-top:8px; border-top:1px dashed rgba(0,0,0,.13); font-size:13.5px; opacity:.85;}
+/* 课名长的时候(如"望远镜看到的是过去")标题会把「回乐园」挤成两行 */
+.back{white-space:nowrap;}
+.title{min-width:0;}
+@media (max-width:430px){
+  /* 4 张知识卡排成 2×2,卡名不再从词中间断 */
+  .orbit{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; width:100%; max-width:340px;}
+  .planet{width:auto;}
+  /* 内容顶到上面,别垂直居中留一大片空白 */
+  .subview{justify-content:flex-start; padding-top:4px;}
+  /* 通关页两个按钮各占一行宽度的一半,不断行 */
+  .finishBtns button{padding:13px 14px; font-size:15px;}
+  /* 长课名缩一号字,尽量不换行 */
+  .topbar .title{font-size:16px;}
+  .back{font-size:17px; padding:8px 11px;}
+}
+/* ===== 手机端排版修正 end ===== */
 </style>
 </head>
 <body>
@@ -96,14 +117,14 @@ const QBANK={
  logic:[
   {ico:'🔁',q:'🔴🔵🔴🔵🔴 下一个？',opts:[['🔵',1],['🔴',0]],fb:'红蓝重复，下一个蓝。'},
   {ico:'🔢',q:'2、4、6、8、__ ？',opts:[['10',1],['9',0]],fb:'每次+2，是10。'},
-  {ico:'🧍',q:'8人排队，小明前3人，他后面几人？',opts:[['4',1],['5',0]],fb:'8−3−1=4。'},
+  {ico:'👤',q:'8人排队，小明前3人，他后面几人？',opts:[['4',1],['5',0]],fb:'8−3−1=4。'},
   {ico:'🔺',q:'正方形画一条对角线，分成几个三角形？',opts:[['2个',1],['4个',0]],fb:'分成2个三角形。'},
   {ico:'📏',q:'小明比小红高，小红比小华高，谁最高？',opts:[['小明',1],['小华',0]],fb:'小明最高。'},
   {ico:'🧦',q:'黑白两色袜子，闭眼最少拿几只保证两只同色？',opts:[['3只',1],['2只',0]],fb:'种类2+1=3。'},
   {ico:'⚖️',q:'3个球1个轻，天平称1次平了，次品是？',opts:[['没上称的那个',1],['左边的',0]],fb:'平=次品在手里。'},
   {ico:'🛶',q:'农夫带狼羊白菜过河，第一趟先带？',opts:[['羊',1],['狼',0]],fb:'羊跟谁都处不来。'}],
  space:[
-  {ico:'🪐',q:'离太阳最近的行星？',opts:[['水星',1],['海王星',0]],fb:'水星最近。'},
+  {ico:'🌍',q:'离太阳最近的行星？',opts:[['水星',1],['海王星',0]],fb:'水星最近。'},
   {ico:'🚀',q:'火箭靠什么飞？',opts:[['往下喷火反推',1],['翅膀',0]],fb:'喷火反推上天。'},
   {ico:'👨‍🚀',q:'太空里东西会？',opts:[['飘起来',1],['掉下来',0]],fb:'没有重力就飘。'},
   {ico:'🌕',q:'月球上跳会？',opts:[['更高',1],['更低',0]],fb:'引力小，跳更高。'},
@@ -128,7 +149,7 @@ const QBANK={
   {ico:'🐝',q:'蜂巢的房间是什么形状？',opts:[['六边形',1],['圆形',0]],fb:'最省蜡又结实。'}],
  tech:[
   {ico:'⚡',q:'家里的电哪来的？',opts:[['发电厂',1],['天上',0]],fb:'电在发电厂发出来。'},
-  {ico:'🪝',q:'撬棍（杠杆）能？',opts:[['省力撬重物',1],['发光',0]],fb:'杠杆省力。'},
+  {ico:'⚖️',q:'撬棍（杠杆）能？',opts:[['省力撬重物',1],['发光',0]],fb:'杠杆省力。'},
   {ico:'👁️',q:'机器人的眼睛耳朵是？',opts:[['传感器',1],['帽子',0]],fb:'传感器帮它看和听。'},
   {ico:'🔺',q:'最稳的形状是？',opts:[['三角形',1],['正方形',0]],fb:'三角形最稳。'},
   {ico:'✈️',q:'飞机靠什么飞上天？',opts:[['机翼和速度',1],['轮子',0]],fb:'机翼产生升力。'},
@@ -137,12 +158,12 @@ const QBANK={
   {ico:'🌡️',q:'铁轨之间要留一条缝，因为？',opts:[['夏天受热会膨胀',1],['省钢材',0]],fb:'热胀冷缩。'}],
  life:[
   {ico:'🍗',q:'想长高长壮多吃？',opts:[['肉蛋奶',1],['糖果',0]],fb:'肉蛋奶帮长身体。'},
-  {ico:'🪙',q:'1元等于几角？',opts:[['10角',1],['5角',0]],fb:'1元=10角。'},
+  {ico:'💰',q:'1元等于几角？',opts:[['10角',1],['5角',0]],fb:'1元=10角。'},
   {ico:'🚦',q:'红灯亮了过马路要？',opts:[['停下等',1],['快点冲',0]],fb:'红灯停。'},
   {ico:'♻️',q:'塑料瓶属于？',opts:[['可回收',1],['厨余',0]],fb:'塑料瓶可回收。'},
   {ico:'🙏',q:'别人帮了你要说？',opts:[['谢谢',1],['走开',0]],fb:'说谢谢。'},
   {ico:'🕐',q:'分针指着3，是几分？',opts:[['15分',1],['3分',0]],fb:'一格5分钟，3×5=15。'},
-  {ico:'🩹',q:'擦破皮第一步是？',opts:[['用干净水冲干净',1],['用嘴吹',0]],fb:'先冲走脏东西防发炎。'},
+  {ico:'💊',q:'擦破皮第一步是？',opts:[['用干净水冲干净',1],['用嘴吹',0]],fb:'先冲走脏东西防发炎。'},
   {ico:'📱',q:'网上有人问你家住哪，应该？',opts:[['不说，告诉爸妈',1],['告诉他',0]],fb:'个人信息谁问都不说。'}],
  heart:[
   {ico:'😟',q:'又担心又紧张时，先做？',opts:[['深呼吸',1],['憋着',0]],fb:'深呼吸让身体平静。'},
@@ -153,13 +174,13 @@ const QBANK={
  plant:[
   {ico:'🌞',q:'植物做饭（光合作用）要用什么当火？',opts:[['阳光',1],['打火机',0]],fb:'晒太阳才能做饭。'},
   {ico:'🐝',q:'蜜蜂帮花做的大事叫？',opts:[['传粉',1],['浇水',0]],fb:'传了粉才能结果。'},
-  {ico:'🪵',q:'数树桩年轮能知道树的？',opts:[['年龄',1],['名字',0]],fb:'一圈就是一年。'},
+  {ico:'🌳',q:'数树桩年轮能知道树的？',opts:[['年龄',1],['名字',0]],fb:'一圈就是一年。'},
   {ico:'🍄',q:'蘑菇是植物吗？',opts:[['不是，是真菌',1],['是',0]],fb:'没有叶绿素，是真菌。'},
   {ico:'🍂',q:'秋天叶子变黄是因为？',opts:[['叶绿素退了黄色素露出来',1],['被晒黄了',0]],fb:'黄色素一直藏在里面。'}],
  chinese:[
   {ico:'✍️',q:'照样子画出来的字叫？',opts:[['象形字',1],['拼音字',0]],fb:'日月山水都是。'},
   {ico:'🦊',q:'借别人威风吓唬人是？',opts:[['狐假虎威',1],['亡羊补牢',0]],fb:'狐狸借了老虎的威风。'},
-  {ico:'🪞',q:'「高」的反义词是？',opts:[['矮',1],['大',0]],fb:'高矮是一对。'},
+  {ico:'💿',q:'「高」的反义词是？',opts:[['矮',1],['大',0]],fb:'高矮是一对。'},
   {ico:'🐴',q:'一（ ）马，填？',opts:[['匹',1],['条',0]],fb:'马专用匹。'},
   {ico:'🌙',q:'哪句是比喻句？',opts:[['月亮像小船',1],['我喜欢月亮',0]],fb:'A像B才是比喻。'},
   {ico:'❓',q:'你吃饭了吗后面用什么标点？',opts:[['问号',1],['句号',0]],fb:'提问用问号。'},
@@ -183,7 +204,7 @@ const QBANK={
   {ico:'🔻',q:'金字塔在哪个国家？',opts:[['埃及',1],['印度',0]],fb:'埃及，是法老的陵墓。'},
   {ico:'🌴',q:'亚马逊雨林被称为？',opts:[['地球之肺',1],['地球之心',0]],fb:'树多氧气多。'},
   {ico:'🐪',q:'骆驼驼峰里装的是？',opts:[['脂肪',1],['水',0]],fb:'脂肪能慢慢变成能量和水。'},
-  {ico:'🕰️',q:'地球两边时间不同，因为地球在？',opts:[['自转',1],['不动',0]],fb:'自转让各地天亮时刻不同。'}],
+  {ico:'🗣️',q:'全世界说的人最多的语言是？',opts:[['汉语',1],['法语',0]],fb:'汉语说的人最多，英语用得最广。'}],
  festival:[
   {ico:'🧨',q:'传说过年放鞭炮是为了赶走？',opts:[['年兽',1],['蚊子',0]],fb:'年兽怕红、怕响、怕光。'},
   {ico:'🥮',q:'中秋节是农历？',opts:[['八月十五',1],['五月初五',0]],fb:'八月十五月最圆。'},
@@ -196,10 +217,10 @@ const QBANK={
   {ico:'🏖️',q:'玻璃是用什么烧成的？',opts:[['沙子',1],['铁',0]],fb:'沙子高温烧化。'},
   {ico:'🔩',q:'铁生锈需要？',opts:[['水和氧气',1],['磁铁',0]],fb:'又潮又通气锈得快。'},
   {ico:'🧂',q:'盐搅进水里不见了，是因为？',opts:[['散成看不见的微粒还在水里',1],['彻底消失了',0]],fb:'尝一口还是咸的。'},
-  {ico:'🍋',q:'紫甘蓝水遇到白醋会？',opts:[['变红',1],['变蓝',0]],fb:'遇酸变红，遇碱变蓝绿。'},
+  {ico:'👕',q:'蚕丝是谁做出来的？',opts:[['蚕吐丝结茧',1],['蜘蛛织网',0]],fb:'一个茧能抽出上千米的丝。'},
   {ico:'☀️',q:'要从盐水里取回盐，该用？',opts:[['蒸发',1],['过滤',0]],fb:'水跑掉盐留下。'}],
  earth:[
-  {ico:'🪨',q:'化石最常藏在哪种岩石里？',opts:[['沉积岩',1],['岩浆岩',0]],fb:'层层泥沙才留得住化石。'},
+  {ico:'🗿',q:'化石最常藏在哪种岩石里？',opts:[['沉积岩',1],['岩浆岩',0]],fb:'层层泥沙才留得住化石。'},
   {ico:'🏔️',q:'高山上发现海贝化石，说明那里？',opts:[['曾经是海底',1],['有人放上去的',0]],fb:'地壳抬升把海底顶成高山。'},
   {ico:'🛡️',q:'地震时在室内应该？',opts:[['蹲下护头躲桌下抓牢',1],['马上坐电梯',0]],fb:'绝不能坐电梯。'},
   {ico:'🌕',q:'海水涨潮落潮主要是谁在拉？',opts:[['月亮',1],['风',0]],fb:'月亮引力为主。'},
@@ -235,8 +256,22 @@ function ans(el,ok,fb){ const fbEl=document.getElementById('qfb');
 function finish(){ show('finish');
   document.getElementById('bigstars').textContent='⭐'.repeat(stars)+'☆'.repeat(QUIZ.length-stars);
   document.getElementById('resTxt').textContent = stars===QUIZ.length? '太厉害啦！今天的内容你全记住了，满星通关！🎉' : `你答对拿到了 ${stars} / ${QUIZ.length} 颗星，很棒！再来一次能拿满星哦～`;
+  saveDaily();
   celebrate();
 }
+/* 记下这天大挑战的成绩，好让首页清单看得出做没做过(2026-07-18)。
+   只往 kidspark_v1 里加一个新的 daily 字段，badges/days 一个字都不动，
+   所以已学课程进度完全不受影响。日期由首页用 ?d= 传进来，没传就按本机当天算。*/
+function saveDaily(){ try{
+  const k='kidspark_v1', d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}');
+  d.daily = d.daily || {};
+  const t=new Date(), p=n=>String(n).padStart(2,'0');
+  const ds = params.get('d') || (t.getFullYear()+'-'+p(t.getMonth()+1)+'-'+p(t.getDate()));
+  const old = d.daily[ds];
+  /* 再战只往上刷新最好成绩，不覆盖成更差的 */
+  if(!old || stars > old.s) d.daily[ds] = {s:stars, t:QUIZ.length};
+  localStorage.setItem(k, JSON.stringify(d));
+}catch(e){} }
 function celebrate(){ const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#ff7a3d','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:150},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
   let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<240)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
 if(location.hash==='#quiz') startQuiz();

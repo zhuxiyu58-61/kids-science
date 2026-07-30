@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>紫甘蓝变色魔法 · 知识乐园</title>
+<title>情绪住在身体里 · 知识乐园</title>
 <style>
-  :root{ --accent:#c2185b; --bg1:#fff2f7; --bg2:#ffd8e6; --ink:#5c1233; --ink2:#8c4a66; --card:#fff; --shadow:0 10px 30px rgba(170,20,80,.16); }
+  :root{ --accent:#ec7aa4; --bg1:#fff2f6; --bg2:#ffdce7; --ink:#5c2338; --ink2:#8f5c72; --card:#fff; --shadow:0 10px 30px rgba(210,90,130,.16); }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
   html,body{height:100%; margin:0;}
   body{ font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; color:var(--ink);
@@ -19,66 +19,87 @@
   #s-intro{align-items:center; justify-content:center; text-align:center;}
   .kico{font-size:92px; animation:bob 2.4s ease-in-out infinite;} @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
   .introCard{background:var(--card); border-radius:24px; padding:22px 28px; box-shadow:var(--shadow); max-width:600px; font-size:clamp(15px,2.2vw,19px); font-weight:700; line-height:1.7;} .introCard b{color:var(--accent);}
-  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#ef7aa8,#9c1348); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:18px;} .bigbtn:active{transform:scale(.95);}
+  .bigbtn{border:none; border-radius:20px; padding:15px 38px; font-size:20px; font-weight:900; color:#fff; background:linear-gradient(160deg,#f5a3c0,#d4587f); box-shadow:var(--shadow); cursor:pointer; letter-spacing:1px; margin-top:18px;} .bigbtn:active{transform:scale(.95);}
   .exTabs{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
   .exTab{border:none; background:#ffffffcc; color:var(--ink2); font-weight:800; font-size:15px; padding:9px 18px; border-radius:16px; cursor:pointer; box-shadow:var(--shadow);} .exTab.on{background:var(--accent); color:#fff;}
   .exBody{flex:1; min-height:0; display:flex;} .subview{flex:1; min-height:0; display:none; flex-direction:column; align-items:center; justify-content:center; gap:14px;} .subview.on{display:flex;} .exFoot{margin-top:8px;}
   .bigEmo{font-size:56px; animation:bob 2.4s ease-in-out infinite;}
   .orbit{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-width:640px;}
-  .planet{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:10px 8px; width:112px; text-align:center; cursor:pointer; border:3px solid #f7c3d6; transition:.15s;}
+  .planet{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:10px 8px; width:112px; text-align:center; cursor:pointer; border:3px solid #f7cbdb; transition:.15s;}
   .planet:active{transform:scale(.94);} .planet.seen{border-color:#41c98a; background:#f0fbf4;}
   .planet .pe{font-size:34px;} .planet .pn{font-weight:800; font-size:13px; margin-top:2px;}
-  .factBox{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:14px 18px; max-width:560px; font-weight:800; font-size:15px; line-height:1.6; min-height:52px; display:flex; align-items:center; justify-content:center; text-align:center;} .factBox b{color:var(--accent);}
+  .factBox{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:14px 18px; max-width:560px; font-weight:800; font-size:15px; line-height:1.8; min-height:52px; text-align:center;} .factBox b{color:var(--accent);}
   .seqBox{background:var(--card); border-radius:20px; padding:18px 24px; box-shadow:var(--shadow); font-size:19px; text-align:center; max-width:600px; font-weight:900;}
   .seqQ{color:var(--ink2); font-size:18px; font-weight:900;}
   .optRow{display:flex; gap:14px; flex-wrap:wrap; justify-content:center;}
-  .optBtn{border:3px solid #f7c3d6; background:#fff7fa; border-radius:16px; padding:12px 20px; font-size:16px; font-weight:900; cursor:pointer; box-shadow:var(--shadow);} .optBtn:active{transform:scale(.94);}
+  .optBtn{border:3px solid #f7cbdb; background:#fff7fa; border-radius:16px; padding:12px 20px; font-size:16px; font-weight:900; cursor:pointer; box-shadow:var(--shadow);} .optBtn:active{transform:scale(.94);}
   .optBtn.right{border-color:#41c98a; background:#e4fbef;} .optBtn.wrong{border-color:#ff8a8a; background:#ffeaea;}
   .roundCap{font-weight:900; color:var(--ink2); font-size:14px; text-align:center; line-height:1.5; max-width:560px;}
-  .progDots{display:flex; gap:8px;} .pd{width:10px; height:10px; border-radius:50%; background:#f7c3d6;} .pd.done{background:var(--accent);}
-  .nextHint{background:#ffe0ec; border-radius:14px; padding:10px 14px; font-weight:800; color:#9c1348; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
-  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#ef7aa8,#9c1348); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
+  .progDots{display:flex; gap:8px;} .pd{width:10px; height:10px; border-radius:50%; background:#f7cbdb;} .pd.done{background:var(--accent);}
+  .nextHint{background:#ffe3ec; border-radius:14px; padding:10px 14px; font-weight:800; color:#d4587f; font-size:14px; text-align:center;} .nextHint b{color:var(--accent);}
+  .nextBtn{border:none; border-radius:16px; padding:14px; font-size:18px; font-weight:900; color:#fff; width:100%; background:linear-gradient(160deg,#f5a3c0,#d4587f); box-shadow:var(--shadow); cursor:pointer; display:none;} .nextBtn:active{transform:scale(.97);}
   #s-game{align-items:center;} .gameTitle{font-size:clamp(16px,2.4vw,21px); font-weight:900; text-align:center; margin:2px 0 12px;} .gameTitle small{display:block; font-size:13px; color:var(--ink2); font-weight:700; margin-top:2px;}
   .gsub{flex:1; min-height:0; width:100%; display:none; flex-direction:column; align-items:center;} .gsub.on{display:flex;}
   .roundNext{display:none; margin-top:18px; text-align:center;} .roundNext .ok{font-size:18px;font-weight:900;color:#2ba36a;margin-bottom:8px;}
   .bins{display:flex; gap:14px; width:100%; max-width:620px; justify-content:center;}
-  .bin{flex:1; background:#ffffffcc; border:4px dashed #f7c3d6; border-radius:20px; padding:12px 8px; text-align:center; min-height:150px; transition:.2s;}
-  .bin.over{border-color:var(--accent); background:#ffe0ec;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
+  .bin{flex:1; background:#ffffffcc; border:4px dashed #f7cbdb; border-radius:20px; padding:12px 8px; text-align:center; min-height:150px; transition:.2s;}
+  .bin.over{border-color:var(--accent); background:#ffe3ec;} .bin.filled{border-style:solid; border-color:#41c98a; background:#e9fbf1;}
   .bin .binIco{font-size:32px;} .bin .binName{font-weight:900; font-size:16px; margin-top:4px;} .bin .binHint{font-size:12px; color:var(--ink2); font-weight:700;}
   .bin .binDrop{margin-top:8px; min-height:60px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:4px;}
   .tray{display:flex; gap:12px; margin-top:20px; justify-content:center; flex-wrap:wrap;}
   .item{background:#fff; border-radius:16px; box-shadow:var(--shadow); padding:10px 13px; text-align:center; cursor:grab; touch-action:none; max-width:170px;}
-  .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg); box-shadow:0 18px 36px rgba(170,20,80,.16);}
+  .item.dragging{cursor:grabbing; transform:scale(1.08) rotate(-3deg); box-shadow:0 18px 36px rgba(210,90,130,.16);}
   .item.placed{cursor:default; box-shadow:none; padding:5px 8px;}
   .item .itName{font-weight:800; font-size:13px; line-height:1.3;} .item.placed .itName{font-size:10px;}
   .qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:22px 26px; max-width:600px; width:100%; text-align:center;} .qcard .qico{font-size:44px;} .qcard .qtext{font-size:18px; font-weight:900; margin:8px 0 16px; line-height:1.5;}
-  .qtag{display:inline-block; font-size:12px; font-weight:900; padding:3px 10px; border-radius:10px; margin-bottom:6px;} .qtag.sci{background:#ffe0ec;color:#9c1348;} .qtag.logic{background:#eef;color:#5a4bd0;} .qtag.en{background:#e3edff;color:#3f7ae0;}
-  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #f7c3d6; background:#fff7fa; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
+  .qtag{display:inline-block; font-size:12px; font-weight:900; padding:3px 10px; border-radius:10px; margin-bottom:6px;} .qtag.sci{background:#ffe3ec;color:#d4587f;} .qtag.logic{background:#eef;color:#5a4bd0;} .qtag.en{background:#e3edff;color:#3f7ae0;}
+  .qopts{display:flex; flex-direction:column; gap:10px;} .qopt{border:3px solid #f7cbdb; background:#fff7fa; border-radius:14px; padding:13px; font-size:16px; font-weight:800; color:var(--ink); cursor:pointer; text-align:left;} .qopt.right{border-color:#41c98a; background:#e4fbef;} .qopt.wrong{border-color:#ff8a8a; background:#ffeaea;}
   .qfb{margin-top:12px; font-size:15px; font-weight:700; min-height:22px; line-height:1.5;} .qprog{margin-bottom:12px; font-weight:800; color:var(--ink2);}
   #s-finish{align-items:center; justify-content:center; text-align:center;} .finishCard{background:var(--card); border-radius:26px; padding:26px 34px; box-shadow:var(--shadow); max-width:560px;}
   .medal{font-size:100px; animation:pop .5s ease;} @keyframes pop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
-  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#ef7aa8,#9c1348); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
+  .finishCard h2{margin:4px 0; font-size:26px;} .medalName{display:inline-block; background:linear-gradient(160deg,#f5a3c0,#d4587f); color:#fff; font-weight:900; font-size:18px; padding:8px 20px; border-radius:18px; margin:8px 0 12px;}
   .finishCard p{color:var(--ink2); font-weight:600; line-height:1.9; margin:0 0 18px; font-size:15px; text-align:left;} .finishCard p b{color:var(--accent);}
-  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#ffe0ec; color:var(--ink);}
+  .finishBtns{display:flex; gap:12px; justify-content:center;} .finishBtns button{border:none; border-radius:16px; padding:13px 22px; font-size:16px; font-weight:900; cursor:pointer;} .fb1{background:var(--accent); color:#fff;} .fb2{background:#ffe3ec; color:var(--ink);}
   .confetti{position:fixed; inset:0; pointer-events:none; z-index:60;}
+
+/* ===== 手机端排版修正 start ===== */
+.finishBtns button{white-space:nowrap;}
+/* 知识卡全看完的提示,接在知识点下面而不是盖掉它 */
+.factDone{margin-top:9px; padding-top:8px; border-top:1px dashed rgba(0,0,0,.13); font-size:13.5px; opacity:.85;}
+/* 课名长的时候(如"望远镜看到的是过去")标题会把「回乐园」挤成两行 */
+.back{white-space:nowrap;}
+.title{min-width:0;}
+@media (max-width:430px){
+  /* 4 张知识卡排成 2×2,卡名不再从词中间断 */
+  .orbit{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; width:100%; max-width:340px;}
+  .planet{width:auto;}
+  /* 内容顶到上面,别垂直居中留一大片空白 */
+  .subview{justify-content:flex-start; padding-top:4px;}
+  /* 通关页两个按钮各占一行宽度的一半,不断行 */
+  .finishBtns button{padding:13px 14px; font-size:15px;}
+  /* 长课名缩一号字,尽量不换行 */
+  .topbar .title{font-size:16px;}
+  .back{font-size:17px; padding:8px 11px;}
+}
+/* ===== 手机端排版修正 end ===== */
 </style>
 </head>
 <body>
   <div class="topbar">
     <button class="back" onclick="location.href='../../index.html'">← 回乐园</button>
-    <div class="title">紫甘蓝变色魔法<small>材料变变变 · 东西是什么做的</small></div>
+    <div class="title">情绪住在身体里<small>情绪成长屋 · 管好自己的心情</small></div>
     <div class="steps"><span class="dot on" id="p0"></span><span class="dot" id="p1"></span><span class="dot" id="p2"></span><span class="dot" id="p3"></span></div>
   </div>
 
   <section class="scene active" id="s-intro">
-    <div class="kico">🍇</div>
-    <div class="introCard">把紫甘蓝煮出的<b>紫水</b>分成几杯：滴柠檬汁的<b>变红</b>，加小苏打的<b>变蓝变绿</b>。同一杯水，为什么颜色说变就变？因为它是个会打小报告的<b>酸碱侦探</b>。</div>
+    <div class="kico">❤️</div>
+    <div class="introCard">紧张的时候肚子会疼、生气的时候拳头会攥紧、害怕的时候手心出汗——情绪从来不只在脑子里，它<b>住在身体里</b>。学会读身体的信号，你能<b>在情绪爆炸前就发现它</b>。</div>
     <button class="bigbtn" onclick="go('explore')">出发探索 ▶</button>
   </section>
 
   <section class="scene" id="s-explore">
     <div class="exTabs">
-      <button class="exTab on" id="tabA" onclick="switchEx('A')">🎨 会变色的紫水</button>
+      <button class="exTab on" id="tabA" onclick="switchEx('A')">❤️ 身体在报信</button>
       <button class="exTab" id="tabB" onclick="switchEx('B')">💡 想一想</button>
     </div>
     <div class="exBody">
@@ -92,10 +113,10 @@
   </section>
 
   <section class="scene" id="s-game">
-    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 酸的还是碱的<small>把东西拖进「酸性 / 碱性」的筐</small></div>
+    <div class="gameTitle" id="gameTitle">🎮 第 1 关 · 身体在说什么<small>把信号拖进「紧张害怕 / 生气恼火」</small></div>
     <div class="gsub on" id="g-round1">
-      <div class="bins"><div class="bin" data-k="a"><div class="binIco">🍋</div><div class="binName">酸性</div><div class="binHint">变红</div><div class="binDrop"></div></div>
-        <div class="bin" data-k="b"><div class="binIco">🧼</div><div class="binName">碱性</div><div class="binHint">变蓝绿</div><div class="binDrop"></div></div></div>
+      <div class="bins"><div class="bin" data-k="good"><div class="binIco">😰</div><div class="binName">紧张害怕</div><div class="binHint">想躲想逃</div><div class="binDrop"></div></div>
+        <div class="bin" data-k="bad"><div class="binIco">😡</div><div class="binName">生气恼火</div><div class="binHint">想冲想吵</div><div class="binDrop"></div></div></div>
       <div class="tray" id="tray"></div>
       <div class="roundNext" id="r1next"><div class="ok">全对啦！🎉</div><button class="bigbtn" onclick="startQuiz()">下一关 ▶</button></div>
     </div>
@@ -106,8 +127,8 @@
   </section>
 
   <section class="scene" id="s-finish">
-    <div class="finishCard"><div class="medal">🍇</div><h2>闯关成功！</h2><div class="medalName">🎖 酸碱小魔术师</div>
-      <p>要记住的：<br>• 紫甘蓝水是<b>天然指示剂</b>：遇<b>酸变红</b>，遇<b>碱变蓝绿</b>，<b>中性不变</b>；<br>• 酸性：白醋、柠檬汁、橙汁；碱性：小苏打水、肥皂水；<br>• 做实验<b>只用厨房安全材料</b>，不乱尝、清洁剂绝不能混；<br>• 🔤 英语：颜色 <b>color</b>。</p>
+    <div class="finishCard"><div class="medal">❤️</div><h2>闯关成功！</h2><div class="medalName">🎖 身体信号侦探</div>
+      <p>要记住的：<br>• 情绪<b>住在身体里</b>：心跳、肚子、拳头、手心都在报信；<br>• 紧张=身体在<b>调集力气</b>，不是要垮了；<br>• 害怕手脚凉=血液去了大肌肉，是<b>保护</b>；<br>• 一察觉身体信号就是<b>最好的喊停时机</b>；<br>• 🔤 英语：身体 <b>body</b>。</p>
       <div class="finishBtns"><button class="fb2" onclick="location.reload()">再玩一次</button><button class="fb1" onclick="location.href='../../index.html'">回乐园，选下一课</button></div>
     </div>
   </section>
@@ -120,18 +141,18 @@ function switchEx(v){ document.getElementById('ex-A').classList.toggle('on',v===
 let doneA=0, doneB=0;
 function unlockGame(){ if(doneA>=4 && doneB>=3){ nextHint.style.display='none'; nextBtn.style.display='block'; } }
 
-const CARDS=[{"e":"🍋","n":"酸的变红","f":"柠檬汁、白醋是<b>酸性</b>的，遇到紫甘蓝水会<b>变红变粉</b>。"},{"e":"🧼","n":"碱的变蓝绿","f":"小苏打、肥皂水是<b>碱性</b>的，会让紫水<b>变蓝变绿</b>。"},{"e":"💧","n":"中性不变","f":"清水这类<b>中性</b>的，滴进去颜色基本<b>不变</b>。"},{"e":"🕵️","n":"这叫指示剂","f":"能靠变色告诉你酸还是碱的东西，叫<b>指示剂</b>，紫甘蓝就是天然的一种。"}];
+const CARDS=[{"e":"💓","n":"紧张：心跳快、肚子紧","f":"上台前心怦怦跳、肚子发紧——身体在<b>调集力气</b>准备应对，不是你要生病了。"},{"e":"✊","n":"生气：拳头攥、脸发烫","f":"肌肉绷紧、脸发热、呼吸变粗，这是生气<b>最早的信号</b>，比\"我很生气\"这个念头还早。"},{"e":"🥶","n":"害怕：手脚发凉、发抖","f":"血液集中到大肌肉准备逃跑，手脚就凉了。这是身体在<b>保护你</b>。"},{"e":"⏰","n":"早发现就好办","f":"一察觉拳头开始攥紧，就是<b>最好的喊停时机</b>——这时候深呼吸还来得及。"}];
 function renderA(){ const box=document.getElementById('ex-A');
-  box.innerHTML='<div class="bigEmo">🍇</div><div class="orbit" id="orbit"></div><div class="factBox" id="factA">👆 点点这 4 张知识卡，看看里面的秘密～</div>';
+  box.innerHTML='<div class="bigEmo">❤️</div><div class="orbit" id="orbit"></div><div class="factBox" id="factA">👆 点点这 4 张知识卡，看看里面的秘密～</div>';
   const orbit=document.getElementById('orbit');
   CARDS.forEach((p,i)=>{ const d=document.createElement('div'); d.className='planet'; d.dataset.i=i;
     d.innerHTML=`<div class="pe">${p.e}</div><div class="pn">${p.n}</div>`;
     d.onclick=()=>{ document.getElementById('factA').innerHTML=p.e+' <b>'+p.n+'</b>：'+p.f;
       if(!d.dataset.seen){ d.dataset.seen='1'; d.classList.add('seen'); doneA++; document.getElementById('cntA').textContent=doneA;
-        if(doneA>=4) document.getElementById('factA').innerHTML='🎉 4 张知识卡都看完啦！去右边答题吧！'; unlockGame(); } };
+        if(doneA>=4) document.getElementById('factA').innerHTML+='<div class="factDone">🎉 4 张知识卡都看完啦！去右边答题吧！</div>'; unlockGame(); } };
     orbit.appendChild(d); });
 }
-const ROUNDS_B=[{"q":"紫甘蓝水遇到柠檬汁会？","opts":["变红变粉","变蓝","没变化"],"ans":0,"cap":"柠檬是酸的，酸性让它变红。"},{"q":"紫甘蓝水变成蓝绿色，说明加进去的是？","opts":["碱性的东西","酸性的东西","清水"],"ans":0,"cap":"小苏打、肥皂水都是碱性的。"},{"q":"紫甘蓝水这种能靠变色报告酸碱的东西叫？","opts":["指示剂","洗洁精","颜料"],"ans":0,"cap":"指示剂，紫甘蓝是天然指示剂。"}];
+const ROUNDS_B=[{"q":"上台前肚子发紧、心跳加快，说明？","opts":["身体在调集力气准备应对","你生病了","你很没用"],"ans":0,"cap":"这是正常的紧张反应。"},{"q":"生气最早的信号常常是？","opts":["身体绷紧、脸发烫","别人告诉你","完全没有信号"],"ans":0,"cap":"身体比念头更早知道。"},{"q":"察觉到身体信号时最该做的是？","opts":["趁早喊停、深呼吸","等它自己过去","继续吵"],"ans":0,"cap":"早发现才来得及处理。"}];
 let idxB=0;
 function renderB(){ const box=document.getElementById('ex-B');
   if(idxB>=ROUNDS_B.length){ box.innerHTML='<div class="seqBox">🎉 三题都答对啦！</div>'; return; }
@@ -149,7 +170,7 @@ function renderB(){ const box=document.getElementById('ex-B');
 }
 renderA(); renderB();
 
-const ITEMS=[{"key":"a","t":"白醋"},{"key":"a","t":"柠檬汁"},{"key":"a","t":"橙汁"},{"key":"b","t":"小苏打水"},{"key":"b","t":"肥皂水"},{"key":"b","t":"洗衣粉水"}];
+const ITEMS=[{"key":"good","t":"手心出汗"},{"key":"good","t":"手脚发凉"},{"key":"good","t":"肚子发紧"},{"key":"bad","t":"拳头攥紧"},{"key":"bad","t":"脸发烫"},{"key":"bad","t":"呼吸变粗"}];
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
 (function buildSort(){
   const tray=document.getElementById('tray');
@@ -172,13 +193,13 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;
     else { rst(); document.getElementById('tray').appendChild(el); el.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:260}); } });
 })();
 
-const QUIZ=[{"tag":"sci","tl":"科学","ico":"🍋","q":"白醋属于？","opts":[["酸性",1],["碱性",0],["中性",0]],"fb":"醋是酸的，会让紫甘蓝水变红。"},{"tag":"sci","tl":"常识","ico":"🧪","q":"做变色实验时，下面哪条最重要？","opts":[["只用厨房里安全的材料，不乱尝不乱混",1],["什么都尝一口试试",0],["把清洁剂全倒一起",0]],"fb":"清洁剂混合可能产生有害气体，绝对不能乱混。"},{"tag":"logic","tl":"逻辑","ico":"🥤","q":"紫水滴进去颜色没怎么变，说明这杯多半是？","opts":[["中性的，比如清水",1],["很酸的",0],["很碱的",0]],"fb":"酸变红、碱变蓝，都不变多半是中性。"},{"tag":"en","tl":"英语","ico":"🔤","q":"英语角：颜色用英语怎么说？","opts":[["color",1],["cold",0],["clock",0]],"fb":"color 颜色。"}];
+const QUIZ=[{"tag":"sci","tl":"心理","ico":"💓","q":"比赛前心跳加快，最好的理解是？","opts":[["身体在帮我准备,不是我要垮了",1],["我不适合比赛",0],["我病了",0]],"fb":"把\"我完了\"换成\"身体在帮我\",紧张就没那么可怕。"},{"tag":"logic","tl":"逻辑","ico":"⏰","q":"为什么说\"察觉拳头攥紧\"很重要？","opts":[["那是还来得及喊停的时刻",1],["攥紧了力气大",0],["没什么用",0]],"fb":"等吼出来就晚了。"},{"tag":"sci","tl":"心理","ico":"🥶","q":"害怕时手脚发凉，是因为？","opts":[["血液集中到大肌肉,准备逃跑",1],["天气冷",0],["血没了",0]],"fb":"这是身体的自我保护。"},{"tag":"en","tl":"英语","ico":"🔤","q":"英语角：\"身体\"用英语怎么说？","opts":[["body",1],["baby",0],["busy",0]],"fb":"body 身体。"}];
 let qi=0; function startQuiz(){ document.getElementById('g-round1').classList.remove('on'); document.getElementById('g-quiz').classList.add('on'); document.getElementById('gameTitle').innerHTML='🎮 第 2 关 · 想一想<small>知识 + 逻辑 + 英语</small>'; qi=0; renderQ(); }
 function renderQ(){ const it=QUIZ[qi]; qprog.textContent=`第 ${qi+1} / ${QUIZ.length} 题`; const tag=document.getElementById('qtag'); tag.className='qtag '+it.tag; tag.textContent=it.tl; qico.textContent=it.ico; qtext.textContent=it.q; qopts.innerHTML=''; qfb.textContent=''; shuffle(it.opts.slice()).forEach(([l,ok])=>{const b=document.createElement('div');b.className='qopt';b.textContent=l;b.onclick=()=>ans(b,ok,it.fb);qopts.appendChild(b);}); }
 function ans(el,ok,fb){ if(ok){ el.classList.add('right'); qopts.querySelectorAll('.qopt').forEach(o=>o.style.pointerEvents='none'); qfb.style.color='#2ba36a'; qfb.innerHTML='✅ '+fb; setTimeout(()=>{ qi++; if(qi<QUIZ.length) renderQ(); else go('finish'); },1500);} else { el.classList.add('wrong'); el.style.pointerEvents='none'; qfb.style.color='#e06060'; qfb.textContent='再想想～'; } }
 
 function saveBadge(id,emoji,name){ try{ const k='kidspark_v1'; const d=JSON.parse(localStorage.getItem(k)||'{"badges":{},"days":[]}'); d.badges[id]={emoji,name,date:new Date().toISOString().slice(0,10)}; const t=new Date().toISOString().slice(0,10); if(!d.days.includes(t))d.days.push(t); localStorage.setItem(k,JSON.stringify(d)); }catch(e){} }
-function celebrate(){ saveBadge('acidbase','🍇','酸碱小魔术师'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#c2185b','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
+function celebrate(){ saveBadge('hbody','❤️','身体信号侦探'); const c=document.getElementById('confetti'), x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight; const cols=['#ec7aa4','#ffd36b','#3aa7ff','#41c98a','#b58bff','#ff8ac0']; const bits=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height,s:6+Math.random()*8,vy:2+Math.random()*4,vx:(Math.random()-.5)*2,col:cols[Math.random()*cols.length|0],rot:Math.random()*7,vr:(Math.random()-.5)*.3}));
   let f=0;(function a(){ x.clearRect(0,0,c.width,c.height); f++; bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.rot+=b.vr;x.save();x.translate(b.x,b.y);x.rotate(b.rot);x.fillStyle=b.col;x.fillRect(-b.s/2,-b.s/2,b.s,b.s);x.restore();}); if(f<220)requestAnimationFrame(a);else x.clearRect(0,0,c.width,c.height);})(); }
 if(location.hash){const h=location.hash.slice(1); if(h==='tabB'){go('explore');switchEx('B');} else if(h==='quiz'){go('game');startQuiz();} else if(SCENES.includes(h))go(h);}
 
